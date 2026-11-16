@@ -1,0 +1,8 @@
+# Ignore node server and local backend from Vercel deployment
+server.js
+src/
+data/
+Dockerfile
+docker-compose.yml
+DEVELOPMENT_GUIDE.md
+*.log

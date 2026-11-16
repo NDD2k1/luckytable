@@ -2,7 +2,6 @@
   "name": "tai-xiu-lucky-table",
   "version": "1.0.0",
   "description": "Tài Xỉu Lucky Table - Realtime Casino Game Server & Dynamic Pity Engine",
-  "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "node server.js",
