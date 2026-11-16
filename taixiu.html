@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tài Xỉu — Lucky Table</title>
   <meta name="description" content="Tài Xỉu Lucky Table - Casino 3D đỉnh cao phong cách Á Đông với Bát Rồng Vàng.">
-  <link rel="stylesheet" href="css/style.css?v=12?v=10">
+  <link rel="stylesheet" href="css/style.css?v=13">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
 </head>
 <body>
@@ -45,6 +45,13 @@
 
       <!-- Gold Action Buttons -->
       <div class="header-actions">
+        <!-- Nút Bật/Tắt Chế Độ Nặn Bát -->
+        <div class="action-circle-item">
+          <button class="btn-circle-action" id="btn-toggle-squeeze" title="Bật/Tắt tính năng tự tay nặn bát">
+            <span id="squeeze-icon">🖐️</span>
+          </button>
+          <span class="action-label" id="squeeze-label">Nặn: BẬT</span>
+        </div>
         <div class="action-circle-item">
           <a href="/" class="btn-circle-action" id="btn-back-home" title="Về Sảnh Chờ" style="text-decoration:none; display:flex; align-items:center; justify-content:center; color:#fff;">🏠</a>
           <span class="action-label">Về Sảnh</span>
@@ -103,6 +110,15 @@
         <!-- PLATE & DRAGON CUP -->
         <div class="plate-master-stage">
 
+          <!-- Hướng Dẫn & Gợi Ý Nặn Bát (Hiện khi vào trạng thái NẶN) -->
+          <div class="squeeze-guide-toast" id="squeeze-guide" style="display: none;">
+            <span>🖐️</span> Kéo giữ Bát Rồng để nặn hé lộ xúc xắc!
+          </div>
+
+          <!-- Nút Mở Nhanh khi đang nặn -->
+          <button class="btn-quick-open-cup" id="btn-quick-open" style="display: none;" title="Bỏ qua nặn để mở bát xem kết quả ngay">
+            ⚡ Mở Bát Ngay
+          </button>
 
           <!-- Red Velvet Felt Plate holding 3D Dice -->
           <div class="plate-felt-arena" id="plate-felt">
@@ -112,7 +128,7 @@
           </div>
 
           <!-- Porcelain Dragon Cup (Bát Úp Rồng Vàng) -->
-          <img src="assets/dragon_cup.png" alt="Bát Rồng Vàng" class="dragon-cup-cover covered" id="dragon-cup" title="Nhấn để Mở Bát!">
+          <img src="assets/dragon_cup.png" alt="Bát Rồng Vàng" class="dragon-cup-cover covered" id="dragon-cup" title="Nhấn hoặc kéo để nặn Bát!">
         </div>
 
         <!-- Status Ribbon Banner -->
@@ -131,8 +147,6 @@
               <span class="door-placed-badge" id="bet-badge-xiu">0 xu</span>
             </div>
           </div>
-
-
 
           <!-- CỬA TÀI (RED FACETED CRYSTAL) -->
           <div class="door-facet-btn door-tai" id="door-tai" title="Đặt cược cửa Tài (10 - 18)">
@@ -154,7 +168,7 @@
           <span>Lịch sử gần đây</span>
         </div>
         <!-- 2x5 Bead Road Grid (10 recent games) -->
-        <div class="bead-grid-10" id="bead-road-grid">
+        <div class="bead-road-grid-10" id="bead-road-grid">
           <!-- Rendered dynamically by JS -->
         </div>
 
@@ -317,6 +331,10 @@
           <span>🔊 Hiệu ứng âm thanh</span>
           <input type="checkbox" id="setting-sound" checked style="width: 20px; height: 20px;">
         </label>
+        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <span>🖐️ Chế độ tự nặn bát</span>
+          <input type="checkbox" id="setting-squeeze" checked style="width: 20px; height: 20px;">
+        </label>
         <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
         <button class="btn-bottom-pill purple" id="btn-reset-demo" style="width: 100%; justify-content: center;">
           🔄 Đặt lại 10.000 xu & xóa lịch sử
@@ -333,6 +351,6 @@
   <script src="js/room-overlay.js"></script>
   <script type="module" src="js/storage.js"></script>
   <script type="module" src="js/dice.js"></script>
-  <script type="module" src="js/game.js?v=11"></script>
+  <script type="module" src="js/game.js?v=13"></script>
 </body>
 </html>

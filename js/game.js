@@ -2,11 +2,10 @@
  * Game Controller Module - Lucky Table Tài Xỉu
  * Chế độ Live Casino tự động theo đúng yêu cầu:
  * - 15 giây đếm ngược đặt cược (15s -> 0s)
- * - Tự động xóc đĩa và mở bát rồng vàng
+ * - Tự động xóc đĩa với Bát Rồng Vàng
+ * - TÍNH NĂNG NẶN BÁT CỰC HỒI HỘP: Tự tay dùng chuột/ngón tay rê kéo Bát để hé lộ dần từng chấm xúc xắc
  * - Chờ 5 giây hiển thị kết quả & trả thưởng (5s -> 0s)
  * - Tự động bắt đầu ván mới liên tục
- * - Có thể bấm nút XÓC để xóc ngay khi đã đặt cược
- * - Animation lắc lắc chip, nảy bounce và ném chip bay vào cửa cược
  */
 
 import { Storage } from './storage.js';
@@ -15,11 +14,13 @@ import { DiceManager, Sound } from './dice.js';
 export const GameState = {
   BETTING: 'BETTING',
   ROLLING: 'ROLLING',
+  SQUEEZING: 'SQUEEZING', // Trạng thái Nặn Bát
   RESULT: 'RESULT'
 };
 
 const BETTING_DURATION_SEC = 15; // 15 giây đếm ngược đặt cược
 const RESULT_DISPLAY_SEC = 5;    // 5 giây chờ sau khi mở bát
+const SQUEEZE_TIME_LIMIT_SEC = 12; // 12 giây tối đa để người chơi tự nặn, sau đó tự mở
 
 class TaiXiuGame {
   constructor() {
@@ -36,7 +37,19 @@ class TaiXiuGame {
 
     // Timers
     this.countdownTimer = null;
+    this.squeezeTimer = null;
     this.remainingSec = BETTING_DURATION_SEC;
+
+    // Cài đặt Nặn Bát (Lưu cấu hình trong localStorage)
+    const savedSqueeze = localStorage.getItem('taixiu_squeeze_mode');
+    this.isSqueezeMode = savedSqueeze !== null ? savedSqueeze === 'true' : true;
+
+    // Biến điều khiển thao tác kéo nặn
+    this.isDragging = false;
+    this.dragStartX = 0;
+    this.dragStartY = 0;
+    this.currentCupOffset = { x: 0, y: 0 };
+    this.lastSoundDistance = 0;
 
     this.dom = {};
   }
@@ -44,10 +57,12 @@ class TaiXiuGame {
   init() {
     this.cacheElements();
     this.bindEvents();
+    this.bindSqueezeGestures();
     this.renderDiceElements();
     this.updateBalanceDisplays();
     this.renderBeadRoadAndStats();
     this.updateSoundDisplay();
+    this.updateSqueezeDisplay();
     
     // Bắt đầu vòng lặp tự động ngay khi vào game
     this.startBettingCountdown();
@@ -71,6 +86,14 @@ class TaiXiuGame {
       dragonCup: document.getElementById('dragon-cup'),
       statusRibbon: document.getElementById('status-ribbon'),
       btnRoll: document.getElementById('btn-roll'),
+
+      // Squeeze elements
+      squeezeGuide: document.getElementById('squeeze-guide'),
+      btnQuickOpen: document.getElementById('btn-quick-open'),
+      btnToggleSqueeze: document.getElementById('btn-toggle-squeeze'),
+      squeezeIcon: document.getElementById('squeeze-icon'),
+      squeezeLabel: document.getElementById('squeeze-label'),
+      settingSqueeze: document.getElementById('setting-squeeze'),
 
       // Chips Tray
       chipButtons: document.querySelectorAll('.chip-img-btn'),
@@ -122,61 +145,74 @@ class TaiXiuGame {
       });
     });
 
-    // Mũi tên lùi/tiến chip
+    // Mũi tên trượt chip
     this.dom.btnChipPrev.addEventListener('click', () => {
-      const newIdx = Math.max(0, this.currentChipIndex - 1);
-      this.selectChipByIndex(newIdx);
+      let nextIndex = this.currentChipIndex - 1;
+      if (nextIndex < 0) nextIndex = this.chipValues.length - 1;
+      this.selectChipByIndex(nextIndex);
     });
 
     this.dom.btnChipNext.addEventListener('click', () => {
-      const newIdx = Math.min(this.chipValues.length - 1, this.currentChipIndex + 1);
-      this.selectChipByIndex(newIdx);
+      let nextIndex = this.currentChipIndex + 1;
+      if (nextIndex >= this.chipValues.length) nextIndex = 0;
+      this.selectChipByIndex(nextIndex);
     });
 
-    // Đặt cược vào cửa Tài / Xỉu
-    this.dom.doorXiu.addEventListener('click', () => this.placeBetOnDoor('xiu'));
-    this.dom.doorTai.addEventListener('click', () => this.placeBetOnDoor('tai'));
+    // Đặt cược vào cửa Xỉu
+    this.dom.doorXiu.addEventListener('click', (e) => {
+      if (this.state !== GameState.BETTING) return;
+      this.placeBet('xiu', e);
+    });
 
-    // Thao tác nút Hủy cược & Đặt cược
-    this.dom.btnClearBet.addEventListener('click', () => this.clearBet());
+    // Đặt cược vào cửa Tài
+    this.dom.doorTai.addEventListener('click', (e) => {
+      if (this.state !== GameState.BETTING) return;
+      this.placeBet('tai', e);
+    });
+
+    // Nút Hủy Cược
+    this.dom.btnClearBet.addEventListener('click', () => {
+      if (this.state !== GameState.BETTING) return;
+      this.clearBet();
+    });
+
+    // Nút Xác Nhận Đặt Cược
     this.dom.btnConfirmBet.addEventListener('click', () => {
-      if (this.currentBet.amount > 0 && this.currentBet.door) {
-        Sound.playChip();
-        this.showToast(`Đã xác nhận đặt cược ${this.formatNumber(this.currentBet.amount)} xu vào cửa ${this.currentBet.door === 'tai' ? 'Tài' : 'Xỉu'}!`);
-      } else {
-        this.showToast('Vui lòng chọn cửa cược trước!', 'warning');
+      if (this.state !== GameState.BETTING) return;
+      if (this.currentBet.amount <= 0) {
+        this.showToast('Vui lòng chọn cửa và đặt chip trước khi xác nhận!', 'warning');
+        return;
       }
+      this.showToast(`Đã xác nhận đặt cược ${this.formatNumber(this.currentBet.amount)} xu vào cửa ${this.currentBet.door === 'tai' ? 'Tài' : 'Xỉu'}!`);
+      Sound.playChip();
     });
 
-    // Nút XÓC: Nếu có thì gán sự kiện xóc sớm
-    if (this.dom.btnRoll) {
-      this.dom.btnRoll.addEventListener('click', () => {
-        if (this.state !== GameState.BETTING) return;
-
-        if (this.currentBet.amount <= 0 || !this.currentBet.door) {
-          this.showToast('👉 Hãy chọn cửa Xỉu hoặc Tài trước khi Xóc!', 'warning');
-          this.dom.doorXiu.classList.add('winner-glow');
-          this.dom.doorTai.classList.add('winner-glow');
-          setTimeout(() => {
-            this.dom.doorXiu.classList.remove('winner-glow');
-            this.dom.doorTai.classList.remove('winner-glow');
-          }, 800);
-          return;
-        }
-
-        clearInterval(this.countdownTimer);
-        this.startRoll();
+    // Nút Bật/Tắt chế độ Nặn Bát trên Top Header
+    if (this.dom.btnToggleSqueeze) {
+      this.dom.btnToggleSqueeze.addEventListener('click', () => {
+        this.toggleSqueezeMode();
       });
     }
 
-    // Bấm Bát Rồng để mở sớm nếu muốn hoặc rung nảy vui mắt
+    // Toggle chế độ Nặn Bát trong Modal Settings
+    if (this.dom.settingSqueeze) {
+      this.dom.settingSqueeze.addEventListener('change', (e) => {
+        this.setSqueezeMode(e.target.checked);
+      });
+    }
+
+    // Nút "Mở Bát Ngay" (bỏ qua nặn)
+    if (this.dom.btnQuickOpen) {
+      this.dom.btnQuickOpen.addEventListener('click', () => {
+        if (this.state === GameState.SQUEEZING) {
+          this.endSqueezeAndReveal();
+        }
+      });
+    }
+
+    // Click vào Bát Rồng khi ở trạng thái chờ
     this.dom.dragonCup.addEventListener('click', () => {
-      if (this.state === GameState.ROLLING) {
-        this.dom.plateFelt.classList.remove('shaking');
-        this.dom.dragonCup.classList.remove('shaking');
-        this.revealResult();
-      } else if (this.state === GameState.BETTING) {
-        Sound.playChip();
+      if (this.state === GameState.BETTING) {
         this.dom.dragonCup.classList.add('quick-wiggle');
         setTimeout(() => this.dom.dragonCup.classList.remove('quick-wiggle'), 450);
       }
@@ -213,6 +249,9 @@ class TaiXiuGame {
     // Modal Cài đặt
     this.dom.btnOpenSettings.addEventListener('click', () => {
       this.dom.settingSound.checked = Storage.isSoundEnabled();
+      if (this.dom.settingSqueeze) {
+        this.dom.settingSqueeze.checked = this.isSqueezeMode;
+      }
       this.openModal(this.dom.modalSettings);
     });
     this.dom.btnCloseSettings.addEventListener('click', () => this.closeModal(this.dom.modalSettings));
@@ -244,6 +283,113 @@ class TaiXiuGame {
     });
   }
 
+  /**
+   * ĐIỀU KHIỂN NẶN BÁT BẰNG CHUỘT / CẢM ỨNG (DRAG / TOUCH)
+   */
+  bindSqueezeGestures() {
+    const cup = this.dom.dragonCup;
+
+    const onStart = (clientX, clientY) => {
+      if (this.state !== GameState.SQUEEZING) return;
+      this.isDragging = true;
+      this.dragStartX = clientX - this.currentCupOffset.x;
+      this.dragStartY = clientY - this.currentCupOffset.y;
+      cup.classList.add('squeezing-active');
+    };
+
+    const onMove = (clientX, clientY) => {
+      if (!this.isDragging || this.state !== GameState.SQUEEZING) return;
+      
+      const newX = clientX - this.dragStartX;
+      const newY = clientY - this.dragStartY;
+      this.currentCupOffset = { x: newX, y: newY };
+
+      // Giới hạn vùng kéo tự do trong đĩa và hé lộ
+      cup.style.transform = `translate(${newX}px, ${newY}px) scale(1.02)`;
+
+      const distance = Math.sqrt(newX * newX + newY * newY);
+
+      // Phát âm thanh trượt bát nhẹ nhàng
+      if (Math.abs(distance - this.lastSoundDistance) > 35) {
+        Sound.playSlide();
+        this.lastSoundDistance = distance;
+      }
+
+      // Ngưỡng kéo xa hơn 130px: Tự động mở bát hoàn toàn
+      if (distance > 130) {
+        this.isDragging = false;
+        cup.classList.remove('squeezing-active');
+        this.endSqueezeAndReveal();
+      }
+    };
+
+    const onEnd = () => {
+      if (!this.isDragging || this.state !== GameState.SQUEEZING) return;
+      this.isDragging = false;
+      cup.classList.remove('squeezing-active');
+      
+      const distance = Math.sqrt(this.currentCupOffset.x * this.currentCupOffset.x + this.currentCupOffset.y * this.currentCupOffset.y);
+      if (distance > 115) {
+        this.endSqueezeAndReveal();
+      }
+    };
+
+    // Chuột Desktop
+    cup.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      onStart(e.clientX, e.clientY);
+    });
+    window.addEventListener('mousemove', (e) => {
+      onMove(e.clientX, e.clientY);
+    });
+    window.addEventListener('mouseup', () => {
+      onEnd();
+    });
+
+    // Cảm ứng Mobile / Tablet
+    cup.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        onMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      onEnd();
+    });
+  }
+
+  toggleSqueezeMode() {
+    this.setSqueezeMode(!this.isSqueezeMode);
+  }
+
+  setSqueezeMode(enabled) {
+    this.isSqueezeMode = enabled;
+    localStorage.setItem('taixiu_squeeze_mode', enabled.toString());
+    this.updateSqueezeDisplay();
+    this.showToast(enabled ? '🖐️ Đã BẬT chế độ NẶN BÁT hồi hộp!' : '⚡ Đã TẮT nặn bát (Mở bát tự động siêu tốc)');
+  }
+
+  updateSqueezeDisplay() {
+    if (this.dom.btnToggleSqueeze) {
+      if (this.isSqueezeMode) {
+        this.dom.btnToggleSqueeze.classList.add('active');
+        this.dom.squeezeLabel.textContent = 'Nặn: BẬT';
+      } else {
+        this.dom.btnToggleSqueeze.classList.remove('active');
+        this.dom.squeezeLabel.textContent = 'Nặn: TẮT';
+      }
+    }
+    if (this.dom.settingSqueeze) {
+      this.dom.settingSqueeze.checked = this.isSqueezeMode;
+    }
+  }
+
   openModal(modalEl) {
     if (modalEl) modalEl.classList.add('active');
   }
@@ -258,125 +404,101 @@ class TaiXiuGame {
   }
 
   selectChipByIndex(index, explicitValue = null) {
+    this.dom.chipButtons.forEach(b => b.classList.remove('active'));
     this.currentChipIndex = index;
-    this.selectedChip = explicitValue || this.chipValues[index];
-    Sound.playChip();
-
-    this.dom.chipButtons.forEach((b, idx) => {
-      const isActive = idx === index;
-      b.classList.toggle('active', isActive);
-      if (isActive) {
-        // Kích hoạt hiệu ứng nảy bật / lắc lắc khi vừa chọn chip
-        b.classList.remove('pop-anim');
-        void b.offsetWidth; // Force reflow
-        b.classList.add('pop-anim');
-      }
-    });
+    const selectedBtn = this.dom.chipButtons[index];
+    if (selectedBtn) {
+      selectedBtn.classList.add('active');
+      this.selectedChip = explicitValue || parseInt(selectedBtn.dataset.value, 10);
+      Sound.playChip();
+    }
   }
 
-  createFlyingChip(door) {
-    const activeChipBtn = document.querySelector('.chip-img-btn.active');
-    const targetDoor = door === 'tai' ? this.dom.doorTai : this.dom.doorXiu;
-    if (!activeChipBtn || !targetDoor) return;
+  placeBet(door, event) {
+    if (this.currentBet.door && this.currentBet.door !== door) {
+      this.showToast('Chỉ được chọn cược một cửa trong cùng một ván chơi!', 'warning');
+      return;
+    }
 
-    const startRect = activeChipBtn.getBoundingClientRect();
-    const endRect = targetDoor.getBoundingClientRect();
+    const availableMoney = this.balance - this.currentBet.amount;
+    if (availableMoney < this.selectedChip) {
+      this.showToast('Số dư xu của bạn không đủ để cược thêm!', 'warning');
+      return;
+    }
 
-    const imgEl = activeChipBtn.querySelector('img');
-    if (!imgEl) return;
+    this.currentBet.door = door;
+    this.currentBet.amount += this.selectedChip;
+    this.updateBetDisplay();
+    Sound.playChip();
 
-    const flyingChip = document.createElement('img');
-    flyingChip.src = imgEl.src;
-    flyingChip.className = 'flying-chip-anim';
-    flyingChip.style.left = `${startRect.left + startRect.width / 2 - 26}px`;
-    flyingChip.style.top = `${startRect.top + startRect.height / 2 - 26}px`;
+    if (event) {
+      this.playChipThrowAnimation(event.clientX, event.clientY, door);
+    }
+  }
 
-    document.body.appendChild(flyingChip);
+  clearBet() {
+    this.currentBet = { door: null, amount: 0 };
+    this.updateBetDisplay();
+    this.dom.doorTai.classList.remove('selected');
+    this.dom.doorXiu.classList.remove('selected');
+    this.showToast('Đã thu hồi tiền cược!');
+    Sound.playChip();
+  }
 
-    const targetX = endRect.left + endRect.width / 2 - 26;
-    const targetY = endRect.top + endRect.height / 2 - 26;
+  updateBetDisplay() {
+    this.dom.betBadgeTai.textContent = this.currentBet.door === 'tai' ? `${this.formatNumber(this.currentBet.amount)} xu` : '0 xu';
+    this.dom.betBadgeXiu.textContent = this.currentBet.door === 'xiu' ? `${this.formatNumber(this.currentBet.amount)} xu` : '0 xu';
+
+    if (this.currentBet.door === 'tai') {
+      this.dom.doorTai.classList.add('selected');
+      this.dom.doorXiu.classList.remove('selected');
+    } else if (this.currentBet.door === 'xiu') {
+      this.dom.doorXiu.classList.add('selected');
+      this.dom.doorTai.classList.remove('selected');
+    } else {
+      this.dom.doorTai.classList.remove('selected');
+      this.dom.doorXiu.classList.remove('selected');
+    }
+  }
+
+  playChipThrowAnimation(startX, startY, door) {
+    const chipAnim = document.createElement('div');
+    chipAnim.className = 'floating-chip-anim';
+    chipAnim.textContent = '🪙';
+    chipAnim.style.left = `${startX - 15}px`;
+    chipAnim.style.top = `${startY - 15}px`;
+    document.body.appendChild(chipAnim);
+
+    const targetEl = door === 'tai' ? this.dom.doorTai : this.dom.doorXiu;
+    const rect = targetEl.getBoundingClientRect();
+    const destX = rect.left + rect.width / 2;
+    const destY = rect.top + rect.height / 2;
 
     requestAnimationFrame(() => {
-      flyingChip.style.transform = `translate(${targetX - (startRect.left + startRect.width / 2 - 26)}px, ${targetY - (startRect.top + startRect.height / 2 - 26)}px) scale(0.65) rotate(360deg)`;
-      flyingChip.style.opacity = '0.9';
+      chipAnim.style.transform = `translate(${destX - startX}px, ${destY - startY}px) scale(0.6)`;
+      chipAnim.style.opacity = '0';
     });
 
     setTimeout(() => {
-      flyingChip.remove();
-      // Kích hoạt hiệu ứng nảy bật cho cửa cược khi nhận chip
-      targetDoor.classList.remove('door-bounce');
-      void targetDoor.offsetWidth;
-      targetDoor.classList.add('door-bounce');
-    }, 420);
+      chipAnim.remove();
+      targetEl.classList.add('chip-placed-bump');
+      setTimeout(() => targetEl.classList.remove('chip-placed-bump'), 300);
+    }, 450);
   }
 
   renderDiceElements() {
     this.dom.diceContainer.innerHTML = '';
     for (let i = 0; i < 3; i++) {
-      const dieEl = DiceManager.createDieElement(i);
+      const dieEl = DiceManager.createDie3DElement(this.currentDice[i]);
       this.dom.diceContainer.appendChild(dieEl);
-      DiceManager.setDieFace(dieEl, this.currentDice[i] || (i + 1), false);
-    }
-  }
-
-  placeBetOnDoor(door) {
-    if (this.state !== GameState.BETTING) {
-      this.showToast('Đang trong lượt xóc, vui lòng chờ ván mới!', 'warning');
-      return;
-    }
-
-    if (this.currentBet.door && this.currentBet.door !== door && this.currentBet.amount > 0) {
-      this.showToast('Trong một ván chỉ đặt một cửa (Tài hoặc Xỉu)! Đã đổi cửa.');
-      this.currentBet.door = door;
-    } else {
-      this.currentBet.door = door;
-    }
-
-    const nextBet = this.currentBet.amount + this.selectedChip;
-    if (nextBet > this.balance) {
-      this.showToast('Số dư của bạn không đủ để đặt mức cược này!', 'warning');
-      return;
-    }
-
-    this.currentBet.amount = nextBet;
-    Sound.playChip();
-    
-    // Tạo hiệu ứng chip bay lắc ném vào cửa cược
-    this.createFlyingChip(door);
-
-    this.updateBetDisplay();
-  }
-
-  clearBet() {
-    if (this.state !== GameState.BETTING) return;
-    this.currentBet = { door: null, amount: 0 };
-    Sound.playChip();
-    this.updateBetDisplay();
-    this.showToast('Đã hủy cược');
-  }
-
-  updateBetDisplay() {
-    this.dom.doorXiu.classList.remove('selected');
-    this.dom.doorTai.classList.remove('selected');
-    this.dom.betBadgeXiu.textContent = '0 xu';
-    this.dom.betBadgeTai.textContent = '0 xu';
-
-    if (this.currentBet.door === 'xiu' && this.currentBet.amount > 0) {
-      this.dom.doorXiu.classList.add('selected');
-      this.dom.betBadgeXiu.textContent = `${this.formatNumber(this.currentBet.amount)} xu`;
-    } else if (this.currentBet.door === 'tai' && this.currentBet.amount > 0) {
-      this.dom.doorTai.classList.add('selected');
-      this.dom.betBadgeTai.textContent = `${this.formatNumber(this.currentBet.amount)} xu`;
     }
   }
 
   updateStatusBanner(text, statusType = '') {
     this.dom.statusRibbon.textContent = text;
-    this.dom.statusRibbon.className = 'status-ribbon-banner';
     if (statusType === 'win') {
-      this.dom.statusRibbon.classList.add('highlight-win');
-    } else if (statusType === 'lose') {
-      this.dom.statusRibbon.classList.add('highlight-lose');
+      this.dom.statusRibbon.style.color = '#ffd700';
+      this.dom.statusRibbon.style.borderColor = '#ffd700';
     } else if (statusType === 'urgent') {
       this.dom.statusRibbon.style.color = '#ff4d4d';
       this.dom.statusRibbon.style.borderColor = '#ff4d4d';
@@ -393,14 +515,21 @@ class TaiXiuGame {
     this.state = GameState.BETTING;
     this.remainingSec = BETTING_DURATION_SEC;
     clearInterval(this.countdownTimer);
+    clearInterval(this.squeezeTimer);
 
     // Mở khóa cửa cược
     this.dom.doorXiu.classList.remove('disabled');
     this.dom.doorTai.classList.remove('disabled');
 
+    // Ẩn hướng dẫn và nút nặn nếu đang hiện
+    if (this.dom.squeezeGuide) this.dom.squeezeGuide.style.display = 'none';
+    if (this.dom.btnQuickOpen) this.dom.btnQuickOpen.style.display = 'none';
+
     // Bát đậy sẵn hoặc nâng nhẹ
-    this.dom.dragonCup.classList.remove('lifted');
+    this.dom.dragonCup.classList.remove('lifted', 'squeezing-ready', 'squeezing-active');
     this.dom.dragonCup.classList.add('covered');
+    this.dom.dragonCup.style.transform = '';
+    this.currentCupOffset = { x: 0, y: 0 };
 
     this.updateStatusBanner(`⏱ Đang đặt cược: ${this.remainingSec}s`);
 
@@ -445,7 +574,6 @@ class TaiXiuGame {
     const balanceBefore = this.balance + this.currentBet.amount;
     const isAllIn = hasBet && (this.currentBet.amount >= balanceBefore * 0.9);
 
-    // Đếm chuỗi thua liên tiếp
     let recentLossStreak = 0;
     for (const h of history) {
       if (h.betDoor) {
@@ -455,20 +583,17 @@ class TaiXiuGame {
     }
 
     if (isAllIn) {
-      // 1. ALL-IN: 50% thắng / 50% thua ngẫu nhiên tuyệt đối tạo cảm xúc nghẹt thở
       const willWin = Math.random() < 0.5;
       const targetDoor = willWin ? this.currentBet.door : (this.currentBet.door === 'tai' ? 'xiu' : 'tai');
       this.currentDice = DiceManager.rollDiceWithTarget(targetDoor);
-      this.pityReason = willWin ? '🎲 ALL-IN: Chiến thắng ngoạn mục!' : '🎲 ALL-IN: Đáng tiếc!';
-    } else if (hasBet && (recentLossStreak >= 2 || this.balance < 2000)) {
-      // 2. DÂY ĐEN: Thua >= 2 ván hoặc sắp cháy túi -> Nâng tỷ lệ thắng lên 75% - 85%
+      this.pityReason = willWin ? '🔥 ALL-IN THẮNG LỚN: Cảm xúc bùng nổ!' : '💀 ALL-IN THUA: Kịch bản nghẹt thở!';
+    } else if (hasBet && recentLossStreak >= 2) {
       const winRate = recentLossStreak >= 3 ? 0.85 : 0.75;
       const willWin = Math.random() < winRate;
       const targetDoor = willWin ? this.currentBet.door : (this.currentBet.door === 'tai' ? 'xiu' : 'tai');
       this.currentDice = DiceManager.rollDiceWithTarget(targetDoor);
       this.pityReason = willWin ? '🔥 Cứu dây đen: Lội ngược dòng thành công!' : null;
     } else {
-      // 3. NGẪU NHIÊN 100%
       this.currentDice = DiceManager.rollThreeDice();
       this.pityReason = null;
     }
@@ -477,8 +602,9 @@ class TaiXiuGame {
 
     // Đậy bát rồng vàng & RUNG LẮC CỰC MẠNH VŨ BÃO
     const cup = this.dom.dragonCup;
-    cup.classList.remove('lifted');
+    cup.classList.remove('lifted', 'squeezing-ready', 'squeezing-active');
     cup.classList.add('covered', 'shaking');
+    cup.style.transform = '';
 
     this.updateStatusBanner('🎲 Đang xóc đĩa...');
     Sound.playShake(1800);
@@ -492,12 +618,73 @@ class TaiXiuGame {
       DiceManager.setDieFace(dieEl, this.currentDice[idx], true);
     });
 
-    // Sau 1.8 giây xóc xong thì tự động mở bát
+    // Sau 1.8 giây xóc xong
     setTimeout(() => {
       this.dom.plateFelt.classList.remove('shaking');
       cup.classList.remove('shaking');
-      this.revealResult();
+
+      // NẾU BẬT CHẾ ĐỘ NẶN BÁT VÀ NGƯỜI CHƠI CÓ ĐẶT CƯỢC -> CHUYỂN VÀO TRẠNG THÁI NẶN BÁT
+      if (this.isSqueezeMode) {
+        this.startSqueezingPhase();
+      } else {
+        this.revealResult();
+      }
     }, 1800);
+  }
+
+  /**
+   * BẮT ĐẦU PHA NẶN BÁT HỒI HỘP
+   */
+  startSqueezingPhase() {
+    this.state = GameState.SQUEEZING;
+    this.currentCupOffset = { x: 0, y: 0 };
+
+    const cup = this.dom.dragonCup;
+    cup.classList.remove('shaking', 'lifted');
+    cup.classList.add('covered', 'squeezing-ready');
+    cup.style.transform = 'translate(0px, 0px)';
+
+    // Hiện thanh gợi ý và nút mở nhanh
+    if (this.dom.squeezeGuide) this.dom.squeezeGuide.style.display = 'flex';
+    if (this.dom.btnQuickOpen) this.dom.btnQuickOpen.style.display = 'block';
+
+    let squeezeCountdown = SQUEEZE_TIME_LIMIT_SEC;
+    this.updateStatusBanner(`🖐️ MỜI BẠN NẶN BÁT (${squeezeCountdown}s) • Kéo Bát Rồng`, 'urgent');
+
+    clearInterval(this.squeezeTimer);
+    this.squeezeTimer = setInterval(() => {
+      squeezeCountdown -= 1;
+      if (squeezeCountdown > 0) {
+        this.updateStatusBanner(`🖐️ MỜI BẠN NẶN BÁT (${squeezeCountdown}s) • Kéo Bát Rồng`, 'urgent');
+      } else {
+        clearInterval(this.squeezeTimer);
+        // Hết giờ nặn -> Tự động mở bát
+        this.endSqueezeAndReveal();
+      }
+    }, 1000);
+  }
+
+  /**
+   * KẾT THÚC NẶN BÁT VÀ NÂNG BÁT
+   */
+  endSqueezeAndReveal() {
+    clearInterval(this.squeezeTimer);
+    if (this.state === GameState.RESULT) return;
+
+    if (this.dom.squeezeGuide) this.dom.squeezeGuide.style.display = 'none';
+    if (this.dom.btnQuickOpen) this.dom.btnQuickOpen.style.display = 'none';
+
+    const cup = this.dom.dragonCup;
+    cup.classList.remove('squeezing-ready', 'squeezing-active');
+    
+    // Nâng bát mượt mà lên trên
+    cup.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+    cup.style.transform = 'translateY(-160px) scale(0.9)';
+    cup.style.opacity = '0.05';
+
+    setTimeout(() => {
+      this.revealResult();
+    }, 300);
   }
 
   /**
@@ -505,8 +692,13 @@ class TaiXiuGame {
    */
   revealResult() {
     this.state = GameState.RESULT;
+    clearInterval(this.squeezeTimer);
+
+    if (this.dom.squeezeGuide) this.dom.squeezeGuide.style.display = 'none';
+    if (this.dom.btnQuickOpen) this.dom.btnQuickOpen.style.display = 'none';
+
     const cup = this.dom.dragonCup;
-    cup.classList.remove('shaking', 'covered');
+    cup.classList.remove('shaking', 'covered', 'squeezing-ready', 'squeezing-active');
     this.dom.plateFelt.classList.remove('shaking');
     cup.classList.add('lifted'); // Nâng bát lên để thấy xúc xắc
 
@@ -589,86 +781,89 @@ class TaiXiuGame {
 
   updateBalanceDisplays() {
     const formatted = this.formatNumber(this.balance);
-    if (this.dom.topBalance) this.dom.topBalance.textContent = formatted;
-    if (this.dom.userBalance) this.dom.userBalance.textContent = formatted;
-    if (this.dom.bxhUserBalance) this.dom.bxhUserBalance.textContent = `${formatted} xu`;
+    this.dom.topBalance.textContent = formatted;
+    this.dom.userBalance.textContent = formatted;
   }
 
   renderBeadRoadAndStats() {
     const history = Storage.getHistory();
     const stats = Storage.getStats();
 
-    // 1. Render 2x5 Bead Grid (10 ván gần nhất)
-    let recent10 = history.slice(0, 10).reverse();
-
-    if (recent10.length === 0) {
-      const demoPatterns = ['tai', 'xiu', 'tai', 'xiu', 'tai', 'xiu', 'xiu', 'tai', 'tai', 'xiu'];
-      recent10 = demoPatterns.map((res) => ({ result: res, sum: res === 'tai' ? 11 : 8 }));
+    // Render 10 hạt gần đây nhất
+    this.dom.beadRoadGrid.innerHTML = '';
+    const last10 = history.slice(0, 10);
+    for (let i = 0; i < 10; i++) {
+      const circle = document.createElement('div');
+      circle.className = 'bead-circle';
+      if (i < last10.length) {
+        const item = last10[i];
+        circle.classList.add(item.result);
+        circle.textContent = item.result === 'tai' ? 'T' : 'X';
+        circle.title = `${item.result === 'tai' ? 'Tài' : 'Xỉu'} ${item.sum} điểm [${item.dice.join(',')}]`;
+      } else {
+        circle.style.opacity = '0.25';
+        circle.style.background = 'rgba(255,255,255,0.05)';
+        circle.textContent = '-';
+      }
+      this.dom.beadRoadGrid.appendChild(circle);
     }
 
-    const dotsHtml = recent10.map(item => {
-      const isTai = item.result === 'tai';
-      return `<div class="bead-circle ${isTai ? 'tai' : 'xiu'}">${isTai ? 'Tài' : 'Xỉu'}</div>`;
-    }).join('');
-
-    this.dom.beadRoadGrid.innerHTML = dotsHtml;
-
-    // 2. Thống kê tỷ lệ
-    const total = stats.totalRounds;
-    let taiPct = 52;
-    let xiuPct = 48;
+    // Cập nhật thanh tỷ lệ % Tài/Xỉu
+    const total = stats.taiCount + stats.xiuCount;
+    let pctTai = 50;
+    let pctXiu = 50;
     if (total > 0) {
-      taiPct = Math.round((stats.taiCount / total) * 100);
-      xiuPct = 100 - taiPct;
+      pctTai = Math.round((stats.taiCount / total) * 100);
+      pctXiu = 100 - pctTai;
     }
-
-    this.dom.statBarTai.style.width = `${taiPct}%`;
-    this.dom.statBarXiu.style.width = `${xiuPct}%`;
-    this.dom.statPctTai.textContent = `${taiPct}%`;
-    this.dom.statPctXiu.textContent = `${xiuPct}%`;
-
-    // Cập nhật tỷ lệ thắng cá nhân trên BXH
-    if (this.dom.bxhUserWinrate) {
-      const winPct = total > 0 && stats.wins > 0 ? Math.round((stats.wins / (stats.wins + stats.losses || 1)) * 100) : 55;
-      this.dom.bxhUserWinrate.textContent = `${winPct}%`;
-    }
+    this.dom.statBarTai.style.width = `${pctTai}%`;
+    this.dom.statBarXiu.style.width = `${pctXiu}%`;
+    this.dom.statPctTai.textContent = `${pctTai}%`;
+    this.dom.statPctXiu.textContent = `${pctXiu}%`;
   }
 
   renderDetailedHistoryTable() {
     const history = Storage.getHistory();
+    this.dom.detailedHistoryTbody.innerHTML = '';
     if (history.length === 0) {
-      this.dom.detailedHistoryTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: #aaa;">Chưa có ván đấu nào</td></tr>`;
+      this.dom.detailedHistoryTbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">Chưa có ván cược nào được ghi lại.</td></tr>';
       return;
     }
 
-    const html = history.slice(0, 20).map(item => {
+    history.forEach(item => {
+      const tr = document.createElement('tr');
       const isTai = item.result === 'tai';
-      const outcomeText = item.betDoor 
-        ? `<span style="color: ${item.isWin ? '#2ecc71' : '#ff7675'}; font-weight: 700;">${item.betDoor === 'tai' ? 'Tài' : 'Xỉu'} (${this.formatNumber(item.betAmount)}) -> ${item.isWin ? '+' : ''}${this.formatNumber(item.netChange)}</span>`
-        : '<span style="color:#888;">(Không cược)</span>';
+      const resultBadge = `<span class="rule-pill-badge ${item.result}" style="font-size:0.75rem; padding: 2px 8px;">${isTai ? 'Tài' : 'Xỉu'}</span>`;
+      let payoutText = '<span style="color:#888;">Chưa cược</span>';
+      if (item.betDoor) {
+        const doorName = item.betDoor === 'tai' ? 'Tài' : 'Xỉu';
+        if (item.isWin) {
+          payoutText = `<span style="color: #2ecc71; font-weight:700;">+${this.formatNumber(item.netChange)} (${doorName})</span>`;
+        } else {
+          payoutText = `<span style="color: #e74c3c; font-weight:700;">-${this.formatNumber(item.betAmount)} (${doorName})</span>`;
+        }
+      }
 
-      return `
-        <tr>
-          <td>${item.timestamp}</td>
-          <td>${item.dice.join(' - ')}</td>
-          <td><strong>${item.sum}</strong></td>
-          <td><span style="color: ${isTai ? '#ff5252' : '#42a5f5'}; font-weight: 900;">${isTai ? 'TÀI' : 'XỈU'}</span></td>
-          <td>${outcomeText}</td>
-        </tr>
+      tr.innerHTML = `
+        <td>${item.timestamp}</td>
+        <td>[${item.dice.join(', ')}]</td>
+        <td><strong>${item.sum}</strong></td>
+        <td>${resultBadge}</td>
+        <td>${payoutText}</td>
       `;
-    }).join('');
-
-    this.dom.detailedHistoryTbody.innerHTML = html;
+      this.dom.detailedHistoryTbody.appendChild(tr);
+    });
   }
 
-  showToast(message, type = 'info') {
+  showToast(msg, type = 'info') {
     const toast = this.dom.toastPopup;
     if (!toast) return;
-    toast.textContent = message;
-    toast.className = `toast-popup show ${type}`;
-    clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => {
-      toast.className = 'toast-popup';
+    toast.textContent = msg;
+    toast.style.borderColor = type === 'win' ? '#2ecc71' : (type === 'warning' ? '#f39c12' : '#d4af37');
+    toast.classList.add('show');
+    clearTimeout(this.toastTimeout);
+    this.toastTimeout = setTimeout(() => {
+      toast.classList.remove('show');
     }, 2800);
   }
 
@@ -677,7 +872,8 @@ class TaiXiuGame {
   }
 }
 
+// Khởi chạy khi DOM sẵn sàng
 document.addEventListener('DOMContentLoaded', () => {
-  window.game = new TaiXiuGame();
-  window.game.init();
+  window.taiXiuGame = new TaiXiuGame();
+  window.taiXiuGame.init();
 });
