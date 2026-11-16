@@ -37,7 +37,11 @@ export const Storage = {
    */
   getBalance() {
     const store = getStorage();
-    const raw = store.getItem(STORAGE_KEYS.BALANCE);
+    const portalBal = store.getItem('lucky_casino_balance');
+    let raw = store.getItem(STORAGE_KEYS.BALANCE);
+    if (portalBal !== null && !isNaN(Number(portalBal))) {
+      raw = portalBal;
+    }
     if (raw === null || isNaN(Number(raw))) {
       this.setBalance(DEFAULT_BALANCE);
       return DEFAULT_BALANCE;
@@ -53,6 +57,15 @@ export const Storage = {
     const store = getStorage();
     const validAmount = Math.max(0, Math.floor(amount));
     store.setItem(STORAGE_KEYS.BALANCE, validAmount.toString());
+    store.setItem('lucky_casino_balance', validAmount.toString());
+    const userRaw = store.getItem('lucky_casino_user');
+    if (userRaw) {
+      try {
+        const u = JSON.parse(userRaw);
+        u.balance = validAmount;
+        store.setItem('lucky_casino_user', JSON.stringify(u));
+      } catch (e) {}
+    }
     return validAmount;
   },
 

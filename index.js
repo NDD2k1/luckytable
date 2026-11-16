@@ -118,6 +118,64 @@ router.get(['/', '/health'], (req, res) => {
   });
 });
 
+
+// ĐĂNG KÝ TÀI KHOẢN MỚI
+router.post('/auth/register', (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Vui lòng nhập tên tài khoản và mật khẩu' });
+  }
+  const cleanUser = username.trim();
+  if (cleanUser.length < 3) {
+    return res.status(400).json({ success: false, message: 'Tên tài khoản phải từ 3 ký tự trở lên' });
+  }
+  if (users[cleanUser]) {
+    return res.status(400).json({ success: false, message: 'Tên tài khoản này đã được sử dụng' });
+  }
+
+  // Khởi tạo tài khoản mới tặng ngay 50.000 xu khởi nghiệp
+  users[cleanUser] = {
+    id: cleanUser,
+    username: cleanUser,
+    password: password,
+    balance: 50000,
+    vipLevel: 1,
+    avatar: 'assets/avatar.png',
+    transactions: [
+      {
+        id: 'BONUS' + Date.now(),
+        type: 'DEPOSIT',
+        title: 'Quà tặng tân thủ đăng ký',
+        amount: 50000,
+        status: 'SUCCESS',
+        timestamp: new Date().toISOString()
+      }
+    ]
+  };
+
+  const userSafe = { ...users[cleanUser] };
+  delete userSafe.password;
+  res.json({ success: true, message: 'Đăng ký tài khoản thành công! Tặng ngay +50.000 xu', user: userSafe });
+});
+
+// ĐĂNG NHẬP TÀI KHOẢN
+router.post('/auth/login', (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Vui lòng nhập đầy đủ tài khoản và mật khẩu' });
+  }
+  const cleanUser = username.trim();
+  const existing = users[cleanUser];
+
+  if (!existing || (existing.password && existing.password !== password)) {
+    return res.status(401).json({ success: false, message: 'Sai tên đăng nhập hoặc mật khẩu!' });
+  }
+
+  const userSafe = { ...existing };
+  delete userSafe.password;
+  res.json({ success: true, message: 'Đăng nhập thành công!', user: userSafe });
+});
+
 // Game News
 router.get('/news', (req, res) => {
   res.json({ success: true, data: news });

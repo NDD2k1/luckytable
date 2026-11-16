@@ -47,6 +47,23 @@ class PortalController {
       btnOpenSettings: document.getElementById('btn-open-settings'),
 
       // Modals
+            // Auth Modals & Form
+      modalLogin: document.getElementById('modal-login'),
+      modalRegister: document.getElementById('modal-register'),
+      btnOpenLogin: document.getElementById('btn-open-login'),
+      btnOpenRegister: document.getElementById('btn-open-register'),
+      authGuestBox: document.getElementById('auth-guest-box'),
+      userProfileBadge: document.getElementById('btn-open-profile'),
+      btnLogout: document.getElementById('btn-logout'),
+      switchToRegister: document.getElementById('switch-to-register'),
+      switchToLogin: document.getElementById('switch-to-login'),
+      formLogin: document.getElementById('form-login'),
+      formRegister: document.getElementById('form-register'),
+      loginUser: document.getElementById('login-username'),
+      loginPass: document.getElementById('login-password'),
+      regUser: document.getElementById('register-username'),
+      regPass: document.getElementById('register-password'),
+      regConfirmPass: document.getElementById('register-confirm-password'),
       modalDeposit: document.getElementById('modal-deposit'),
       modalWithdraw: document.getElementById('modal-withdraw'),
       modalProfile: document.getElementById('modal-profile'),
@@ -104,6 +121,37 @@ class PortalController {
 
   bindEvents() {
     // Mở modals
+        // Auth Events
+    if (this.dom.btnOpenLogin) {
+      this.dom.btnOpenLogin.addEventListener('click', () => this.openModal(this.dom.modalLogin));
+    }
+    if (this.dom.btnOpenRegister) {
+      this.dom.btnOpenRegister.addEventListener('click', () => this.openModal(this.dom.modalRegister));
+    }
+    if (this.dom.switchToRegister) {
+      this.dom.switchToRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.closeModal(this.dom.modalLogin);
+        this.openModal(this.dom.modalRegister);
+      });
+    }
+    if (this.dom.switchToLogin) {
+      this.dom.switchToLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.closeModal(this.dom.modalRegister);
+        this.openModal(this.dom.modalLogin);
+      });
+    }
+    if (this.dom.formLogin) {
+      this.dom.formLogin.addEventListener('submit', () => this.handleLogin());
+    }
+    if (this.dom.btnLogout) {
+      this.dom.btnLogout.addEventListener('click', () => this.handleLogout());
+    }
+    if (this.dom.formRegister) {
+      this.dom.formRegister.addEventListener('submit', () => this.handleRegister());
+    }
+
     if (this.dom.btnOpenDeposit) {
       this.dom.btnOpenDeposit.addEventListener('click', () => this.openModal(this.dom.modalDeposit));
     }
@@ -363,8 +411,88 @@ class PortalController {
   // =========================================================================
   // USER DATA & API
   // =========================================================================
-  fetchUserData() {
-    fetch(`/api/user/${USER_ID}`)
+    async handleLogin() {
+    const username = this.dom.loginUser ? this.dom.loginUser.value.trim() : '';
+    const password = this.dom.loginPass ? this.dom.loginPass.value : '';
+
+    if (!username || !password) {
+      this.showToast('Vui lòng nhập đầy đủ tên tài khoản và mật khẩu!', 'error');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        this.user = { ...data.user, isLoggedIn: true };
+        localStorage.setItem('lucky_casino_user', JSON.stringify(this.user));
+        localStorage.setItem('lucky_casino_balance', this.user.balance.toString());
+        this.updateUserUI();
+        this.closeModal(this.dom.modalLogin);
+        this.showToast('🎉 Chào mừng ' + this.user.username + ' quay trở lại!', 'success');
+      } else {
+        this.showToast(data.message || 'Đăng nhập thất bại!', 'error');
+      }
+    } catch (e) {
+      this.showToast('Lỗi kết nối khi đăng nhập', 'error');
+    }
+  }
+
+  async handleRegister() {
+    const username = this.dom.regUser ? this.dom.regUser.value.trim() : '';
+    const password = this.dom.regPass ? this.dom.regPass.value : '';
+    const confirmPass = this.dom.regConfirmPass ? this.dom.regConfirmPass.value : '';
+
+    if (!username || !password) {
+      this.showToast('Vui lòng điền đủ thông tin đăng ký!', 'error');
+      return;
+    }
+    if (username.length < 3) {
+      this.showToast('Tên tài khoản phải từ 3 ký tự trở lên!', 'error');
+      return;
+    }
+    if (password !== confirmPass) {
+      this.showToast('Mật khẩu xác nhận không khớp!', 'error');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        this.user = { ...data.user, isLoggedIn: true };
+        localStorage.setItem('lucky_casino_user', JSON.stringify(this.user));
+        localStorage.setItem('lucky_casino_balance', this.user.balance.toString());
+        this.updateUserUI();
+        this.closeModal(this.dom.modalRegister);
+        this.showToast(data.message || 'Đăng ký tài khoản thành công!', 'success');
+      } else {
+        this.showToast(data.message || 'Đăng ký thất bại!', 'error');
+      }
+    } catch (e) {
+      this.showToast('Lỗi kết nối khi đăng ký', 'error');
+    }
+  }
+
+    fetchUserData() {
+    const saved = localStorage.getItem('lucky_casino_user');
+    if (saved) {
+      try {
+        this.user = JSON.parse(saved);
+        this.updateUserUI();
+      } catch (e) {}
+    }
+
+    const currentId = this.user && this.user.id ? this.user.id : 'Player001';
+    fetch('/api/user/' + currentId)
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data) {
@@ -378,6 +506,23 @@ class PortalController {
       });
   }
 
+  handleLogout() {
+    localStorage.removeItem('lucky_casino_user');
+    this.user = {
+      id: 'Player001',
+      username: 'Khách',
+      balance: 10000,
+      vipLevel: 1,
+      avatar: 'assets/avatar.png',
+      isLoggedIn: false
+    };
+    localStorage.setItem('lucky_casino_balance', '10000');
+    localStorage.setItem('tai_xiu_balance', '10000');
+    this.updateUserUI();
+    this.closeModal(this.dom.modalProfile);
+    this.showToast('Đã đăng xuất tài khoản!', 'info');
+  }
+
   updateUserUI() {
     const formattedBalance = Number(this.user.balance).toLocaleString('vi-VN');
     if (this.dom.headerBalance) this.dom.headerBalance.textContent = formattedBalance;
@@ -387,6 +532,16 @@ class PortalController {
     if (this.dom.profileUsernameInput) this.dom.profileUsernameInput.value = this.user.username;
     if (this.dom.profileBalanceText) this.dom.profileBalanceText.textContent = `${formattedBalance} xu`;
     if (this.dom.profileVipText) this.dom.profileVipText.textContent = `VIP ${this.user.vipLevel || 1}`;
+    const profileName = document.getElementById('profile-display-name');
+    if (profileName) profileName.textContent = this.user.username;
+
+    const isLoggedIn = !!(this.user && this.user.isLoggedIn);
+    if (this.dom.authGuestBox) {
+      this.dom.authGuestBox.style.display = isLoggedIn ? 'none' : 'flex';
+    }
+    if (this.dom.userProfileBadge) {
+      this.dom.userProfileBadge.style.display = isLoggedIn ? 'flex' : 'none';
+    }
   }
 
   handleDeposit() {
