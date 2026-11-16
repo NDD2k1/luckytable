@@ -1,26 +1,29 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
     },
     {
-      "source": "/taixiu",
-      "destination": "/public/taixiu.html"
+      "src": "/taixiu",
+      "dest": "/public/taixiu.html"
     },
     {
-      "source": "/baucua",
-      "destination": "/public/baucua.html"
+      "src": "/baucua",
+      "dest": "/public/baucua.html"
     },
     {
-      "source": "/bacay",
-      "destination": "/public/bacay.html"
+      "src": "/bacay",
+      "dest": "/public/bacay.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/public/$1"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/index.html"
     }
   ]
 }

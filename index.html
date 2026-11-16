@@ -6,6 +6,7 @@
   <title>LUCKY TABLE — Cổng Game Casino & Giải Trí Quốc Tế</title>
   <meta name="description" content="Cổng Game Casino Quốc Tế: Tài Xỉu Bát Rồng Vàng, Xóc Đĩa, Bầu Cua, Nổ Hũ Slots và Bắn Cá 3D.">
   <link rel="stylesheet" href="css/portal.css?v=1">
+  <link rel="stylesheet" href="css/room-overlay.css?v=1">
   <link rel="stylesheet" href="css/style.css?v=12?v=1012">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
 </head>
@@ -29,8 +30,9 @@
         <li><a href="/" class="nav-link-btn active">🏠 Trang Chủ</a></li>
         <li><a href="/taixiu" class="nav-link-btn">🎲 Tài Xỉu 3D</a></li>
         <li><a href="/baucua" class="nav-link-btn">🦀 Bầu Cua 3D</a></li>
+        <li><a href="/bacay" class="nav-link-btn">🃏 Ba Cây VIP</a></li>
+        <li><a href="#friends-section" class="nav-link-btn">👥 Chơi Bạn Bè</a></li>
         <li><a href="#games-section" class="nav-link-btn">🎰 Kho Trò Chơi</a></li>
-        <li><a href="#news-section" class="nav-link-btn">📰 Tin Tức & Sự Kiện</a></li>
       </ul>
 
       <!-- User Bar: Balance & Action Buttons -->
@@ -100,6 +102,35 @@
       </div>
       <div class="hero-banner-graphic">
         <img src="assets/dragon_cup.png" alt="Bát Rồng Vàng" class="hero-dragon-preview">
+      </div>
+    </section>
+
+    <!-- MULTIPLAYER FRIEND ROOMS SECTION -->
+    <section class="multiplayer-section" id="friends-section">
+      <div class="multiplayer-header-wrap">
+        <div class="multiplayer-title-box">
+          <span class="multiplayer-icon-glow">👥</span>
+          <div>
+            <h2 class="multiplayer-heading">Chơi Chung Cùng Bạn Bè — Multiplayer VIP</h2>
+            <p class="multiplayer-subtext">Tạo bàn riêng, chia sẻ mã phòng hoặc link mời bạn bè cùng vào so tài cược và chat thời gian thực</p>
+          </div>
+        </div>
+
+        <div class="multiplayer-action-bar">
+          <div class="join-room-input-group">
+            <input type="text" id="quick-room-code-input" class="input-room-code" placeholder="Mã phòng (vd: PRO935)" maxlength="8">
+            <button class="btn-join-code" id="btn-quick-join-room">➔ Vào Bàn</button>
+          </div>
+          <button class="btn-create-room" id="btn-open-create-room">
+            <span>➕</span>
+            <span>Tạo Phòng Mới</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Rooms Grid (Powered by SQLite) -->
+      <div class="rooms-grid-container" id="lobby-rooms-grid">
+        <div class="no-rooms-notice">Đang kết nối danh sách phòng chơi bạn bè...</div>
       </div>
     </section>
 
@@ -416,10 +447,58 @@ MODAL 2: RÚT TIỀN (WITHDRAW)  <div class="portal-modal-overlay" id="modal-wit
     </div>
   </div>
 
+  <!-- ==========================================================================
+       MODAL 5: TẠO PHÒNG BẠN BÈ MỚI (MULTIPLAYER)
+       ========================================================================== -->
+  <div class="portal-modal-overlay" id="modal-create-room">
+    <div class="portal-modal-card">
+      <div class="modal-header-row">
+        <h3 class="modal-title-heading">👥 Khởi Tạo Phòng Chơi Bạn Bè</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group-item">
+          <label class="form-label-text">Tên phòng chơi:</label>
+          <input type="text" id="create-room-name" class="portal-form-input" placeholder="Ví dụ: Hội Bạn Thân VIP" value="Hội Bạn Thân VIP" maxlength="30">
+        </div>
+
+        <div class="form-group-item">
+          <label class="form-label-text">Chọn Game:</label>
+          <select id="create-room-game" class="portal-form-input" style="cursor: pointer;">
+            <option value="taixiu">🎲 Tài Xỉu 3D — Bát Rồng Vàng</option>
+            <option value="baucua">🦀 Bầu Cua 3D — Hoàng Gia</option>
+            <option value="bacay">🃏 Ba Cây VIP — Chia Bài 3D</option>
+          </select>
+        </div>
+
+        <div class="form-group-item">
+          <label class="form-label-text">Số người chơi tối đa:</label>
+          <select id="create-room-max" class="portal-form-input">
+            <option value="4">4 người chơi</option>
+            <option value="8" selected>8 người chơi</option>
+            <option value="12">12 người chơi</option>
+          </select>
+        </div>
+
+        <div class="form-group-item">
+          <label class="form-label-text">Mật khẩu phòng (tùy chọn):</label>
+          <input type="password" id="create-room-pass" class="portal-form-input" placeholder="Để trống nếu muốn phòng công khai">
+        </div>
+
+        <button class="btn-form-submit" id="btn-submit-create-room">
+          🚀 TẠO PHÒNG & VÀO BÀN NGAY
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST POPUP NOTIFICATION -->
   <div class="toast-popup" id="toast-popup"></div>
 
   <!-- JAVASCRIPT CONTROLLERS -->
-  <script src="js/portal.js?v=1?v=11"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/room-overlay.js"></script>
+  <script src="js/portal.js?v=2"></script>
 </body>
 </html>
