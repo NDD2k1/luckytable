@@ -96,8 +96,11 @@ const news = [
   }
 ];
 
+// Tạo router chung hỗ trợ cả đường dẫn có prefix /api hoặc không có
+const router = express.Router();
+
 // Health Check
-app.get('/api/health', (req, res) => {
+router.get(['/', '/health'], (req, res) => {
   res.json({
     status: 'online',
     platform: 'Vercel Serverless',
@@ -107,12 +110,12 @@ app.get('/api/health', (req, res) => {
 });
 
 // Game News
-app.get('/api/news', (req, res) => {
+router.get('/news', (req, res) => {
   res.json({ success: true, data: news });
 });
 
 // User Profile & Balance
-app.get('/api/user/:userId', (req, res) => {
+router.get('/user/:userId', (req, res) => {
   const { userId } = req.params;
   if (!users[userId]) {
     users[userId] = {
@@ -127,10 +130,19 @@ app.get('/api/user/:userId', (req, res) => {
   res.json({ success: true, data: users[userId] });
 });
 
-app.post('/api/user/:userId/deposit', (req, res) => {
+router.post('/user/:userId/deposit', (req, res) => {
   const { userId } = req.params;
   const amount = parseInt(req.body.amount, 10) || 10000;
-  if (!users[userId]) users[userId] = { id: userId, username: userId, balance: 50000, vipLevel: 1, avatar: 'assets/avatar.png', transactions: [] };
+  if (!users[userId]) {
+    users[userId] = {
+      id: userId,
+      username: userId,
+      balance: 50000,
+      vipLevel: 1,
+      avatar: 'assets/avatar.png',
+      transactions: []
+    };
+  }
   users[userId].balance += amount;
   users[userId].transactions.unshift({
     id: 'DEP' + Date.now(),
@@ -143,10 +155,19 @@ app.post('/api/user/:userId/deposit', (req, res) => {
   res.json({ success: true, balance: users[userId].balance, added: amount });
 });
 
-app.post('/api/user/:userId/withdraw', (req, res) => {
+router.post('/user/:userId/withdraw', (req, res) => {
   const { userId } = req.params;
   const amount = parseInt(req.body.amount, 10) || 10000;
-  if (!users[userId]) users[userId] = { id: userId, username: userId, balance: 50000, vipLevel: 1, avatar: 'assets/avatar.png', transactions: [] };
+  if (!users[userId]) {
+    users[userId] = {
+      id: userId,
+      username: userId,
+      balance: 50000,
+      vipLevel: 1,
+      avatar: 'assets/avatar.png',
+      transactions: []
+    };
+  }
   users[userId].balance = Math.max(0, users[userId].balance - amount);
   users[userId].transactions.unshift({
     id: 'WTH' + Date.now(),
@@ -159,36 +180,54 @@ app.post('/api/user/:userId/withdraw', (req, res) => {
   res.json({ success: true, balance: users[userId].balance, deducted: amount });
 });
 
-app.post('/api/user/:userId/sync-balance', (req, res) => {
+router.post('/user/:userId/sync-balance', (req, res) => {
   const { userId } = req.params;
   const balance = parseInt(req.body.balance, 10);
-  if (!users[userId]) users[userId] = { id: userId, username: userId, balance: 50000, vipLevel: 1, avatar: 'assets/avatar.png', transactions: [] };
+  if (!users[userId]) {
+    users[userId] = {
+      id: userId,
+      username: userId,
+      balance: 50000,
+      vipLevel: 1,
+      avatar: 'assets/avatar.png',
+      transactions: []
+    };
+  }
   if (!isNaN(balance)) users[userId].balance = balance;
   res.json({ success: true, balance: users[userId].balance });
 });
 
-app.post('/api/user/:userId/profile', (req, res) => {
+router.post('/user/:userId/profile', (req, res) => {
   const { userId } = req.params;
   const { username } = req.body;
-  if (!users[userId]) users[userId] = { id: userId, username: userId, balance: 50000, vipLevel: 1, avatar: 'assets/avatar.png', transactions: [] };
+  if (!users[userId]) {
+    users[userId] = {
+      id: userId,
+      username: userId,
+      balance: 50000,
+      vipLevel: 1,
+      avatar: 'assets/avatar.png',
+      transactions: []
+    };
+  }
   if (username) users[userId].username = username;
   res.json({ success: true, user: users[userId] });
 });
 
-app.get('/api/user/:userId/transactions', (req, res) => {
+router.get('/user/:userId/transactions', (req, res) => {
   const { userId } = req.params;
   const user = users[userId] || { transactions: [] };
   res.json({ success: true, count: user.transactions.length, data: user.transactions });
 });
 
 // Rooms API
-app.get('/api/rooms', (req, res) => {
+router.get('/rooms', (req, res) => {
   const { gameType } = req.query;
   const filtered = gameType ? rooms.filter(r => r.gameType === gameType) : rooms;
   res.json({ success: true, count: filtered.length, rooms: filtered });
 });
 
-app.get('/api/rooms/:roomCode', (req, res) => {
+router.get('/rooms/:roomCode', (req, res) => {
   const { roomCode } = req.params;
   const r = rooms.find(item => item.roomCode === roomCode.toUpperCase());
   if (r) {
@@ -198,7 +237,7 @@ app.get('/api/rooms/:roomCode', (req, res) => {
   }
 });
 
-app.post('/api/rooms/create', (req, res) => {
+router.post('/rooms/create', (req, res) => {
   const { hostId, hostName, roomName, gameType, maxPlayers, password } = req.body;
   const roomCode = 'VIP' + Math.floor(100 + Math.random() * 900);
   const newRoom = {
@@ -215,6 +254,35 @@ app.post('/api/rooms/create', (req, res) => {
   };
   rooms.unshift(newRoom);
   res.json({ success: true, room: newRoom });
+});
+
+// Mount router on both /api and / so it works regardless of Vercel path rewrites
+app.use('/api', router);
+app.use('/', router);
+
+// Fallback 404 handler for unmatched API routes
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `API endpoint ${req.method} ${req.url} không tìm thấy`,
+    availableEndpoints: [
+      'GET /api/health',
+      'GET /api/news',
+      'GET /api/user/:userId',
+      'POST /api/user/:userId/deposit',
+      'POST /api/user/:userId/withdraw',
+      'GET /api/rooms'
+    ]
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Serverless Error:', err);
+  res.status(500).json({
+    success: false,
+    error: err.message || 'Internal Server Error'
+  });
 });
 
 export default app;
