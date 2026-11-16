@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bầu Cua Hoàng Gia 3D - VIP Royal Casino WebGL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js r128 cho đồ họa 3D WebGL chân thực -->
+    <link rel="stylesheet" href="/css/room-overlay.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/room-overlay.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold-bright: #fff3b0;
+            --gold-main: #e5b84b;
+            --gold-deep: #9c6b19;
+            --crimson-velvet: #4a060b;
+            --crimson-dark: #140103;
+            --ebony-wood: #170d0a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--crimson-dark);
+            background-image: 
+                radial-gradient(ellipse 90% 60% at 50% 10%, rgba(185, 28, 28, 0.45) 0%, rgba(45, 3, 7, 0.92) 60%, rgba(10, 1, 2, 1) 100%);
+            color: #fff;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .font-royal {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Chữ vàng kim loại 3D khắc nổi */
+        .text-metallic-gold {
+            background: linear-gradient(180deg, #ffffff 0%, #ffe680 35%, #d4af37 70%, #8c6218 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+        }
+
+        /* Khung bàn Casino 3D Bevel */
+        .vip-casino-table {
+            background: linear-gradient(180deg, rgba(65, 6, 12, 0.72) 0%, rgba(28, 2, 5, 0.92) 100%);
+            backdrop-filter: blur(8px);
+            border: 2px solid #d4af37;
+            box-shadow: 
+                0 0 0 3px #1c0f0a,
+                0 0 0 5px #8a621c,
+                0 25px 60px rgba(0, 0, 0, 0.95),
+                inset 0 1px 2px rgba(255, 243, 176, 0.45);
+            position: relative;
+        }
+
+        /* Viền hộp VIP Glassmorphism */
+        .vip-panel {
+            background: linear-gradient(180deg, rgba(35, 8, 10, 0.82) 0%, rgba(16, 3, 5, 0.92) 100%);
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(229, 184, 75, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 243, 176, 0.25);
+        }
+
+        /* Không gian phối cảnh 3D cho bàn cược */
+        .board-3d-perspective {
+            perspective: 1100px;
+        }
+
+        .board-3d-grid {
+            transform: rotateX(8deg);
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        /* Ô đặt cược 3D nổi khối (Bevel + Depth Shadow + Inner Specular) */
+        .bet-cell-3d {
+            background: 
+                radial-gradient(circle at 50% 25%, rgba(165, 22, 34, 0.85) 0%, rgba(58, 4, 9, 0.96) 100%);
+            border: 2px solid rgba(235, 192, 85, 0.65);
+            border-bottom-width: 5px;
+            border-bottom-color: #7c5211;
+            box-shadow: 
+                0 10px 18px rgba(0, 0, 0, 0.75),
+                inset 0 2px 3px rgba(255, 243, 176, 0.35),
+                inset 0 -6px 14px rgba(0, 0, 0, 0.65);
+            transform: translateZ(0px);
+            transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .bet-cell-3d:hover {
+            border-color: #fff099;
+            transform: translateY(-3px) translateZ(8px);
+            box-shadow: 
+                0 14px 24px rgba(0, 0, 0, 0.85),
+                0 0 18px rgba(255, 215, 0, 0.25),
+                inset 0 2px 4px rgba(255, 248, 200, 0.5);
+        }
+
+        .bet-cell-3d:active {
+            transform: translateY(3px) translateZ(-2px) scale(0.97);
+            border-bottom-width: 2px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.8), inset 0 4px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Hiệu ứng hào quang ô trúng thưởng 3D */
+        @keyframes royalWinGlow3D {
+            0%, 100% {
+                border-color: #ffffff;
+                border-bottom-color: #ffd700;
+                box-shadow: 0 0 22px #ffd700, 0 0 40px rgba(255, 170, 0, 0.8), inset 0 0 28px rgba(255, 230, 128, 0.65);
+                transform: translateY(-4px) scale(1.02);
+            }
+            50% {
+                border-color: #ffe680;
+                border-bottom-color: #fff3b0;
+                box-shadow: 0 0 34px #ffea75, 0 0 58px rgba(255, 200, 0, 0.95), inset 0 0 42px rgba(255, 245, 180, 0.9);
+                transform: translateY(-7px) scale(1.045);
+            }
+        }
+
+        .bet-cell-3d.winner {
+            animation: royalWinGlow3D 0.85s infinite ease-in-out;
+            background: radial-gradient(circle at 50% 35%, rgba(234, 138, 12, 0.55) 0%, rgba(95, 8, 15, 0.96) 100%) !important;
+            z-index: 20;
+        }
+
+        /* Khay đựng chip 3D */
+        .chip-tray-3d {
+            background: linear-gradient(180deg, #361a0e 0%, #170a05 55%, #080301 100%);
+            border: 2px solid #d4af37;
+            border-bottom: 5px solid #6b470c;
+            box-shadow: 
+                0 14px 32px rgba(0, 0, 0, 0.92),
+                inset 0 5px 14px rgba(0, 0, 0, 0.95),
+                inset 0 -1px 2px rgba(255, 230, 128, 0.4);
+        }
+
+        .chip-btn-3d {
+            transform: perspective(400px) rotateX(14deg);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+            filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.85));
+        }
+        .chip-btn-3d:hover:not(.selected) {
+            transform: perspective(400px) rotateX(6deg) translateY(-6px) scale(1.06);
+        }
+        .chip-btn-3d.selected {
+            transform: perspective(400px) rotateX(0deg) translateY(-13px) scale(1.18);
+            filter: drop-shadow(0 14px 16px rgba(255, 215, 0, 0.8));
+            z-index: 15;
+        }
+        .chip-btn-3d.selected::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 9999px;
+            border: 2px dashed #fff099;
+            box-shadow: 0 0 14px rgba(255, 215, 0, 0.85);
+            animation: spinRing 8s linear infinite;
+        }
+
+        @keyframes spinRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Nút bấm Casino 3D */
+        .btn-gold-3d {
+            background: linear-gradient(180deg, #fff2a6 0%, #e5b84b 48%, #9e6d16 100%);
+            color: #2b0902;
+            border: 1px solid #fff8cc;
+            box-shadow: 0 5px 0 #523506, 0 10px 20px rgba(0, 0, 0, 0.7);
+            transition: all 0.12s ease;
+        }
+        .btn-gold-3d:hover:not(:disabled) {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+        .btn-gold-3d:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #523506, 0 3px 6px rgba(0, 0, 0, 0.7);
+        }
+        .btn-gold-3d:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(0.7);
+        }
+
+        .btn-crimson-3d {
+            background: linear-gradient(180deg, #ff6666 0%, #c8102e 50%, #700515 100%);
+            color: #fff8dc;
+            border: 1px solid #ffaaaa;
+            box-shadow: 0 5px 0 #3b0109, 0 10px 20px rgba(0, 0, 0, 0.7);
+            transition: all 0.12s ease;
+        }
+        .btn-crimson-3d:hover:not(:disabled) {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+        .btn-crimson-3d:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #3b0109, 0 3px 6px rgba(0, 0, 0, 0.7);
+        }
+        .btn-crimson-3d:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(0.7);
+        }
+
+        .btn-dark-3d {
+            background: linear-gradient(180deg, #42271e 0%, #21110c 100%);
+            color: #f5d77f;
+            border: 1px solid rgba(229, 184, 75, 0.45);
+            box-shadow: 0 3px 0 #0d0604, 0 6px 12px rgba(0, 0, 0, 0.6);
+            transition: all 0.12s ease;
+        }
+        .btn-dark-3d:hover:not(:disabled) {
+            border-color: #ffe680;
+            color: #fff;
+        }
+        .btn-dark-3d:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0d0604;
+        }
+        .btn-dark-3d:disabled {
+            opacity: 0.38;
+            cursor: not-allowed;
+        }
+
+        /* Chip bay parabol 3D */
+        .flying-chip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.38s ease;
+        }
+
+        @keyframes bigWinPop {
+            0% { transform: scale(0.4) translateY(20px); opacity: 0; }
+            65% { transform: scale(1.08) translateY(-4px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .big-win-anim {
+            animation: bigWinPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        #webgl-stage {
+            touch-action: none;
+            cursor: grab;
+        }
+        #webgl-stage:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative">
+
+    <!-- CANVAS 3D NỀN HOÀNG GIA (Đèn lồng đỏ 3D & Hoa mai vàng rơi lơ lửng) -->
+    <canvas id="bg-3d-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- CANVAS PHÁO HOA & MƯA TIỀN VÀNG KHI THẮNG -->
+    <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-40"></canvas>
+
+    <!-- HEADER: Cổng Hoàng Gia & Ví VIP -->
+    <header class="w-full max-w-5xl mx-auto px-3 pt-2 pb-1 flex flex-wrap items-center justify-between gap-2 z-20">
+        <div class="flex items-center gap-2.5">
+            <div class="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-yellow-200 via-amber-500 to-amber-900 p-0.5 shadow-[0_0_18px_rgba(255,215,0,0.55)]">
+                <div class="w-full h-full rounded-full bg-red-950 flex items-center justify-center border border-yellow-300/70">
+                    <span class="font-royal font-black text-xl sm:text-2xl text-metallic-gold">王</span>
+                </div>
+            </div>
+            <div>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="font-royal font-black text-lg sm:text-2xl tracking-wider text-metallic-gold leading-none">BẦU CUA HOÀNG GIA 3D</h1>
+                    <span class="hidden sm:inline-block text-[10px] font-black px-2 py-0.5 rounded bg-gradient-to-r from-amber-400 to-yellow-200 text-red-950 tracking-widest shadow">3D VIP</span>
+                </div>
+                <p class="text-[10px] sm:text-xs text-amber-200/80 tracking-widest uppercase mt-0.5">WebGL Sòng Bài Hoàng Gia • Đại Cát Đại Lợi</p>
+            </div>
+        </div>
+
+        <!-- Về Sảnh & Số dư VIP & Âm thanh -->
+        <div class="flex items-center gap-2">
+            <a href="/" class="vip-panel rounded-full px-3 py-1.5 flex items-center gap-1.5 text-amber-300 hover:text-white hover:border-yellow-300 transition text-xs font-bold shadow" title="Quay lại Sảnh Cổng Game">
+                <span>🏠</span>
+                <span>Về Sảnh</span>
+            </a>
+            <div class="vip-panel rounded-full px-3.5 py-1.5 flex items-center gap-2">
+                <div class="w-5 h-5 rounded-full bg-gradient-to-b from-yellow-300 to-amber-600 flex items-center justify-center text-[11px] font-black text-red-950 shadow">
+                    $
+                </div>
+                <span id="balance-display" class="font-black text-base sm:text-lg text-amber-300 tracking-tight">50,000</span>
+                <button onclick="topUpBalance()" title="Nhận thêm +50,000 Lộc" class="ml-0.5 w-6 h-6 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-700 hover:brightness-110 text-white font-black text-sm flex items-center justify-center shadow border border-emerald-200/50 active:scale-90 transition">
+                    +
+                </button>
+            </div>
+
+            <button id="sound-toggle" onclick="toggleSound()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full vip-panel flex items-center justify-center text-amber-300 hover:border-yellow-300 transition active:scale-95" title="Bật/Tắt âm thanh">
+                <svg id="icon-sound-on" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                </svg>
+                <svg id="icon-sound-off" class="w-5 h-5 hidden text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN ARENA: Sân Khấu 3D WebGL & Bàn Cược 3D Perspective -->
+    <main class="w-full max-w-5xl mx-auto px-2.5 sm:px-4 flex-1 flex flex-col justify-center my-1 z-10">
+        <div class="vip-casino-table rounded-3xl p-2.5 sm:p-4 flex flex-col gap-2.5 sm:gap-3">
+            
+            <!-- 4 Đinh tán vàng 3D góc bàn Casino -->
+            <div class="hidden sm:block absolute top-2.5 left-2.5 w-3.5 h-3.5 rounded-full bg-gradient-to-br from-yellow-100 via-amber-400 to-amber-800 shadow-md"></div>
+            <div class="hidden sm:block absolute top-2.5 right-2.5 w-3.5 h-3.5 rounded-full bg-gradient-to-br from-yellow-100 via-amber-400 to-amber-800 shadow-md"></div>
+            <div class="hidden sm:block absolute bottom-2.5 left-2.5 w-3.5 h-3.5 rounded-full bg-gradient-to-br from-yellow-100 via-amber-400 to-amber-800 shadow-md"></div>
+            <div class="hidden sm:block absolute bottom-2.5 right-2.5 w-3.5 h-3.5 rounded-full bg-gradient-to-br from-yellow-100 via-amber-400 to-amber-800 shadow-md"></div>
+
+            <!-- KHU VỰC TRÊN: Lịch Sử Soi Cầu | SÂN KHẤU 3D ĐĨA NGỌC & BÁT SƠN MÀI | Điều Khiển -->
+            <div class="grid grid-cols-1 md:grid-cols-12 items-center gap-2.5 sm:gap-3.5">
+                
+                <!-- CỘT TRÁI (3 cols): Bảng Soi Cầu 5 Ván -->
+                <div class="md:col-span-3 vip-panel rounded-2xl p-2 sm:p-2.5 flex md:flex-col items-center justify-between gap-2 z-10">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300">Lịch sử 5 ván</span>
+                    </div>
+                    <div id="history-list" class="flex md:flex-col gap-1.5 items-center justify-end w-full">
+                        <div class="text-[11px] text-amber-100/40 italic py-1">Chưa có lịch sử</div>
+                    </div>
+                </div>
+
+                <!-- CỘT GIỮA (6 cols): SÂN KHẤU 3D THREE.JS WEBGL CHÂN THỰC -->
+                <div class="md:col-span-6 flex flex-col items-center justify-center relative">
+                    <div id="webgl-stage-container" class="relative w-full h-56 sm:h-64 rounded-2xl overflow-hidden border border-amber-400/40 bg-gradient-to-b from-black/50 via-red-950/30 to-black/70 shadow-[inset_0_0_30px_rgba(0,0,0,0.85)] flex items-center justify-center">
+                        <!-- Canvas 3D Chính (Đĩa sứ 3D, Xúc xắc 3D, Bát sơn mài 3D) -->
+                        <canvas id="webgl-stage" class="w-full h-full block"></canvas>
+
+                        <!-- Ribbon Đếm Ngược Hoàng Gia trên sân khấu 3D -->
+                        <div id="round-timer-badge" class="absolute top-2.5 bg-black/85 backdrop-blur-md px-4 py-1.5 rounded-full border border-amber-400/70 shadow-[0_0_15px_rgba(251,191,36,0.45)] text-amber-300 font-extrabold text-xs flex items-center gap-2 z-20">
+                            <span class="text-amber-400">⏱️</span>
+                            <span id="stage-timer-text">Đang đặt cược: 15s</span>
+                        </div>
+
+                        <!-- BẢNG THÔNG BÁO THẮNG LỚN (BIG WIN BANNER) -->
+                        <div id="result-banner" class="hidden absolute inset-x-0 bottom-2.5 z-30 flex justify-center pointer-events-none">
+                            <div id="result-banner-inner" class="px-5 py-1.5 rounded-full font-black text-sm sm:text-base shadow-[0_8px_25px_rgba(0,0,0,0.9)] border-2 text-center whitespace-nowrap"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI (3 cols): Tổng Cược & Nút Xóc / Mở Bát -->
+                <div class="md:col-span-3 flex flex-col gap-2 z-10">
+                    <div class="vip-panel rounded-2xl px-3 py-2 flex md:flex-col items-center justify-between text-center">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-200/75">Tổng tiền cược</span>
+                        <span id="total-bet-display" class="font-black text-lg sm:text-2xl text-amber-400 drop-shadow">0</span>
+                    </div>
+
+                    <!-- BẢNG ĐẾM NGƯỢC TỰ ĐỘNG 15S (AUTO CASINO LOOP) -->
+                    <div class="vip-panel rounded-2xl p-2.5 flex flex-col items-center justify-center text-center gap-1 border border-amber-500/40 bg-gradient-to-b from-amber-950/40 to-black/60 shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
+                        <div class="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-amber-300">
+                            <span id="countdown-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span id="countdown-title">TỰ ĐỘNG XÓC</span>
+                        </div>
+                        <div class="flex items-baseline justify-center gap-1 py-0.5">
+                            <span id="countdown-sec" class="font-mono font-black text-3xl sm:text-4xl text-amber-300 drop-shadow-[0_0_12px_rgba(251,191,36,0.6)]">15</span>
+                            <span id="countdown-unit" class="text-xs font-bold text-amber-200/70">giây</span>
+                        </div>
+                        <button id="btn-quick-roll" onclick="triggerEarlyRoll()" class="btn-gold-3d w-full font-black py-1.5 px-2 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md">
+                            ⚡ Xóc Sớm
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THANH TRẠNG THÁI & CÁC NÚT CASINO CHUYÊN NGHIỆP -->
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-black/50 px-3 py-1.5 rounded-2xl border border-amber-500/30 z-10">
+                <div id="status-bar" class="text-xs sm:text-sm font-semibold text-amber-200 truncate flex-1">
+                    Chọn phỉnh cược bên dưới và chạm vào ô linh vật 3D để đặt!
+                </div>
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <button id="btn-rebet" onclick="rebetLastRound()" disabled class="btn-dark-3d text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg uppercase tracking-wide">
+                        Cược Lại
+                    </button>
+                    <button id="btn-double" onclick="doubleBets()" disabled class="btn-dark-3d text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg uppercase tracking-wide">
+                        X2 Cược
+                    </button>
+                    <button id="btn-clear" onclick="clearBets()" disabled class="btn-dark-3d text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg uppercase tracking-wide text-red-300">
+                        Xóa Cược
+                    </button>
+                </div>
+            </div>
+
+            <!-- BÀN CƯỢC 6 LINH VẬT 3D NỔI KHỐI (3D Perspective Grid) -->
+            <div class="board-3d-perspective">
+                <div id="betting-board" class="board-3d-grid grid grid-cols-3 gap-2 sm:gap-3.5">
+                    <!-- Render tự động bằng JS -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER: Khay Đựng 5 Đồng Chip SVG 3D VIP -->
+    <footer class="w-full max-w-4xl mx-auto px-2.5 pb-3 pt-1 z-20">
+        <div id="chip-tray-container" class="chip-tray-3d rounded-full px-3 py-2 sm:px-6 sm:py-2.5 flex items-center justify-around sm:justify-center sm:gap-7">
+            
+            <!-- CHIP 100 (Màu Bạc / Trắng xám) -->
+            <button onclick="selectChip(100)" data-chip="100" class="chip-btn-3d selected relative w-14 h-14 sm:w-16 sm:h-16 rounded-full focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="silver-outer" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#f2f2f2"/>
+                            <stop offset="50%" stop-color="#a6a6a6"/>
+                            <stop offset="100%" stop-color="#595959"/>
+                        </linearGradient>
+                        <radialGradient id="silver-inner" cx="40%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="70%" stop-color="#e6e6e6"/>
+                            <stop offset="100%" stop-color="#b3b3b3"/>
+                        </radialGradient>
+                        <filter id="drop-shadow-100" x="-10%" y="-10%" width="120%" height="120%">
+                            <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.55"/>
+                        </filter>
+                    </defs>
+                    <g filter="url(#drop-shadow-100)">
+                        <circle cx="100" cy="100" r="90" fill="url(#silver-outer)" stroke="#404040" stroke-width="2"/>
+                        <g stroke="#ffffff" stroke-width="22" stroke-dasharray="22 65" fill="none">
+                            <circle cx="100" cy="100" r="78" transform="rotate(-12 100 100)"/>
+                        </g>
+                        <circle cx="100" cy="100" r="67" fill="none" stroke="#666666" stroke-width="3"/>
+                        <circle cx="100" cy="100" r="64" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+                        <circle cx="100" cy="100" r="62" fill="url(#silver-inner)"/>
+                        <text x="100" y="116" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="48" fill="#1a1a1a" text-anchor="middle" letter-spacing="-1">100</text>
+                        <ellipse cx="75" cy="55" rx="35" ry="15" transform="rotate(-30 75 55)" fill="#ffffff" opacity="0.4"/>
+                    </g>
+                </svg>
+            </button>
+
+            <!-- CHIP 500 (Màu Xanh dương) -->
+            <button onclick="selectChip(500)" data-chip="500" class="chip-btn-3d relative w-14 h-14 sm:w-16 sm:h-16 rounded-full focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="blue-outer" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#3399ff"/>
+                            <stop offset="50%" stop-color="#005ce6"/>
+                            <stop offset="100%" stop-color="#002b80"/>
+                        </linearGradient>
+                        <radialGradient id="blue-inner" cx="40%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#4da6ff"/>
+                            <stop offset="60%" stop-color="#0066ff"/>
+                            <stop offset="100%" stop-color="#003d99"/>
+                        </radialGradient>
+                        <filter id="drop-shadow-500" x="-10%" y="-10%" width="120%" height="120%">
+                            <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.55"/>
+                        </filter>
+                    </defs>
+                    <g filter="url(#drop-shadow-500)">
+                        <circle cx="100" cy="100" r="90" fill="url(#blue-outer)" stroke="#001a4d" stroke-width="2"/>
+                        <g stroke="#e6f2ff" stroke-width="22" stroke-dasharray="22 65" fill="none">
+                            <circle cx="100" cy="100" r="78" transform="rotate(-12 100 100)"/>
+                        </g>
+                        <circle cx="100" cy="100" r="67" fill="none" stroke="#002666" stroke-width="3"/>
+                        <circle cx="100" cy="100" r="64" fill="none" stroke="#80bfff" stroke-width="1.5" opacity="0.8"/>
+                        <circle cx="100" cy="100" r="62" fill="url(#blue-inner)"/>
+                        <text x="100" y="116" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="48" fill="#ffffff" text-anchor="middle" letter-spacing="-1">500</text>
+                        <ellipse cx="75" cy="55" rx="35" ry="15" transform="rotate(-30 75 55)" fill="#ffffff" opacity="0.35"/>
+                    </g>
+                </svg>
+            </button>
+
+            <!-- CHIP 1K (Màu Xanh lá) -->
+            <button onclick="selectChip(1000)" data-chip="1000" class="chip-btn-3d relative w-14 h-14 sm:w-16 sm:h-16 rounded-full focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="green-outer" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#5cd65c"/>
+                            <stop offset="50%" stop-color="#248f24"/>
+                            <stop offset="100%" stop-color="#0f3d0f"/>
+                        </linearGradient>
+                        <radialGradient id="green-inner" cx="40%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#70db70"/>
+                            <stop offset="60%" stop-color="#29a329"/>
+                            <stop offset="100%" stop-color="#145214"/>
+                        </radialGradient>
+                        <filter id="drop-shadow-1k" x="-10%" y="-10%" width="120%" height="120%">
+                            <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.55"/>
+                        </filter>
+                    </defs>
+                    <g filter="url(#drop-shadow-1k)">
+                        <circle cx="100" cy="100" r="90" fill="url(#green-outer)" stroke="#0a290a" stroke-width="2"/>
+                        <g stroke="#ebfaeb" stroke-width="22" stroke-dasharray="22 65" fill="none">
+                            <circle cx="100" cy="100" r="78" transform="rotate(-12 100 100)"/>
+                        </g>
+                        <circle cx="100" cy="100" r="67" fill="none" stroke="#145214" stroke-width="3"/>
+                        <circle cx="100" cy="100" r="64" fill="none" stroke="#99e699" stroke-width="1.5" opacity="0.8"/>
+                        <circle cx="100" cy="100" r="62" fill="url(#green-inner)"/>
+                        <text x="100" y="117" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="52" fill="#ffffff" text-anchor="middle">1K</text>
+                        <ellipse cx="75" cy="55" rx="35" ry="15" transform="rotate(-30 75 55)" fill="#ffffff" opacity="0.35"/>
+                    </g>
+                </svg>
+            </button>
+
+            <!-- CHIP 5K (Màu Tím) -->
+            <button onclick="selectChip(5000)" data-chip="5000" class="chip-btn-3d relative w-14 h-14 sm:w-16 sm:h-16 rounded-full focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="purple-outer" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#c266ff"/>
+                            <stop offset="50%" stop-color="#7a00cc"/>
+                            <stop offset="100%" stop-color="#3d0066"/>
+                        </linearGradient>
+                        <radialGradient id="purple-inner" cx="40%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#cc80ff"/>
+                            <stop offset="60%" stop-color="#8a00e6"/>
+                            <stop offset="100%" stop-color="#4d0080"/>
+                        </radialGradient>
+                        <filter id="drop-shadow-5k" x="-10%" y="-10%" width="120%" height="120%">
+                            <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.55"/>
+                        </filter>
+                    </defs>
+                    <g filter="url(#drop-shadow-5k)">
+                        <circle cx="100" cy="100" r="90" fill="url(#purple-outer)" stroke="#29004d" stroke-width="2"/>
+                        <g stroke="#f5e6ff" stroke-width="22" stroke-dasharray="22 65" fill="none">
+                            <circle cx="100" cy="100" r="78" transform="rotate(-12 100 100)"/>
+                        </g>
+                        <circle cx="100" cy="100" r="67" fill="none" stroke="#3d0066" stroke-width="3"/>
+                        <circle cx="100" cy="100" r="64" fill="none" stroke="#d999ff" stroke-width="1.5" opacity="0.8"/>
+                        <circle cx="100" cy="100" r="62" fill="url(#purple-inner)"/>
+                        <text x="100" y="117" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="52" fill="#ffffff" text-anchor="middle">5K</text>
+                        <ellipse cx="75" cy="55" rx="35" ry="15" transform="rotate(-30 75 55)" fill="#ffffff" opacity="0.35"/>
+                    </g>
+                </svg>
+            </button>
+
+            <!-- CHIP 10K (Màu Vàng / Cam Gold) -->
+            <button onclick="selectChip(10000)" data-chip="10000" class="chip-btn-3d relative w-14 h-14 sm:w-16 sm:h-16 rounded-full focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="gold-outer" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffdb4d"/>
+                            <stop offset="50%" stop-color="#e69900"/>
+                            <stop offset="100%" stop-color="#804d00"/>
+                        </linearGradient>
+                        <radialGradient id="gold-inner" cx="40%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#ffe680"/>
+                            <stop offset="60%" stop-color="#ffaa00"/>
+                            <stop offset="100%" stop-color="#b36b00"/>
+                        </radialGradient>
+                        <filter id="drop-shadow-10k" x="-10%" y="-10%" width="120%" height="120%">
+                            <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.55"/>
+                        </filter>
+                    </defs>
+                    <g filter="url(#drop-shadow-10k)">
+                        <circle cx="100" cy="100" r="90" fill="url(#gold-outer)" stroke="#663d00" stroke-width="2"/>
+                        <g stroke="#fff9e6" stroke-width="22" stroke-dasharray="22 65" fill="none">
+                            <circle cx="100" cy="100" r="78" transform="rotate(-12 100 100)"/>
+                        </g>
+                        <circle cx="100" cy="100" r="67" fill="none" stroke="#995c00" stroke-width="3"/>
+                        <circle cx="100" cy="100" r="64" fill="none" stroke="#ffe680" stroke-width="1.5" opacity="0.9"/>
+                        <circle cx="100" cy="100" r="62" fill="url(#gold-inner)"/>
+                        <text x="100" y="115" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="45" fill="#4d2600" text-anchor="middle" letter-spacing="-1">10K</text>
+                        <ellipse cx="75" cy="55" rx="35" ry="15" transform="rotate(-30 75 55)" fill="#ffffff" opacity="0.45"/>
+                    </g>
+                </svg>
+            </button>
+
+        </div>
+    </footer>
+
+    <!-- MODAL NHẬN LỘC HOÀNG GIA KHI HẾT TIỀN -->
+    <div id="out-of-money-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="vip-casino-table rounded-3xl max-w-sm w-full p-6 text-center big-win-anim">
+            <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-yellow-300 to-amber-700 p-0.5 shadow-lg">
+                <div class="w-full h-full rounded-full bg-red-950 flex items-center justify-center font-royal font-black text-2xl text-metallic-gold">
+                    福
+                </div>
+            </div>
+            <h2 class="font-royal font-black text-2xl text-metallic-gold mb-2">Bổ Sung Ngân Khố</h2>
+            <p class="text-sm text-amber-100/85 mb-5">Số dư hiện tại đã cạn. Hoàng Gia ban tặng thêm <span class="text-yellow-300 font-bold">50,000</span> lộc xuân để bạn tiếp tục chinh phục!</p>
+            <button onclick="topUpBalance(); closeModal();" class="w-full btn-gold-3d font-black py-3 rounded-xl text-base uppercase tracking-wider">
+                Nhận Ngay +50,000 Lộc
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * BỘ 6 LINH VẬT NGHỆ THUẬT 3D HOÀNG GIA (Đông Hồ cách điệu mạ vàng kim)
+         * Dùng cả cho giao diện thẻ 3D và render Texture độ phân giải cao lên 6 mặt xúc xắc 3D!
+         */
+        const ITEMS = [
+            {
+                id: 'nai',
+                name: 'NAI',
+                bgHex: '#fef3c7',
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full drop-shadow-[0_6px_8px_rgba(0,0,0,0.75)]">
+                        <defs>
+                            <radialGradient id="art-nai-face" cx="45%" cy="35%" r="65%">
+                                <stop offset="0%" stop-color="#fde68a"/>
+                                <stop offset="45%" stop-color="#d97706"/>
+                                <stop offset="100%" stop-color="#78350f"/>
+                            </radialGradient>
+                            <linearGradient id="art-nai-antler" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fffbeb"/>
+                                <stop offset="50%" stop-color="#fcd34d"/>
+                                <stop offset="100%" stop-color="#b45309"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="62" r="48" fill="#451a03" fill-opacity="0.45" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4 3"/>
+                        <g stroke="url(#art-nai-antler)" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M44 42 C36 28, 28 20, 32 10"/>
+                            <path d="M37 28 C28 26, 22 22, 20 16"/>
+                            <path d="M40 34 C46 26, 50 20, 48 14"/>
+                            <path d="M76 42 C84 28, 92 20, 88 10"/>
+                            <path d="M83 28 C92 26, 98 22, 100 16"/>
+                            <path d="M80 34 C74 26, 70 20, 72 14"/>
+                        </g>
+                        <path d="M36 48 C20 42, 16 54, 32 58 Z" fill="#92400e" stroke="#fbbf24" stroke-width="1.5"/>
+                        <path d="M84 48 C100 42, 104 54, 88 58 Z" fill="#92400e" stroke="#fbbf24" stroke-width="1.5"/>
+                        <path d="M35 48 C35 32, 85 32, 85 48 C85 74, 70 98, 60 98 C50 98, 35 74, 35 48 Z" fill="url(#art-nai-face)" stroke="#fde68a" stroke-width="2"/>
+                        <circle cx="60" cy="44" r="3" fill="#fef08a"/>
+                        <circle cx="51" cy="49" r="2" fill="#fef08a" opacity="0.8"/>
+                        <circle cx="69" cy="49" r="2" fill="#fef08a" opacity="0.8"/>
+                        <ellipse cx="60" cy="83" rx="14" ry="11" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+                        <path d="M55 78 Q60 82 65 78 L60 85 Z" fill="#1c1917"/>
+                        <ellipse cx="47" cy="60" rx="5.5" ry="6.5" fill="#1c1917"/>
+                        <circle cx="45.5" cy="58" r="2" fill="#ffffff"/>
+                        <ellipse cx="73" cy="60" rx="5.5" ry="6.5" fill="#1c1917"/>
+                        <circle cx="71.5" cy="58" r="2" fill="#ffffff"/>
+                      </svg>`
+            },
+            {
+                id: 'bau',
+                name: 'BẦU',
+                bgHex: '#dcfce7',
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full drop-shadow-[0_6px_8px_rgba(0,0,0,0.75)]">
+                        <defs>
+                            <radialGradient id="art-bau-body" cx="35%" cy="30%" r="70%">
+                                <stop offset="0%" stop-color="#bef264"/>
+                                <stop offset="40%" stop-color="#22c55e"/>
+                                <stop offset="85%" stop-color="#15803d"/>
+                                <stop offset="100%" stop-color="#052e16"/>
+                            </radialGradient>
+                            <linearGradient id="art-bau-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fffbeb"/>
+                                <stop offset="50%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#92400e"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="62" r="48" fill="#052e16" fill-opacity="0.45" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4 3"/>
+                        <path d="M60 22 Q66 10 78 13" stroke="url(#art-bau-gold)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                        <path d="M58 20 C40 12, 28 24, 40 32 C48 36, 55 28, 58 20 Z" fill="#4ade80" stroke="#fef08a" stroke-width="1.2"/>
+                        <circle cx="60" cy="41" r="19" fill="url(#art-bau-body)" stroke="#fde68a" stroke-width="2"/>
+                        <circle cx="60" cy="79" r="28" fill="url(#art-bau-body)" stroke="#fde68a" stroke-width="2"/>
+                        <path d="M41 56 Q60 63 79 56" stroke="#dc2626" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+                        <path d="M52 59 L46 73 M68 59 L74 73" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="60" cy="60" r="6" fill="url(#art-bau-gold)" stroke="#78350f" stroke-width="1"/>
+                        <rect x="58" y="58" width="4" height="4" fill="#78350f"/>
+                        <ellipse cx="49" cy="72" rx="6" ry="12" transform="rotate(-18 49 72)" fill="#ffffff" opacity="0.38"/>
+                      </svg>`
+            },
+            {
+                id: 'ga',
+                name: 'GÀ',
+                bgHex: '#ffedd5',
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full drop-shadow-[0_6px_8px_rgba(0,0,0,0.75)]">
+                        <defs>
+                            <radialGradient id="art-ga-body" cx="40%" cy="35%" r="65%">
+                                <stop offset="0%" stop-color="#fef08a"/>
+                                <stop offset="50%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#92400e"/>
+                            </radialGradient>
+                        </defs>
+                        <circle cx="60" cy="62" r="48" fill="#451a03" fill-opacity="0.45" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4 3"/>
+                        <path d="M78 62 C98 44, 108 56, 96 72" stroke="#10b981" stroke-width="6" fill="none" stroke-linecap="round"/>
+                        <path d="M80 68 C102 56, 106 72, 90 82" stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M76 74 C94 70, 96 84, 82 90" stroke="#ef4444" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                        <path d="M44 30 C44 16, 54 16, 56 24 C59 14, 68 16, 68 26 C74 18, 80 24, 74 34 Z" fill="#ef4444" stroke="#fde68a" stroke-width="1.5"/>
+                        <path d="M36 54 C36 30, 68 28, 72 50 C78 60, 88 64, 84 82 C80 96, 40 98, 36 78 Z" fill="url(#art-ga-body)" stroke="#fde68a" stroke-width="2"/>
+                        <path d="M52 60 C66 54, 76 64, 68 78 C58 82, 48 72, 52 60 Z" fill="#d97706" stroke="#fef08a" stroke-width="1.5"/>
+                        <path d="M36 44 L20 49 L36 54 Z" fill="#facc15" stroke="#92400e" stroke-width="1"/>
+                        <circle cx="38" cy="59" r="5.5" fill="#dc2626"/>
+                        <circle cx="46" cy="42" r="3.8" fill="#1c1917"/>
+                        <circle cx="45" cy="41" r="1.4" fill="#ffffff"/>
+                      </svg>`
+            },
+            {
+                id: 'ca',
+                name: 'CÁ',
+                bgHex: '#e0f2fe',
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full drop-shadow-[0_6px_8px_rgba(0,0,0,0.75)]">
+                        <defs>
+                            <linearGradient id="art-ca-body" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fef08a"/>
+                                <stop offset="35%" stop-color="#38bdf8"/>
+                                <stop offset="80%" stop-color="#0369a1"/>
+                                <stop offset="100%" stop-color="#1e1b4b"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="62" r="48" fill="#082f49" fill-opacity="0.45" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4 3"/>
+                        <path d="M48 38 C56 20, 68 20, 74 38 Z" fill="#f59e0b" stroke="#fef08a" stroke-width="1.5"/>
+                        <path d="M52 82 C58 98, 68 98, 72 82 Z" fill="#f59e0b" stroke="#fef08a" stroke-width="1.5"/>
+                        <path d="M84 60 C98 40, 110 38, 104 56 C100 60, 100 62, 104 66 C110 84, 98 82, 84 60 Z" fill="#ea580c" stroke="#fde68a" stroke-width="1.5"/>
+                        <path d="M16 60 C32 32, 74 32, 88 60 C74 88, 32 88, 16 60 Z" fill="url(#art-ca-body)" stroke="#fde68a" stroke-width="2"/>
+                        <path d="M20 64 Q10 74 16 82" stroke="#fcd34d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                        <path d="M38 43 Q46 60 38 77" stroke="#fde68a" stroke-width="2.5" fill="none"/>
+                        <path d="M52 48 Q59 60 52 72 M64 48 Q71 60 64 72" stroke="#bae6fd" stroke-width="2" fill="none" opacity="0.85"/>
+                        <circle cx="28" cy="54" r="4.8" fill="#ffffff"/>
+                        <circle cx="27" cy="54" r="2.4" fill="#0f172a"/>
+                      </svg>`
+            },
+            {
+                id: 'cua',
+                name: 'CUA',
+                bgHex: '#ffe4e6',
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full drop-shadow-[0_6px_8px_rgba(0,0,0,0.75)]">
+                        <defs>
+                            <radialGradient id="art-cua-shell" cx="42%" cy="35%" r="65%">
+                                <stop offset="0%" stop-color="#fda4af"/>
+                                <stop offset="45%" stop-color="#e11d48"/>
+                                <stop offset="90%" stop-color="#881337"/>
+                                <stop offset="100%" stop-color="#4c0519"/>
+                            </radialGradient>
+                        </defs>
+                        <circle cx="60" cy="62" r="48" fill="#4c0519" fill-opacity="0.45" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4 3"/>
+                        <g stroke="#fb7185" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M32 62 L14 55 L10 64"/>
+                            <path d="M30 72 L12 72 L9 82"/>
+                            <path d="M34 82 L18 89 L16 98"/>
+                            <path d="M88 62 L106 55 L110 64"/>
+                            <path d="M90 72 L108 72 L111 82"/>
+                            <path d="M86 82 L102 89 L104 98"/>
+                        </g>
+                        <path d="M36 52 C16 38, 20 16, 40 22 C32 30, 38 36, 45 31 C48 42, 42 50, 36 52 Z" fill="#f43f5e" stroke="#fde68a" stroke-width="1.8"/>
+                        <path d="M84 52 C104 38, 100 16, 80 22 C88 30, 82 36, 75 31 C72 42, 78 50, 84 52 Z" fill="#f43f5e" stroke="#fde68a" stroke-width="1.8"/>
+                        <ellipse cx="60" cy="70" rx="32" ry="23" fill="url(#art-cua-shell)" stroke="#fde68a" stroke-width="2.2"/>
+                        <path d="M46 66 Q60 58 74 66" stroke="#fde68a" stroke-width="1.8" fill="none" opacity="0.75"/>
+                        <line x1="49" y1="50" x2="49" y2="44" stroke="#fda4af" stroke-width="3"/>
+                        <line x1="71" y1="50" x2="71" y2="44" stroke="#fda4af" stroke-width="3"/>
+                        <circle cx="49" cy="43" r="4.5" fill="#ffffff"/>
+                        <circle cx="49" cy="43" r="2.2" fill="#000000"/>
+                        <circle cx="71" cy="43" r="4.5" fill="#ffffff"/>
+                        <circle cx="71" cy="43" r="2.2" fill="#000000"/>
+                      </svg>`
+            },
+            {
+                id: 'tom',
+                name: 'TÔM',
+                bgHex: '#ffedd5',
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full drop-shadow-[0_6px_8px_rgba(0,0,0,0.75)]">
+                        <defs>
+                            <linearGradient id="art-tom-body" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fed7aa"/>
+                                <stop offset="45%" stop-color="#f97316"/>
+                                <stop offset="100%" stop-color="#9a3412"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="62" r="48" fill="#431407" fill-opacity="0.45" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4 3"/>
+                        <path d="M36 38 Q12 20 12 46" stroke="#fdba74" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                        <path d="M40 33 Q20 10 16 32" stroke="#fde68a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                        <path d="M34 42 C54 22, 92 32, 92 64 C92 86, 72 96, 54 90 C68 80, 70 64, 54 56 C44 52, 34 52, 34 42 Z" fill="url(#art-tom-body)" stroke="#fde68a" stroke-width="2"/>
+                        <path d="M54 90 L36 100 L44 88 L32 82 Z" fill="#dc2626" stroke="#fde68a" stroke-width="1.5"/>
+                        <path d="M66 35 Q61 47 69 54" stroke="#fef08a" stroke-width="2" fill="none"/>
+                        <path d="M81 45 Q72 54 77 64" stroke="#fef08a" stroke-width="2" fill="none"/>
+                        <path d="M86 64 Q74 69 74 79" stroke="#fef08a" stroke-width="2" fill="none"/>
+                        <circle cx="39" cy="40" r="3.8" fill="#ffffff"/>
+                        <circle cx="38" cy="40" r="2" fill="#000000"/>
+                      </svg>`
+            }
+        ];
+
+        const CHIP_STYLES = {
+            100:   { bg: '#e5e7eb', ring: '#4b5563', text: '#111827', label: '100' },
+            500:   { bg: '#2563eb', ring: '#dbeafe', text: '#ffffff', label: '500' },
+            1000:  { bg: '#16a34a', ring: '#dcfce7', text: '#ffffff', label: '1K' },
+            5000:  { bg: '#9333ea', ring: '#f3e8ff', text: '#ffffff', label: '5K' },
+            10000: { bg: '#f59e0b', ring: '#fef3c7', text: '#451a03', label: '10K' }
+        };
+
+        let state = {
+            balance: 50000,
+            selectedChip: 100,
+            bets: { nai: 0, bau: 0, ga: 0, ca: 0, cua: 0, tom: 0 },
+            betHistoryChips: { nai: [], bau: [], ga: [], ca: [], cua: [], tom: [] },
+            lastRoundBets: null,
+            currentDice: ['bau', 'cua', 'tom'],
+            phase: 'BETTING', // 'BETTING' | 'SHAKING' | 'RESULT'
+            history: [],
+            soundEnabled: true,
+            remainingSec: 15
+        };
+
+        let roundTimerInterval = null;
+        let shakeInterval = null;
+        let resultCooldownInterval = null;
+
+        /**
+         * =========================================================================
+         * 1. ENGINE 3D WEBGL CHÍNH (THREE.JS): ĐĨA SỨ 3D, XÚC XẮC 3D & BÁT SƠN MÀI 3D
+         * =========================================================================
+         */
+        const Casino3D = (() => {
+            let scene, camera, renderer, stageGroup;
+            let plateMesh, bowlGroup, diceMeshes = [];
+            let diceMaterials = [];
+            let targetBowlPos = new THREE.Vector3(4.8, 2.2, -1.8);
+            let targetBowlRot = new THREE.Euler(0, 0, -0.35);
+            let targetBowlOpacity = 0;
+            let bowlCurrentOpacity = 0;
+
+            // Trạng thái nặn bát 3D bằng chuột/touch
+            let isDraggingBowl = false;
+            let dragStartScreen = { x: 0, y: 0 };
+            let dragOffset3D = { x: 0, z: 0 };
+
+            // Trạng thái xúc xắc nảy 3D
+            let diceTargets = [
+                { pos: new THREE.Vector3(-0.75, 0.56, -0.45), quat: new THREE.Quaternion() },
+                { pos: new THREE.Vector3(0.75, 0.56, -0.35), quat: new THREE.Quaternion() },
+                { pos: new THREE.Vector3(0.0, 0.56, 0.72), quat: new THREE.Quaternion() }
+            ];
+
+            // Quy ước 6 mặt của BoxGeometry trong Three.js:
+            // 0: +X (Right) -> nai
+            // 1: -X (Left)  -> bau
+            // 2: +Y (Top)   -> ga
+            // 3: -Y (Bottom)-> ca
+            // 4: +Z (Front) -> cua
+            // 5: -Z (Back)  -> tom
+            const FACE_IDS = ['nai', 'bau', 'ga', 'ca', 'cua', 'tom'];
+            const FACE_UP_EULERS = {
+                ga:  new THREE.Euler(0, 0, 0),
+                ca:  new THREE.Euler(Math.PI, 0, 0),
+                cua: new THREE.Euler(-Math.PI / 2, 0, 0),
+                tom: new THREE.Euler(Math.PI / 2, 0, 0),
+                nai: new THREE.Euler(0, 0, Math.PI / 2),
+                bau: new THREE.Euler(0, 0, -Math.PI / 2)
+            };
+
+            // Tạo Texture Canvas chất lượng cao từ SVG linh vật cho mặt xúc xắc 3D
+            function createDiceFaceTexture(item) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 256;
+                canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+
+                // Nền ngà voi sang trọng
+                const grad = ctx.createRadialGradient(100, 90, 20, 128, 128, 175);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.7, '#fdf8e7');
+                grad.addColorStop(1, '#e6d2b5');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 256, 256);
+
+                // Viền khung vàng trên mặt xúc xắc
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 10;
+                ctx.strokeRect(12, 12, 232, 232);
+
+                // Chữ tên linh vật phía dưới
+                ctx.fillStyle = '#78350f';
+                ctx.font = '900 28px "Be Vietnam Pro", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.name, 128, 226);
+
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.anisotropy = 4;
+
+                // Vẽ SVG linh vật lên canvas bất đồng bộ
+                const img = new Image();
+                const svgBlob = new Blob([item.svg], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+                img.onload = () => {
+                    ctx.drawImage(img, 38, 22, 180, 175);
+                    tex.needsUpdate = true;
+                    URL.revokeObjectURL(url);
+                };
+                img.src = url;
+
+                return tex;
+            }
+
+            // Tạo Texture hoa văn Rồng Vàng cho Đĩa Sứ Ngọc Bích 3D
+            function createPlateTexture() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+
+                const grad = ctx.createRadialGradient(256, 256, 30, 256, 256, 250);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.65, '#f0f7f4');
+                grad.addColorStop(0.88, '#cce0d8');
+                grad.addColorStop(1, '#8fb3a4');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 512, 512);
+
+                // Vòng chỉ vàng cung đình
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.arc(256, 256, 232, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#047857';
+                ctx.lineWidth = 4;
+                ctx.setLineDash([14, 8]);
+                ctx.beginPath();
+                ctx.arc(256, 256, 212, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Hoa văn trống đồng mờ giữa đĩa
+                ctx.strokeStyle = 'rgba(180, 83, 9, 0.25)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(256, 256, 150, 0, Math.PI * 2);
+                ctx.stroke();
+
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.anisotropy = 4;
+                return tex;
+            }
+
+            // Tạo Texture cho Bát Sơn Mài Khảm Vàng 3D
+            function createBowlTexture() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+
+                const grad = ctx.createRadialGradient(200, 180, 20, 256, 256, 256);
+                grad.addColorStop(0, '#ef4444');
+                grad.addColorStop(0.45, '#991b1b');
+                grad.addColorStop(0.85, '#5c0a0a');
+                grad.addColorStop(1, '#2b0303');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 512, 512);
+
+                // Hoa văn chỉ vàng đồng tâm
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.arc(256, 256, 225, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.lineWidth = 3;
+                ctx.setLineDash([18, 10]);
+                ctx.beginPath();
+                ctx.arc(256, 256, 195, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Chữ TÀI LỘC - PHÚ QUÝ khảm vàng trên thân bát
+                ctx.fillStyle = '#ffe680';
+                ctx.font = '900 32px "Playfair Display", serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('TÀI LỘC', 256, 130);
+                ctx.fillText('PHÚ QUÝ', 256, 405);
+
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.anisotropy = 4;
+                return tex;
+            }
+
+            function init() {
+                const container = document.getElementById('webgl-stage-container');
+                const canvas = document.getElementById('webgl-stage');
+
+                scene = new THREE.Scene();
+
+                camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera.position.set(0, 5.6, 5.2);
+                camera.lookAt(0, 0.35, 0.15);
+
+                renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                renderer.outputEncoding = THREE.sRGBEncoding;
+
+                // HỆ THỐNG ÁNH SÁNG STUDIO SÒNG BÀI HOÀNG GIA
+                const ambientLight = new THREE.AmbientLight(0xffe8cc, 0.65);
+                scene.add(ambientLight);
+
+                const spotLight = new THREE.SpotLight(0xfff2cc, 1.35);
+                spotLight.position.set(3.5, 9, 4.5);
+                spotLight.angle = Math.PI / 4;
+                spotLight.penumbra = 0.5;
+                spotLight.castShadow = true;
+                spotLight.shadow.mapSize.width = 1024;
+                spotLight.shadow.mapSize.height = 1024;
+                scene.add(spotLight);
+
+                const rimLight = new THREE.PointLight(0xffaa00, 0.85, 15);
+                rimLight.position.set(-4, 4, -3);
+                scene.add(rimLight);
+
+                stageGroup = new THREE.Group();
+                scene.add(stageGroup);
+
+                // 1. ĐĨA SỨ NGỌC BÍCH VIỀN RỒNG VÀNG 3D
+                const plateGeo = new THREE.CylinderGeometry(2.35, 1.95, 0.24, 64);
+                const plateTopMat = new THREE.MeshStandardMaterial({
+                    map: createPlateTexture(),
+                    roughness: 0.18,
+                    metalness: 0.1
+                });
+                const plateGoldRimMat = new THREE.MeshStandardMaterial({
+                    color: 0xe5b84b,
+                    roughness: 0.25,
+                    metalness: 0.85
+                });
+                plateMesh = new THREE.Mesh(plateGeo, [plateGoldRimMat, plateTopMat, plateGoldRimMat]);
+                plateMesh.position.y = 0.12;
+                plateMesh.receiveShadow = true;
+                plateMesh.castShadow = true;
+                stageGroup.add(plateMesh);
+
+                // Vành gờ mạ vàng nổi bao quanh đĩa 3D
+                const torusRim = new THREE.Mesh(
+                    new THREE.TorusGeometry(2.32, 0.08, 16, 64),
+                    plateGoldRimMat
+                );
+                torusRim.rotation.x = Math.PI / 2;
+                torusRim.position.y = 0.24;
+                stageGroup.add(torusRim);
+
+                // 2. 3 VIÊN XÚC XẮC NGÀ VOI 3D (6 MẶT IN LINH VẬT)
+                diceMaterials = FACE_IDS.map(id => {
+                    const item = ITEMS.find(i => i.id === id);
+                    return new THREE.MeshStandardMaterial({
+                        map: createDiceFaceTexture(item),
+                        roughness: 0.22,
+                        metalness: 0.08
+                    });
+                });
+
+                const diceGeo = new THREE.BoxGeometry(0.68, 0.68, 0.68);
+                for (let i = 0; i < 3; i++) {
+                    const mesh = new THREE.Mesh(diceGeo, diceMaterials);
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    mesh.position.copy(diceTargets[i].pos);
+                    stageGroup.add(mesh);
+                    diceMeshes.push(mesh);
+                }
+
+                // 3. BÁT ÚP SƠN MÀI KHẢM VÀNG & NÚM NGỌC BÍCH 3D
+                bowlGroup = new THREE.Group();
+                const bowlMat = new THREE.MeshStandardMaterial({
+                    map: createBowlTexture(),
+                    roughness: 0.16,
+                    metalness: 0.18,
+                    transparent: true,
+                    opacity: 0
+                });
+                const bowlGoldMat = new THREE.MeshStandardMaterial({
+                    color: 0xffd700,
+                    roughness: 0.22,
+                    metalness: 0.88,
+                    transparent: true,
+                    opacity: 0
+                });
+                const jadeKnobMat = new THREE.MeshStandardMaterial({
+                    color: 0x10b981,
+                    emissive: 0x064e3b,
+                    roughness: 0.12,
+                    metalness: 0.2,
+                    transparent: true,
+                    opacity: 0
+                });
+
+                // Bán cầu úp làm thân bát
+                const domeGeo = new THREE.SphereGeometry(2.15, 48, 32, 0, Math.PI * 2, 0, Math.PI * 0.46);
+                const domeMesh = new THREE.Mesh(domeGeo, bowlMat);
+                domeMesh.scale.set(1, 0.72, 1);
+                domeMesh.castShadow = true;
+                bowlGroup.add(domeMesh);
+
+                // Vành vàng miệng bát
+                const bowlLip = new THREE.Mesh(new THREE.TorusGeometry(2.13, 0.07, 16, 64), bowlGoldMat);
+                bowlLip.rotation.x = Math.PI / 2;
+                bowlLip.position.y = 0.18;
+                bowlGroup.add(bowlLip);
+
+                // Đế vàng & Núm cầm Ngọc Bích trên đỉnh bát
+                const knobBase = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.46, 0.16, 32), bowlGoldMat);
+                knobBase.position.y = 1.54;
+                bowlGroup.add(knobBase);
+
+                const jadeKnob = new THREE.Mesh(new THREE.SphereGeometry(0.32, 32, 24), jadeKnobMat);
+                jadeKnob.position.y = 1.72;
+                bowlGroup.add(jadeKnob);
+
+                bowlGroup.userData = { materials: [bowlMat, bowlGoldMat, jadeKnobMat] };
+                bowlGroup.position.copy(targetBowlPos);
+                stageGroup.add(bowlGroup);
+
+                // Thiết lập mặt xúc xắc ban đầu
+                syncDiceToState(true);
+                setupInteractiveBowl3D(canvas);
+
+                window.addEventListener('resize', onResize);
+                animate();
+            }
+
+            function onResize() {
+                const container = document.getElementById('webgl-stage-container');
+                if (!container || !renderer) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            // Đồng bộ góc xoay 3D của 3 viên xúc xắc sao cho mặt trúng hướng thẳng lên trời (+Y)
+            function syncDiceToState(instant = false) {
+                const baseOffsets = [
+                    new THREE.Vector3(-0.72, 0.58, -0.42),
+                    new THREE.Vector3(0.74, 0.58, -0.34),
+                    new THREE.Vector3(0.02, 0.58, 0.68)
+                ];
+
+                state.currentDice.forEach((faceId, idx) => {
+                    const baseEuler = FACE_UP_EULERS[faceId].clone();
+                    // Xoay ngẫu nhiên quanh trục Y thẳng đứng để tự nhiên như ném thật
+                    const randomSpinY = (Math.random() - 0.5) * 1.4;
+                    const worldYQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), randomSpinY);
+                    const faceQuat = new THREE.Quaternion().setFromEuler(baseEuler);
+                    const finalQuat = worldYQuat.multiply(faceQuat);
+
+                    const jitterX = (Math.random() - 0.5) * 0.22;
+                    const jitterZ = (Math.random() - 0.5) * 0.22;
+                    const targetP = baseOffsets[idx].clone().add(new THREE.Vector3(jitterX, 0, jitterZ));
+
+                    diceTargets[idx] = { pos: targetP, quat: finalQuat };
+                    if (instant && diceMeshes[idx]) {
+                        diceMeshes[idx].position.copy(targetP);
+                        diceMeshes[idx].quaternion.copy(finalQuat);
+                    }
+                });
+            }
+
+            // Điều khiển Bát 3D: Đóng úp, Xóc rung lắc, Mở bát
+            function setBowlClosed() {
+                dragOffset3D = { x: 0, z: 0 };
+                targetBowlPos.set(0, 0.1, 0);
+                targetBowlRot.set(0, 0, 0);
+                targetBowlOpacity = 1;
+            }
+
+            function setBowlOpened() {
+                targetBowlPos.set(4.5, 2.1, -1.6);
+                targetBowlRot.set(0.15, 0, -0.45);
+                targetBowlOpacity = 0;
+            }
+
+            // Tương tác kéo nặn Bát 3D trực tiếp bằng chuột / cảm ứng
+            function setupInteractiveBowl3D(canvas) {
+                function getPoint(e) {
+                    return e.touches ? e.touches[0] : e;
+                }
+
+                function onDown(e) {
+                    if (state.phase !== 'READY_TO_OPEN') return;
+                    isDraggingBowl = true;
+                    const pt = getPoint(e);
+                    dragStartScreen = { x: pt.clientX, y: pt.clientY };
+                }
+
+                function onMove(e) {
+                    if (!isDraggingBowl) return;
+                    e.preventDefault();
+                    const pt = getPoint(e);
+                    const dx = (pt.clientX - dragStartScreen.x) / 65;
+                    const dy = (pt.clientY - dragStartScreen.y) / 65;
+                    dragOffset3D.x = dx;
+                    dragOffset3D.z = dy;
+
+                    targetBowlPos.set(dx, 0.18 + Math.min(0.6, Math.hypot(dx, dy) * 0.25), dy);
+                    targetBowlRot.set(dy * 0.18, 0, -dx * 0.18);
+                }
+
+                function onUp() {
+                    if (!isDraggingBowl) return;
+                    isDraggingBowl = false;
+                    const dist = Math.hypot(dragOffset3D.x, dragOffset3D.z);
+                    if (dist > 1.35) {
+                        openBowl();
+                    } else {
+                        // Trả bát về tâm đĩa nếu chưa kéo đủ xa
+                        dragOffset3D = { x: 0, z: 0 };
+                        targetBowlPos.set(0, 0.1, 0);
+                        targetBowlRot.set(0, 0, 0);
+                    }
+                }
+
+                canvas.addEventListener('mousedown', onDown);
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+
+                canvas.addEventListener('touchstart', onDown, { passive: false });
+                window.addEventListener('touchmove', onMove, { passive: false });
+                window.addEventListener('touchend', onUp);
+            }
+
+            // Vòng lặp render 60fps
+            function animate() {
+                requestAnimationFrame(animate);
+                const time = performance.now() * 0.001;
+
+                if (state.phase === 'SHAKING') {
+                    // Hiệu ứng xóc bát đĩa 3D rung lắc mạnh & 3 viên xúc xắc nảy loạn xạ bên trong
+                    stageGroup.position.x = Math.sin(time * 48) * 0.35;
+                    stageGroup.position.y = Math.abs(Math.cos(time * 42)) * 0.28;
+                    stageGroup.rotation.z = Math.sin(time * 36) * 0.14;
+                    stageGroup.rotation.x = Math.cos(time * 32) * 0.08;
+
+                    diceMeshes.forEach((m, i) => {
+                        m.position.y = 0.75 + Math.abs(Math.sin(time * 28 + i * 2)) * 0.65;
+                        m.rotation.x += 0.28;
+                        m.rotation.y += 0.34;
+                        m.rotation.z += 0.22;
+                    });
+                } else {
+                    // Đưa bàn đĩa về vị trí cân bằng êm ái + nhịp thở 3D nhẹ nhàng
+                    stageGroup.position.x += (0 - stageGroup.position.x) * 0.15;
+                    stageGroup.position.y += (Math.sin(time * 1.8) * 0.03 - stageGroup.position.y) * 0.15;
+                    stageGroup.rotation.z += (0 - stageGroup.rotation.z) * 0.15;
+                    stageGroup.rotation.x += (0 - stageGroup.rotation.x) * 0.15;
+
+                    // Xúc xắc hạ cánh vào đúng mặt kết quả
+                    diceMeshes.forEach((m, i) => {
+                        m.position.lerp(diceTargets[i].pos, 0.22);
+                        m.quaternion.slerp(diceTargets[i].quat, 0.22);
+                    });
+                }
+
+                // Di chuyển & làm mờ Bát Sơn Mài 3D
+                bowlGroup.position.lerp(targetBowlPos, 0.18);
+                bowlGroup.rotation.x += (targetBowlRot.x - bowlGroup.rotation.x) * 0.18;
+                bowlGroup.rotation.z += (targetBowlRot.z - bowlGroup.rotation.z) * 0.18;
+
+                bowlCurrentOpacity += (targetBowlOpacity - bowlCurrentOpacity) * 0.16;
+                bowlGroup.visible = bowlCurrentOpacity > 0.02;
+                bowlGroup.userData.materials.forEach(mat => {
+                    mat.opacity = bowlCurrentOpacity;
+                });
+
+                renderer.render(scene, camera);
+            }
+
+            return {
+                init,
+                syncDiceToState,
+                setBowlClosed,
+                setBowlOpened
+            };
+        })();
+
+        /**
+         * =========================================================================
+         * 2. KHÔNG GIAN NỀN 3D HOÀNG GIA (ĐÈN LỒNG ĐỎ 3D & HOA MAI VÀNG RƠI)
+         * =========================================================================
+         */
+        const RoyalAtmosphere3D = (() => {
+            function init() {
+                const canvas = document.getElementById('bg-3d-canvas');
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+                camera.position.z = 12;
+
+                const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+                const light = new THREE.PointLight(0xffd700, 1.5, 40);
+                light.position.set(0, 5, 8);
+                scene.add(light);
+                scene.add(new THREE.AmbientLight(0xffaa44, 0.6));
+
+                // Tạo các hạt hoa mai vàng 3D rơi lơ lửng
+                const petalGeo = new THREE.CircleGeometry(0.14, 5);
+                const petalMat = new THREE.MeshStandardMaterial({
+                    color: 0xffd700,
+                    emissive: 0xb45309,
+                    roughness: 0.3,
+                    side: THREE.DoubleSide
+                });
+
+                const petals = [];
+                for (let i = 0; i < 45; i++) {
+                    const p = new THREE.Mesh(petalGeo, petalMat);
+                    p.position.set(
+                        (Math.random() - 0.5) * 24,
+                        (Math.random() - 0.5) * 16,
+                        (Math.random() - 0.5) * 10
+                    );
+                    p.userData = {
+                        vy: 0.012 + Math.random() * 0.018,
+                        vx: (Math.random() - 0.5) * 0.015,
+                        rx: Math.random() * 0.04,
+                        ry: Math.random() * 0.04
+                    };
+                    scene.add(p);
+                    petals.push(p);
+                }
+
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+
+                function loop() {
+                    requestAnimationFrame(loop);
+                    petals.forEach(p => {
+                        p.position.y -= p.userData.vy;
+                        p.position.x += Math.sin(p.position.y * 0.8) * 0.008 + p.userData.vx;
+                        p.rotation.x += p.userData.rx;
+                        p.rotation.y += p.userData.ry;
+                        if (p.position.y < -8.5) {
+                            p.position.y = 8.5;
+                            p.position.x = (Math.random() - 0.5) * 24;
+                        }
+                    });
+                    renderer.render(scene, camera);
+                }
+                loop();
+            }
+            return { init };
+        })();
+
+        /**
+         * =========================================================================
+         * 3. WEB AUDIO API - ÂM THANH SÒNG BÀI CAO CẤP
+         * =========================================================================
+         */
+        const AudioEngine = (() => {
+            let ctx = null;
+            function getCtx() {
+                if (!ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    ctx = new AudioContext();
+                }
+                if (ctx.state === 'suspended') ctx.resume();
+                return ctx;
+            }
+
+            return {
+                playChip() {
+                    if (!state.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        const osc = c.createOscillator();
+                        const gain = c.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(1200, c.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(2000, c.currentTime + 0.055);
+                        gain.gain.setValueAtTime(0.24, c.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.065);
+                        osc.connect(gain);
+                        gain.connect(c.destination);
+                        osc.start();
+                        osc.stop(c.currentTime + 0.065);
+                    } catch (e) {}
+                },
+
+                playShakeTick() {
+                    if (!state.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        const osc = c.createOscillator();
+                        const gain = c.createGain();
+                        osc.type = 'triangle';
+                        const freq = 290 + Math.random() * 250;
+                        osc.frequency.setValueAtTime(freq, c.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(95, c.currentTime + 0.045);
+                        gain.gain.setValueAtTime(0.18, c.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.05);
+                        osc.connect(gain);
+                        gain.connect(c.destination);
+                        osc.start();
+                        osc.stop(c.currentTime + 0.05);
+                    } catch (e) {}
+                },
+
+                playOpen() {
+                    if (!state.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        const osc = c.createOscillator();
+                        const gain = c.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(380, c.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(760, c.currentTime + 0.22);
+                        gain.gain.setValueAtTime(0.22, c.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.24);
+                        osc.connect(gain);
+                        gain.connect(c.destination);
+                        osc.start();
+                        osc.stop(c.currentTime + 0.24);
+                    } catch (e) {}
+                },
+
+                playWin() {
+                    if (!state.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+                        notes.forEach((freq, i) => {
+                            const osc = c.createOscillator();
+                            const gain = c.createGain();
+                            osc.type = 'triangle';
+                            const start = c.currentTime + i * 0.08;
+                            osc.frequency.setValueAtTime(freq, start);
+                            gain.gain.setValueAtTime(0.25, start);
+                            gain.gain.exponentialRampToValueAtTime(0.001, start + 0.4);
+                            osc.connect(gain);
+                            gain.connect(c.destination);
+                            osc.start(start);
+                            osc.stop(start + 0.4);
+                        });
+                    } catch (e) {}
+                }
+            };
+        })();
+
+        /**
+         * =========================================================================
+         * 4. HIỆU ỨNG PHÁO HOA & MƯA TIỀN VÀNG KHI THẮNG LỚN
+         * =========================================================================
+         */
+        const CelebrationFX = (() => {
+            const canvas = document.getElementById('fx-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animId = null;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            function spawnBurst() {
+                const colors = ['#ffd700', '#fff099', '#ff9900', '#ff3333', '#ffffff'];
+                for (let i = 0; i < 95; i++) {
+                    const isCoin = Math.random() > 0.42;
+                    particles.push({
+                        x: canvas.width * (0.2 + Math.random() * 0.6),
+                        y: canvas.height * 0.35,
+                        vx: (Math.random() - 0.5) * 13,
+                        vy: -4.5 - Math.random() * 10,
+                        gravity: 0.28,
+                        size: isCoin ? (6.5 + Math.random() * 4) : (3.5 + Math.random() * 3),
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        isCoin,
+                        angle: Math.random() * Math.PI * 2,
+                        spin: (Math.random() - 0.5) * 0.26,
+                        alpha: 1
+                    });
+                }
+                if (!animId) loop();
+            }
+
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+                    p.angle += p.spin;
+                    p.alpha -= 0.011;
+
+                    if (p.alpha > 0) {
+                        ctx.save();
+                        ctx.globalAlpha = Math.max(0, p.alpha);
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.angle);
+                        if (p.isCoin) {
+                            ctx.fillStyle = '#ffd700';
+                            ctx.beginPath();
+                            ctx.ellipse(0, 0, p.size, p.size * Math.abs(Math.cos(p.angle * 2)), 0, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.strokeStyle = '#92400e';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        } else {
+                            ctx.fillStyle = p.color;
+                            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        }
+                        ctx.restore();
+                    }
+                });
+                particles = particles.filter(p => p.alpha > 0 && p.y < canvas.height + 30);
+                if (particles.length > 0) {
+                    animId = requestAnimationFrame(loop);
+                } else {
+                    animId = null;
+                }
+            }
+
+            return { trigger: spawnBurst };
+        })();
+
+        /**
+         * =========================================================================
+         * 5. LOGIC TRÒ CHƠI & TƯƠNG TÁC BÀN CƯỢC 3D
+         * =========================================================================
+         */
+        function initGame() {
+            RoyalAtmosphere3D.init();
+            Casino3D.init();
+            renderBoard();
+            updateUI();
+
+            // Đồng bộ số dư thực tế từ Server Cổng Game
+            fetch('/api/user/Player001')
+                .then(r => r.json())
+                .then(res => {
+                    if (res && res.success && res.data && typeof res.data.balance === 'number') {
+                        state.balance = res.data.balance;
+                        updateUI();
+                    }
+                }).catch(() => {});
+
+            // Khởi động vòng lặp tự động 15s đếm ngược cho Bầu Cua
+            startBettingRound();
+        }
+
+        function formatMoney(num) {
+            return num.toLocaleString('en-US');
+        }
+
+        function renderBoard() {
+            const board = document.getElementById('betting-board');
+            board.innerHTML = ITEMS.map(item => `
+                <div id="cell-${item.id}" onclick="placeBet('${item.id}')" 
+                     class="bet-cell-3d relative rounded-2xl p-2 sm:p-3 flex flex-col items-center justify-between cursor-pointer select-none min-h-[120px] sm:min-h-[150px] overflow-hidden">
+                    
+                    <!-- Góc trên: Tỷ lệ & Huy hiệu số mặt trúng -->
+                    <div class="w-full flex justify-between items-center text-[10px] font-bold text-amber-300/80 z-10">
+                        <span class="bg-black/45 px-1.5 py-0.5 rounded border border-amber-500/25">1 : 1</span>
+                        <span id="badge-count-${item.id}" class="hidden px-2 py-0.5 bg-gradient-to-r from-yellow-300 to-amber-500 text-red-950 rounded-full font-black shadow">x1</span>
+                    </div>
+
+                    <!-- Linh vật SVG 3D -->
+                    <div class="w-14 h-14 sm:w-20 sm:h-20 my-0.5 pointer-events-none transition-transform duration-200">
+                        ${item.svg}
+                    </div>
+
+                    <!-- Tên linh vật vàng kim -->
+                    <div class="font-royal font-black text-sm sm:text-lg tracking-widest text-metallic-gold">
+                        ${item.name}
+                    </div>
+
+                    <!-- Chồng Chip (Chip Stack 3D) -->
+                    <div id="chip-stack-${item.id}" class="absolute bottom-7 right-2 flex flex-col-reverse items-center pointer-events-none z-20"></div>
+
+                    <!-- Nhãn tổng tiền cược trên ô -->
+                    <div id="bet-tag-${item.id}" class="hidden mt-1 w-full bg-black/85 border border-amber-400/90 rounded-full py-0.5 px-2 flex items-center justify-center gap-1 shadow-lg z-20">
+                        <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                        <span id="bet-amount-${item.id}" class="text-xs sm:text-sm font-black text-amber-300">0</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function animateFlyingChip(chipValue, targetCellId) {
+            const sourceBtn = document.querySelector(`.chip-btn-3d[data-chip="${chipValue}"]`);
+            const targetCell = document.getElementById(`cell-${targetCellId}`);
+            if (!sourceBtn || !targetCell) return;
+
+            const srcRect = sourceBtn.getBoundingClientRect();
+            const dstRect = targetCell.getBoundingClientRect();
+
+            const clone = sourceBtn.querySelector('svg').cloneNode(true);
+            const flyEl = document.createElement('div');
+            flyEl.className = 'flying-chip w-10 h-10';
+            flyEl.style.left = `${srcRect.left + srcRect.width / 2 - 20}px`;
+            flyEl.style.top = `${srcRect.top + srcRect.height / 2 - 20}px`;
+            flyEl.appendChild(clone);
+            document.body.appendChild(flyEl);
+
+            requestAnimationFrame(() => {
+                const dx = (dstRect.left + dstRect.width / 2) - (srcRect.left + srcRect.width / 2);
+                const dy = (dstRect.top + dstRect.height / 2) - (srcRect.top + srcRect.height / 2);
+                flyEl.style.transform = `translate(${dx}px, ${dy}px) scale(0.65)`;
+                flyEl.style.opacity = '0.25';
+            });
+
+            setTimeout(() => flyEl.remove(), 380);
+        }
+
+        function renderChipStack(itemId) {
+            const stackContainer = document.getElementById(`chip-stack-${itemId}`);
+            const chips = state.betHistoryChips[itemId];
+            if (!chips || chips.length === 0) {
+                stackContainer.innerHTML = '';
+                return;
+            }
+            const visibleChips = chips.slice(-5);
+            stackContainer.innerHTML = visibleChips.map((val, idx) => {
+                const style = CHIP_STYLES[val] || CHIP_STYLES[100];
+                return `
+                    <div style="background:${style.bg}; border-color:${style.ring}; color:${style.text}; margin-bottom:${idx === 0 ? 0 : -14}px"
+                         class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-dashed shadow-[0_3px_5px_rgba(0,0,0,0.85)] flex items-center justify-center text-[8px] sm:text-[9px] font-black">
+                        ${style.label}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectChip(amount) {
+            state.selectedChip = amount;
+            AudioEngine.playChip();
+            document.querySelectorAll('.chip-btn-3d').forEach(btn => {
+                btn.classList.toggle('selected', Number(btn.dataset.chip) === amount);
+            });
+        }
+
+        function placeBet(itemId) {
+            if (state.phase !== 'BETTING') return;
+
+            if (state.balance < state.selectedChip) {
+                if (state.balance < 100 && getTotalBet() === 0) {
+                    document.getElementById('out-of-money-modal').classList.remove('hidden');
+                } else {
+                    setStatus('Số dư không đủ cho phỉnh cược này!');
+                }
+                return;
+            }
+
+            state.balance -= state.selectedChip;
+            state.bets[itemId] += state.selectedChip;
+            state.betHistoryChips[itemId].push(state.selectedChip);
+            if (window.RoomOverlay && window.RoomOverlay.syncCustomBet) {
+                window.RoomOverlay.syncCustomBet(itemId, state.selectedChip, 'baucua');
+            }
+
+            AudioEngine.playChip();
+            animateFlyingChip(state.selectedChip, itemId);
+            renderChipStack(itemId);
+            updateUI();
+        }
+
+        function rebetLastRound() {
+            if (state.phase !== 'BETTING') return;
+            if (!state.lastRoundBets) return;
+
+            const currentTotal = getTotalBet();
+            state.balance += currentTotal;
+            for (let k in state.bets) {
+                state.bets[k] = 0;
+                state.betHistoryChips[k] = [];
+            }
+
+            const needed = Object.values(state.lastRoundBets).reduce((a, b) => a + b, 0);
+            if (state.balance < needed) {
+                setStatus('Số dư không đủ để Cược Lại ván trước!');
+                updateUI();
+                return;
+            }
+
+            for (let k in state.lastRoundBets) {
+                const amt = state.lastRoundBets[k];
+                if (amt > 0) {
+                    state.balance -= amt;
+                    state.bets[k] = amt;
+                    state.betHistoryChips[k] = decomposeChips(amt);
+                    animateFlyingChip(state.betHistoryChips[k][0] || 100, k);
+                    renderChipStack(k);
+                }
+            }
+            AudioEngine.playChip();
+            setStatus('Đã đặt lại toàn bộ cửa cược của ván trước!');
+            updateUI();
+        }
+
+        function doubleBets() {
+            if (state.phase !== 'BETTING') return;
+            const total = getTotalBet();
+            if (total === 0) return;
+
+            if (state.balance < total) {
+                setStatus('Số dư không đủ để nhân đôi (X2) tiền cược!');
+                return;
+            }
+
+            for (let k in state.bets) {
+                const amt = state.bets[k];
+                if (amt > 0) {
+                    state.balance -= amt;
+                    state.bets[k] += amt;
+                    state.betHistoryChips[k] = decomposeChips(state.bets[k]);
+                    animateFlyingChip(state.selectedChip, k);
+                    renderChipStack(k);
+                }
+            }
+            AudioEngine.playChip();
+            setStatus('Đã nhân đôi (X2) tất cả các cửa đang cược!');
+            updateUI();
+        }
+
+        function decomposeChips(amount) {
+            const denoms = [10000, 5000, 1000, 500, 100];
+            const res = [];
+            let rem = amount;
+            for (let d of denoms) {
+                while (rem >= d && res.length < 5) {
+                    res.push(d);
+                    rem -= d;
+                }
+            }
+            return res.reverse();
+        }
+
+        function getTotalBet() {
+            return Object.values(state.bets).reduce((a, b) => a + b, 0);
+        }
+
+        function clearBets() {
+            if (state.phase !== 'BETTING') return;
+            const total = getTotalBet();
+            if (total === 0) return;
+
+            state.balance += total;
+            for (let key in state.bets) {
+                state.bets[key] = 0;
+                state.betHistoryChips[key] = [];
+                renderChipStack(key);
+            }
+            AudioEngine.playChip();
+            updateUI();
+            setStatus('Đã thu hồi toàn bộ phỉnh cược trên bàn.');
+        }
+
+        function resetRoundVisuals() {
+            document.getElementById('result-banner').classList.add('hidden');
+            ITEMS.forEach(item => {
+                document.getElementById(`cell-${item.id}`).classList.remove('winner');
+                document.getElementById(`badge-count-${item.id}`).classList.add('hidden');
+            });
+        }
+
+        // =========================================================================
+        // HỆ THỐNG ĐẾM NGƯỢC 15S & VÒNG LẶP CASINO HOÀNG GIA HOÀN TOÀN TỰ ĐỘNG
+        // =========================================================================
+        function startBettingRound() {
+            if (roundTimerInterval) clearInterval(roundTimerInterval);
+            if (shakeInterval) clearInterval(shakeInterval);
+            if (resultCooldownInterval) clearInterval(resultCooldownInterval);
+
+            state.phase = 'BETTING';
+            state.remainingSec = 15;
+
+            // Đóng úp Bát Sơn Mài 3D chuẩn bị cho ván mới
+            Casino3D.setBowlClosed();
+            resetRoundVisuals();
+            updateTimerUI();
+            updateUI();
+            setStatus('Đang mở nhận cược (15s)... Hãy chọn linh vật và đặt phỉnh!');
+
+            roundTimerInterval = setInterval(() => {
+                state.remainingSec--;
+                updateTimerUI();
+
+                // 5 giây cuối phát tiếng tích tắc cảnh báo
+                if (state.remainingSec <= 5 && state.remainingSec > 0) {
+                    AudioEngine.playShakeTick();
+                }
+
+                // Khi hết 15s tự động xóc bát đĩa 3D
+                if (state.remainingSec <= 0) {
+                    clearInterval(roundTimerInterval);
+                    startAutoShake();
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const cdSec = document.getElementById('countdown-sec');
+            const cdTitle = document.getElementById('countdown-title');
+            const cdUnit = document.getElementById('countdown-unit');
+            const stageText = document.getElementById('stage-timer-text');
+            const cdIndicator = document.getElementById('countdown-indicator');
+
+            if (state.phase === 'BETTING') {
+                if (cdSec) cdSec.textContent = state.remainingSec;
+                if (cdTitle) cdTitle.textContent = 'TỰ ĐỘNG XÓC';
+                if (cdUnit) cdUnit.textContent = 'giây';
+                if (stageText) stageText.textContent = `Đang đặt cược: ${state.remainingSec}s`;
+                if (cdIndicator) {
+                    cdIndicator.className = state.remainingSec <= 5
+                        ? 'w-2.5 h-2.5 rounded-full bg-red-500 animate-ping'
+                        : 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping';
+                }
+            } else if (state.phase === 'SHAKING') {
+                if (cdSec) cdSec.textContent = '🎲';
+                if (cdTitle) cdTitle.textContent = 'ĐANG XÓC 3D';
+                if (cdUnit) cdUnit.textContent = '';
+                if (stageText) stageText.textContent = '🎲 Đang xóc đĩa 3D...';
+                if (cdIndicator) cdIndicator.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping';
+            } else if (state.phase === 'RESULT') {
+                if (cdTitle) cdTitle.textContent = 'VÁN MỚI SAU';
+                if (cdUnit) cdUnit.textContent = 'giây';
+                if (cdIndicator) cdIndicator.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping';
+            }
+        }
+
+        function triggerEarlyRoll() {
+            if (state.phase !== 'BETTING') return;
+            if (roundTimerInterval) clearInterval(roundTimerInterval);
+            startAutoShake();
+        }
+
+        function startAutoShake() {
+            if (state.phase === 'SHAKING') return;
+            if (roundTimerInterval) clearInterval(roundTimerInterval);
+
+            state.phase = 'SHAKING';
+            Casino3D.setBowlClosed();
+            updateTimerUI();
+            updateUI();
+            setStatus('Đang xóc đĩa 3D tự động... Chúc quý khách đại thắng!');
+
+            shakeInterval = setInterval(() => {
+                AudioEngine.playShakeTick();
+            }, 110);
+
+            // Sinh ngẫu nhiên 3 xúc xắc
+            state.currentDice = [
+                ITEMS[Math.floor(Math.random() * ITEMS.length)].id,
+                ITEMS[Math.floor(Math.random() * ITEMS.length)].id,
+                ITEMS[Math.floor(Math.random() * ITEMS.length)].id
+            ];
+
+            setTimeout(() => {
+                clearInterval(shakeInterval);
+                autoRevealResult();
+            }, 2200);
+        }
+
+        function autoRevealResult() {
+            // Cập nhật vị trí mặt xúc xắc 3D theo kết quả
+            Casino3D.syncDiceToState(false);
+            // Tự động mở bát sơn mài 3D
+            Casino3D.setBowlOpened();
+            AudioEngine.playOpen();
+
+            // Đánh giá kết quả & cộng thưởng
+            evaluateResult();
+
+            // Đếm ngược 5 giây kết quả trước khi sang ván mới
+            let cooldown = 5;
+            const cdSec = document.getElementById('countdown-sec');
+            const stageText = document.getElementById('stage-timer-text');
+            if (cdSec) cdSec.textContent = cooldown;
+            if (stageText) stageText.textContent = `Ván mới sau: ${cooldown}s`;
+
+            if (resultCooldownInterval) clearInterval(resultCooldownInterval);
+            resultCooldownInterval = setInterval(() => {
+                cooldown--;
+                if (cdSec) cdSec.textContent = cooldown;
+                if (stageText) stageText.textContent = `Ván mới sau: ${cooldown}s`;
+
+                if (cooldown <= 0) {
+                    clearInterval(resultCooldownInterval);
+                    // Dọn sạch bàn cược và sang ván tiếp theo
+                    for (let key in state.bets) {
+                        state.bets[key] = 0;
+                        state.betHistoryChips[key] = [];
+                        renderChipStack(key);
+                    }
+                    startBettingRound();
+                }
+            }, 1000);
+        }
+
+        function evaluateResult() {
+            state.phase = 'RESULT';
+            updateTimerUI();
+
+            const counts = {};
+            state.currentDice.forEach(id => {
+                counts[id] = (counts[id] || 0) + 1;
+            });
+
+            let totalWinProfit = 0;
+            let totalReturn = 0;
+            const totalBet = getTotalBet();
+
+            if (totalBet > 0) {
+                state.lastRoundBets = { ...state.bets };
+            }
+
+            ITEMS.forEach(item => {
+                const count = counts[item.id] || 0;
+                const betOnItem = state.bets[item.id];
+                const cell = document.getElementById(`cell-${item.id}`);
+                const badge = document.getElementById(`badge-count-${item.id}`);
+
+                if (count > 0) {
+                    cell.classList.add('winner');
+                    badge.textContent = `x${count}`;
+                    badge.classList.remove('hidden');
+
+                    if (betOnItem > 0) {
+                        const profit = betOnItem * count;
+                        totalWinProfit += profit;
+                        totalReturn += betOnItem + profit;
+                    }
+                }
+            });
+
+            state.balance += totalReturn;
+
+            const banner = document.getElementById('result-banner');
+            const bannerInner = document.getElementById('result-banner-inner');
+            banner.classList.remove('hidden');
+            bannerInner.classList.remove('big-win-anim');
+            void bannerInner.offsetWidth;
+
+            if (totalBet === 0) {
+                bannerInner.className = 'px-4 py-1.5 rounded-full font-black text-xs sm:text-sm shadow-2xl border-2 border-amber-300 bg-red-950/95 text-amber-200 big-win-anim';
+                bannerInner.textContent = `Kết quả: ${state.currentDice.map(id => ITEMS.find(i => i.id === id).name).join(' • ')}`;
+                setStatus('Ván này bạn chưa đặt cược. Chuẩn bị cho ván tiếp theo!');
+            } else if (totalReturn > 0) {
+                AudioEngine.playWin();
+                CelebrationFX.trigger();
+                bannerInner.className = 'px-5 py-1.5 rounded-full font-black text-sm sm:text-base shadow-[0_0_25px_#ffd700] border-2 border-white bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 text-red-950 big-win-anim';
+                bannerInner.textContent = `👑 THẮNG LỚN +${formatMoney(totalReturn)}!`;
+                setStatus(`Chúc mừng! Bạn thắng ${formatMoney(totalReturn)} (Lãi ròng +${formatMoney(totalWinProfit)}).`);
+            } else {
+                bannerInner.className = 'px-4 py-1.5 rounded-full font-black text-xs sm:text-sm shadow-2xl border-2 border-red-400 bg-stone-950/95 text-red-300 big-win-anim';
+                bannerInner.textContent = `Chưa trúng • -${formatMoney(totalBet)}`;
+                setStatus('Chưa may mắn ván này! Thử vận may ở ván tiếp theo nhé.');
+            }
+
+            state.history.unshift([...state.currentDice]);
+            if (state.history.length > 5) state.history.pop();
+            renderHistory();
+
+            // Đồng bộ số dư mới về Server
+            fetch('/api/user/Player001/sync-balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ balance: state.balance })
+            }).catch(() => {});
+
+            updateUI();
+
+            if (state.balance < 100) {
+                setTimeout(() => {
+                    document.getElementById('out-of-money-modal').classList.remove('hidden');
+                }, 1150);
+            }
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            if (state.history.length === 0) return;
+
+            container.innerHTML = state.history.map((round, idx) => `
+                <div class="flex items-center justify-between gap-1.5 bg-black/60 px-2 py-1 rounded-xl border ${idx === 0 ? 'border-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.45)]' : 'border-white/10'} md:w-full">
+                    <span class="hidden md:inline text-[10px] font-bold ${idx === 0 ? 'text-amber-300' : 'text-white/40'}">#${idx + 1}</span>
+                    <div class="flex items-center gap-1">
+                        ${round.map(id => {
+                            const item = ITEMS.find(i => i.id === id);
+                            return `<div class="w-5 h-5 sm:w-6 sm:h-6" title="${item.name}">${item.svg}</div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateUI() {
+            document.getElementById('balance-display').textContent = formatMoney(state.balance);
+            const totalBet = getTotalBet();
+            document.getElementById('total-bet-display').textContent = formatMoney(totalBet);
+
+            ITEMS.forEach(item => {
+                const amt = state.bets[item.id];
+                const tag = document.getElementById(`bet-tag-${item.id}`);
+                const amtEl = document.getElementById(`bet-amount-${item.id}`);
+                if (amt > 0) {
+                    tag.classList.remove('hidden');
+                    amtEl.textContent = formatMoney(amt);
+                } else {
+                    tag.classList.add('hidden');
+                }
+            });
+
+            const isBetting = (state.phase === 'BETTING');
+            const quickRollBtn = document.getElementById('btn-quick-roll');
+            if (quickRollBtn) quickRollBtn.disabled = !isBetting;
+
+            document.getElementById('btn-clear').disabled = (!isBetting || totalBet === 0);
+            document.getElementById('btn-double').disabled = (!isBetting || totalBet === 0 || state.balance < totalBet);
+            document.getElementById('btn-rebet').disabled = (!isBetting || !state.lastRoundBets);
+        }
+
+        function setStatus(msg) {
+            document.getElementById('status-bar').textContent = msg;
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            document.getElementById('icon-sound-on').classList.toggle('hidden', !state.soundEnabled);
+            document.getElementById('icon-sound-off').classList.toggle('hidden', state.soundEnabled);
+            if (state.soundEnabled) AudioEngine.playChip();
+        }
+
+        function topUpBalance() {
+            state.balance += 50000;
+            AudioEngine.playWin();
+            CelebrationFX.trigger();
+            updateUI();
+            setStatus('Hoàng Gia ban thưởng +50,000 vào ví của bạn!');
+
+            // Đồng bộ số dư về Server
+            fetch('/api/user/Player001/sync-balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ balance: state.balance })
+            }).catch(() => {});
+        }
+
+        function closeModal() {
+            document.getElementById('out-of-money-modal').classList.add('hidden');
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

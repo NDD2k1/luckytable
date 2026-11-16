@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ba Cây Hoàng Gia VIP — Đẳng Cấp Thần Bài</title>
+    <link rel="stylesheet" href="/css/room-overlay.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/room-overlay.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --felt-green: #0a3d24;
+            --felt-dark: #041f12;
+            --gold-bright: #fff3b0;
+            --gold-main: #e5b84b;
+            --gold-deep: #9c6b19;
+            --wood-rim: #1c0f0a;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #070e0a;
+            background-image: 
+                radial-gradient(ellipse 95% 65% at 50% 20%, rgba(16, 78, 46, 0.45) 0%, rgba(4, 31, 18, 0.9) 65%, rgba(2, 10, 6, 1) 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-royal {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .text-metallic-gold {
+            background: linear-gradient(180deg, #ffffff 0%, #ffe680 35%, #d4af37 70%, #8c6218 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+        }
+
+        /* Bàn Poker / Ba Cây Oval Nỉ Xanh Hoàng Gia */
+        .poker-oval-table {
+            background: radial-gradient(ellipse at 50% 50%, #0e502c 0%, #08381e 55%, #032010 100%);
+            border: 10px solid #23120b;
+            box-shadow: 
+                0 0 0 3px #d4af37,
+                0 0 0 6px #150a06,
+                0 0 45px rgba(0, 0, 0, 0.95),
+                inset 0 0 60px rgba(0, 0, 0, 0.7),
+                inset 0 1px 3px rgba(255, 243, 176, 0.35);
+            border-radius: 9999px;
+            position: relative;
+        }
+
+        /* Lá bài 3D Flip */
+        .card-container-3d {
+            perspective: 800px;
+        }
+
+        .card-inner-3d {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card-inner-3d.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 50%, #991b1b 100%);
+            border: 2px solid #fbbf24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-back::before {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border: 1px dashed rgba(251, 191, 36, 0.6);
+            border-radius: 5px;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(0,0,0,0.15),
+                rgba(0,0,0,0.15) 6px,
+                rgba(251,191,36,0.12) 6px,
+                rgba(251,191,36,0.12) 12px
+            );
+        }
+
+        .card-front {
+            background: #ffffff;
+            color: #111827;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 4px 6px;
+            border: 1.5px solid #d1d5db;
+        }
+
+        .card-front.red-suit {
+            color: #dc2626;
+        }
+
+        .card-front.black-suit {
+            color: #111827;
+        }
+
+        /* Phỉnh Casino 3D */
+        .chip-btn-3d {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .chip-btn-3d:hover:not(.selected) {
+            transform: translateY(-4px) scale(1.06);
+        }
+
+        .chip-btn-3d.selected {
+            transform: translateY(-8px) scale(1.14);
+            filter: drop-shadow(0 0 10px #fbbf24);
+        }
+
+        .chip-btn-3d.selected::after {
+            content: '▲';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fbbf24;
+            font-size: 10px;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        /* Nút Vàng Casino 3D */
+        .btn-gold-3d {
+            background: linear-gradient(180deg, #ffe082 0%, #e5b84b 45%, #b27e1f 100%);
+            border: 1px solid #ffecb3;
+            color: #3e2704;
+            box-shadow: 0 4px 0 #6d4a0c, 0 8px 18px rgba(0, 0, 0, 0.6);
+            transition: all 0.15s ease;
+        }
+
+        .btn-gold-3d:hover:not(:disabled) {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        .btn-gold-3d:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #6d4a0c, 0 4px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-gold-3d:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+        }
+
+        /* Nút Tối Casino */
+        .btn-dark-3d {
+            background: linear-gradient(180deg, #2b352e 0%, #17211a 100%);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            color: #fef3c7;
+            box-shadow: 0 3px 0 #0a110d, 0 6px 14px rgba(0,0,0,0.6);
+        }
+
+        .btn-dark-3d:hover:not(:disabled) {
+            filter: brightness(1.18);
+        }
+
+        .btn-dark-3d:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0a110d;
+        }
+
+        /* Hộp nặn bài (Squeeze Area) */
+        .squeeze-overlay {
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Flying Card Deal Animation */
+        .dealing-card-clone {
+            position: fixed;
+            width: 48px;
+            height: 68px;
+            background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 50%, #991b1b 100%);
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85);
+            pointer-events: none;
+            z-index: 999;
+            transition: all 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+            transform-origin: center center;
+        }
+
+        /* Flying Coin / Chip Animation */
+        .chip-fly-clone {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            transition: all 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75);
+        }
+
+        /* Floating Score Text (+10,000 / -5,000) */
+        .floating-score-text {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1001;
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+            animation: floatScoreUp 1.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes floatScoreUp {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 10px) scale(0.6);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -10px) scale(1.18);
+            }
+            75% {
+                opacity: 1;
+                transform: translate(-50%, -35px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -55px) scale(0.9);
+            }
+        }
+
+        /* Flying chip animation */
+        .flying-chip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            transition: all 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @keyframes bounce {
+            from { transform: translateX(-50%) translateY(0); }
+            to { transform: translateX(-50%) translateY(3px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.8); }
+        }
+
+        .pot-glow {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between min-h-screen">
+
+    <!-- CANVAS HIỆU ỨNG HẠT PHẤN & PHÁO HOA ĂN MỪNG -->
+    <canvas id="fireworks-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <!-- =========================================================================
+         TOP HEADER BAR
+         ========================================================================= -->
+    <header class="w-full bg-black/60 backdrop-blur-md border-b border-amber-500/30 px-3 py-2 flex items-center justify-between z-30 shadow-lg">
+        <!-- Thông tin người chơi (Player001) -->
+        <div class="flex items-center gap-2.5">
+            <div class="relative">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full p-0.5 bg-gradient-to-br from-yellow-300 via-amber-500 to-amber-700 shadow-md">
+                    <img src="assets/avatar.png" alt="Avatar" class="w-full h-full rounded-full object-cover">
+                </div>
+                <span class="absolute -top-1 -right-1 text-xs">👑</span>
+            </div>
+            <div>
+                <div class="flex items-center gap-1.5">
+                    <span id="player-name" class="font-extrabold text-sm sm:text-base text-amber-200">Player001</span>
+                    <span class="text-[10px] bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-black px-1.5 py-0.2 rounded-full uppercase">VIP 2</span>
+                </div>
+                <div class="flex items-center gap-1 bg-black/50 px-2.5 py-0.5 rounded-full border border-amber-500/30 text-amber-400 text-xs sm:text-sm font-black">
+                    <span>🪙</span>
+                    <span id="balance-display">50,000</span>
+                    <button onclick="topUpBalance()" title="Nạp nhanh 50,000 xu" class="ml-1 w-4 h-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black flex items-center justify-center text-[10px] leading-none transition-transform hover:scale-110">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tiêu đề Game Chính giữa -->
+        <div class="text-center">
+            <div class="flex items-center justify-center gap-1.5">
+                <span class="text-xl">🎴</span>
+                <h1 class="font-royal font-black text-lg sm:text-2xl tracking-wider text-metallic-gold uppercase">Ba Cây Hoàng Gia</h1>
+                <span class="text-xl">🎴</span>
+            </div>
+            <p class="text-[10px] sm:text-xs font-semibold text-amber-300/80 tracking-widest uppercase">Bàn VIP 01 — Phòng Đại Gia</p>
+        </div>
+
+        <!-- Các nút điều hướng & âm thanh -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <a href="/" class="bg-stone-900/85 hover:bg-stone-800 text-amber-300 border border-amber-500/40 px-2.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition shadow">
+                <span>🏠</span>
+                <span class="hidden sm:inline">Về Sảnh</span>
+            </a>
+            <button onclick="openRuleModal()" class="bg-stone-900/85 hover:bg-stone-800 text-amber-300 border border-amber-500/40 px-2 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition shadow" title="Luật chơi">
+                📜
+            </button>
+            <button id="btn-sound" onclick="toggleSound()" class="w-8 h-8 rounded-xl bg-stone-900/85 hover:bg-stone-800 text-amber-300 border border-amber-500/40 flex items-center justify-center text-sm transition shadow" title="Âm thanh">
+                <span id="sound-icon">🔊</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- =========================================================================
+         BÀN CHƠI BA CÂY OVAL POKER CASINO VIP
+         ========================================================================= -->
+    <main class="w-full max-w-5xl mx-auto px-2 sm:px-4 py-2 flex-1 flex flex-col justify-center relative z-10">
+        
+        <div class="poker-oval-table w-full aspect-[4/3] sm:aspect-[16/10] max-h-[580px] p-3 sm:p-5 flex flex-col justify-between items-center relative overflow-hidden">
+            
+            <!-- Vạch kẻ viền nỉ bàn & Hoa văn Hoàng Gia -->
+            <div class="absolute inset-5 rounded-full border border-amber-400/20 pointer-events-none"></div>
+            <div class="absolute inset-7 rounded-full border border-dashed border-amber-400/15 pointer-events-none"></div>
+
+            <!-- -------------------------------------------------------------
+                 VỊ TRÍ 1 (TOP): NHÀ CÁI / CHƯƠNG (DEALER)
+                 ------------------------------------------------------------- -->
+            <div id="seat-dealer" class="flex flex-col items-center z-10">
+                <!-- Avatar & Badge Nhà Cái -->
+                <div class="flex items-center gap-2 bg-black/60 px-3 py-1 rounded-full border border-amber-500/50 shadow-md">
+                    <span class="text-xs">👑</span>
+                    <span id="dealer-seat-title" class="text-xs sm:text-sm font-extrabold text-amber-300 uppercase">Nhà Cái Hoàng Gia</span>
+                    <span id="dealer-point-badge" class="hidden text-[10px] font-black bg-gradient-to-r from-red-600 to-amber-600 text-white px-2 py-0.5 rounded-full shadow"></span>
+                </div>
+                <!-- 3 Lá Bài của Nhà Cái -->
+                <div class="flex items-center gap-1.5 sm:gap-2.5 mt-1.5">
+                    <div id="card-dealer-0" class="card-container-3d w-11 h-16 sm:w-14 sm:h-20">
+                        <div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div>
+                    </div>
+                    <div id="card-dealer-1" class="card-container-3d w-11 h-16 sm:w-14 sm:h-20">
+                        <div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div>
+                    </div>
+                    <div id="card-dealer-2" class="card-container-3d w-11 h-16 sm:w-14 sm:h-20">
+                        <div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- -------------------------------------------------------------
+                 KHU VỰC TRUNG TÂM: HỘP BÀI (SHOE), HŨ GÀ (POT) & COUNTDOWN
+                 ------------------------------------------------------------- -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 my-auto z-10 w-full px-4">
+                
+                <!-- GHẾ TAY TRÁI (BOT 1: Đại Gia Nam) -->
+                <div id="seat-bot1" class="hidden md:flex flex-col items-center">
+                    <div class="bg-black/60 px-2.5 py-0.5 rounded-full border border-white/20 text-[11px] text-gray-200 font-bold flex items-center gap-1">
+                        <span>🧔</span> Đại Gia Nam
+                    </div>
+                    <div class="text-[10px] text-amber-300 font-extrabold mt-0.5">Cược: <span id="bot1-bet-display">5,000</span></div>
+                    <div class="flex items-center gap-1 mt-1">
+                        <div id="card-bot1-0" class="card-container-3d w-8 h-12 sm:w-10 sm:h-14"><div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div></div>
+                        <div id="card-bot1-1" class="card-container-3d w-8 h-12 sm:w-10 sm:h-14"><div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div></div>
+                        <div id="card-bot1-2" class="card-container-3d w-8 h-12 sm:w-10 sm:h-14"><div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div></div>
+                    </div>
+                    <span id="bot1-point-badge" class="hidden text-[9px] font-black bg-black/80 text-amber-300 px-1.5 py-0.5 rounded-full border border-amber-500/40 mt-1"></span>
+                </div>
+
+                <!-- TÂM BÀN: HỘP BÀI NẸP VÀNG, HŨ GÀ & TIMER RIBBON -->
+                <div class="flex flex-col items-center justify-center">
+                    
+                    <!-- HỘP BÀI CHIA 3D (TABLE SHOE / DECK) -->
+                    <div id="table-deck" class="relative w-12 h-16 sm:w-14 sm:h-20 card-back rounded-lg border-2 border-amber-400 shadow-[0_8px_25px_rgba(0,0,0,0.9)] mb-2 flex items-center justify-center cursor-pointer select-none transition-transform hover:scale-105" title="Hộp bài chia">
+                        <div class="absolute -top-1 -left-1 w-full h-full card-back rounded-lg opacity-50 -z-10"></div>
+                        <div class="absolute -top-2 -left-2 w-full h-full card-back rounded-lg opacity-25 -z-20"></div>
+                        <span class="text-sm font-black text-amber-300 drop-shadow">🎴</span>
+                    </div>
+
+                    <!-- HŨ GÀ (POT) -->
+                    <div id="table-pot" class="pot-glow bg-gradient-to-b from-amber-900/80 to-black/85 border border-amber-400/80 rounded-2xl px-4 py-1.5 flex items-center gap-2 shadow-xl mb-2">
+                        <span class="text-xl">🏆</span>
+                        <div>
+                            <div class="text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">Hũ Gà (10 Nước Ăn Trọn)</div>
+                            <div id="pot-amount-display" class="font-mono font-black text-base sm:text-xl text-yellow-300 drop-shadow">50,000 xu</div>
+                        </div>
+                    </div>
+
+                    <!-- RIBBON ĐẾM NGƯỢC THỜI GIAN -->
+                    <div id="timer-badge" class="bg-black/85 backdrop-blur-md px-4 py-1.5 rounded-full border border-amber-400/70 shadow-[0_0_15px_rgba(251,191,36,0.5)] text-amber-300 font-extrabold text-xs sm:text-sm flex items-center gap-2">
+                        <span id="timer-icon" class="text-amber-400">⏱️</span>
+                        <span id="timer-text">Đang đặt cược: 15s</span>
+                    </div>
+
+                    <!-- THÔNG BÁO THẮNG THUA CHÍNH GIỮA (BIG WIN BANNER) -->
+                    <div id="table-announcement" class="hidden mt-2 px-5 py-1.5 rounded-full font-black text-sm sm:text-base border-2 shadow-2xl animate-bounce whitespace-nowrap"></div>
+                </div>
+
+                <!-- GHẾ TAY PHẢI (BOT 2: Bạch Thủ Phát) -->
+                <div id="seat-bot2" class="hidden md:flex flex-col items-center">
+                    <div class="bg-black/60 px-2.5 py-0.5 rounded-full border border-white/20 text-[11px] text-gray-200 font-bold flex items-center gap-1">
+                        <span>👨‍💼</span> Bạch Thủ Phát
+                    </div>
+                    <div class="text-[10px] text-amber-300 font-extrabold mt-0.5">Cược: <span id="bot2-bet-display">5,000</span></div>
+                    <div class="flex items-center gap-1 mt-1">
+                        <div id="card-bot2-0" class="card-container-3d w-8 h-12 sm:w-10 sm:h-14"><div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div></div>
+                        <div id="card-bot2-1" class="card-container-3d w-8 h-12 sm:w-10 sm:h-14"><div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div></div>
+                        <div id="card-bot2-2" class="card-container-3d w-8 h-12 sm:w-10 sm:h-14"><div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div></div>
+                    </div>
+                    <span id="bot2-point-badge" class="hidden text-[9px] font-black bg-black/80 text-amber-300 px-1.5 py-0.5 rounded-full border border-amber-500/40 mt-1"></span>
+                </div>
+
+            </div>
+
+            <!-- -------------------------------------------------------------
+                 VỊ TRÍ 2 (BOTTOM): BẠN (PLAYER001) VỚI 3 LÁ BÀI & KHU NẶN BÀI
+                 ------------------------------------------------------------- -->
+            <div id="seat-player" class="flex flex-col items-center z-20 w-full">
+                
+                <!-- Huy hiệu Nhà Cái khi bạn Cầm Chương -->
+                <div id="player-dealer-crown" class="hidden bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 text-red-950 px-3.5 py-0.5 rounded-full font-black text-xs shadow-[0_0_18px_#fbbf24] border border-white mb-1 animate-pulse">
+                    👑 BẠN LÀ NHÀ CÁI (CẦM CHƯƠNG)
+                </div>
+
+                <!-- Huy hiệu điểm số của bạn -->
+                <div class="flex items-center gap-2 mb-1">
+                    <span id="player-point-badge" class="hidden text-xs sm:text-sm font-black bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 text-red-950 px-3.5 py-1 rounded-full shadow-[0_0_15px_#fbbf24] border border-white animate-pulse"></span>
+                    <span id="ga-status-badge" class="hidden text-[11px] font-bold bg-amber-600/80 text-white px-2.5 py-0.5 rounded-full border border-amber-300/50">🍗 ĐÃ VÀO GÀ</span>
+                </div>
+
+                <!-- 3 LÁ BÀI LỚN CỦA PLAYER001 (CÓ THỂ CLICK / KÉO NẶN) -->
+                <div class="flex items-center justify-center gap-2 sm:gap-3">
+                    <!-- Lá bài 1 -->
+                    <div id="card-player-0" class="card-container-3d w-16 h-24 sm:w-20 sm:h-28 transition-transform hover:-translate-y-1">
+                        <div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div>
+                    </div>
+                    <!-- Lá bài 2 -->
+                    <div id="card-player-1" class="card-container-3d w-16 h-24 sm:w-20 sm:h-28 transition-transform hover:-translate-y-1">
+                        <div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div>
+                    </div>
+                    <!-- Lá bài 3 (LÁ NẶN BÀI) -->
+                    <div id="card-player-2" onclick="openSqueezeModal()" class="card-container-3d w-16 h-24 sm:w-20 sm:h-28 relative cursor-pointer transition-transform hover:scale-105" title="Chạm để nặn bài">
+                        <div class="card-inner-3d"><div class="card-face card-back"></div><div class="card-face card-front"></div></div>
+                        <div id="squeeze-hint" class="hidden absolute -bottom-5 inset-x-0 flex justify-center pointer-events-none">
+                            <span class="bg-amber-500 text-black font-black text-[9px] px-2 py-0.5 rounded-full uppercase shadow animate-bounce">✋ Nặn bài</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thanh thông tin cược của người chơi -->
+                <div class="flex items-center gap-3 mt-1.5 bg-black/60 px-4 py-1 rounded-full border border-amber-500/40 text-xs sm:text-sm font-bold">
+                    <span class="text-amber-200">Đang cược:</span>
+                    <span id="player-bet-display" class="font-mono font-black text-yellow-400 text-sm sm:text-base">0 xu</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- =========================================================================
+         THANH ĐIỀU KHIỂN CƯỢC & PHỈNH CASINO 3D (BOTTOM BAR)
+         ========================================================================= -->
+    <footer class="w-full bg-black/75 backdrop-blur-md border-t border-amber-500/30 px-2 sm:px-4 py-2 z-30">
+        <div class="max-w-4xl mx-auto flex flex-col gap-2">
+            
+            <!-- HÀNG 1: TRẠNG THÁI & CÁC NÚT HÀNH ĐỘNG CASINO -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div id="action-status-bar" class="text-xs sm:text-sm font-semibold text-amber-200 truncate flex-1">
+                    Chọn mệnh giá phỉnh cược và bấm "Đặt Cược" để bắt đầu!
+                </div>
+                
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <button id="btn-relinquish-dealer" onclick="relinquishDealerRole()" class="hidden btn-dark-3d font-extrabold px-2.5 py-1.5 rounded-xl text-xs uppercase tracking-wide text-amber-300 border border-amber-400/80 shadow">
+                        👑 Trả Cái
+                    </button>
+                    <button id="btn-bet" onclick="placePlayerBet()" class="btn-gold-3d font-black px-3.5 py-1.5 rounded-xl text-xs sm:text-sm uppercase tracking-wide flex items-center gap-1">
+                        🪙 Đặt Cược
+                    </button>
+                    <button id="btn-double" onclick="doublePlayerBet()" disabled class="btn-dark-3d font-extrabold px-2.5 py-1.5 rounded-xl text-xs uppercase tracking-wide">
+                        X2 Cược
+                    </button>
+                    <button id="btn-vaoga" onclick="toggleVaoGa()" class="btn-dark-3d font-extrabold px-2.5 py-1.5 rounded-xl text-xs uppercase tracking-wide text-yellow-300">
+                        🍗 Vào Gà (+1K)
+                    </button>
+                    <button id="btn-clear" onclick="clearPlayerBet()" disabled class="btn-dark-3d font-extrabold px-2.5 py-1.5 rounded-xl text-xs uppercase tracking-wide text-red-300">
+                        Xóa Cược
+                    </button>
+                    <button id="btn-quick-deal" onclick="triggerEarlyDeal()" class="btn-gold-3d font-black px-3 py-1.5 rounded-xl text-xs uppercase tracking-wide">
+                        ⚡ Chia Ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- HÀNG 2: KHAY PHỈNH CASINO 3D -->
+            <div class="flex items-center justify-center gap-2 sm:gap-4 py-1 overflow-x-auto">
+                <!-- 100 -->
+                <button onclick="selectChip(100)" data-chip="100" class="chip-btn-3d selected w-11 h-11 sm:w-13 sm:h-13 rounded-full border-2 border-dashed border-gray-400 bg-gray-200 text-gray-900 font-black text-xs shadow-lg flex items-center justify-center">
+                    100
+                </button>
+                <!-- 500 -->
+                <button onclick="selectChip(500)" data-chip="500" class="chip-btn-3d w-11 h-11 sm:w-13 sm:h-13 rounded-full border-2 border-dashed border-blue-200 bg-blue-600 text-white font-black text-xs shadow-lg flex items-center justify-center">
+                    500
+                </button>
+                <!-- 1K -->
+                <button onclick="selectChip(1000)" data-chip="1000" class="chip-btn-3d w-11 h-11 sm:w-13 sm:h-13 rounded-full border-2 border-dashed border-emerald-200 bg-emerald-600 text-white font-black text-xs shadow-lg flex items-center justify-center">
+                    1K
+                </button>
+                <!-- 5K -->
+                <button onclick="selectChip(5000)" data-chip="5000" class="chip-btn-3d w-11 h-11 sm:w-13 sm:h-13 rounded-full border-2 border-dashed border-purple-200 bg-purple-600 text-white font-black text-xs shadow-lg flex items-center justify-center">
+                    5K
+                </button>
+                <!-- 10K -->
+                <button onclick="selectChip(10000)" data-chip="10000" class="chip-btn-3d w-11 h-11 sm:w-13 sm:h-13 rounded-full border-2 border-dashed border-amber-200 bg-amber-500 text-amber-950 font-black text-xs shadow-lg flex items-center justify-center">
+                    10K
+                </button>
+                <!-- 50K -->
+                <button onclick="selectChip(50000)" data-chip="50000" class="chip-btn-3d w-11 h-11 sm:w-13 sm:h-13 rounded-full border-2 border-dashed border-red-200 bg-red-600 text-white font-black text-xs shadow-lg flex items-center justify-center">
+                    50K
+                </button>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- =========================================================================
+         MODAL NẶN BÀI TƯƠNG TÁC (CARD SQUEEZING OVERLAY)
+         ========================================================================= -->
+    <div id="squeeze-modal" class="hidden fixed inset-0 squeeze-overlay z-50 flex flex-col items-center justify-center p-4">
+        <div class="text-center mb-4">
+            <h3 class="font-royal font-black text-xl sm:text-2xl text-metallic-gold">NẶN BÀI HOÀNG GIA</h3>
+            <p class="text-xs sm:text-sm text-amber-200/80">Kéo/Vuốt lá bài từ mép để hé lộ quân bài may mắn!</p>
+        </div>
+
+        <!-- Khung sân khấu nặn bài -->
+        <div class="relative w-64 h-96 sm:w-72 sm:h-[420px] rounded-2xl p-3 bg-gradient-to-b from-stone-900 to-black border-2 border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.3)] flex items-center justify-center overflow-hidden">
+            
+            <!-- Mặt trước lá bài (Bên dưới) -->
+            <div id="squeeze-under-card" class="w-56 h-80 sm:w-64 sm:h-92 bg-white rounded-xl shadow-2xl flex flex-col justify-between p-4 border border-gray-300 select-none">
+                <div class="flex flex-col items-center leading-none">
+                    <span id="squeeze-rank-top" class="font-black text-3xl font-mono">9</span>
+                    <span id="squeeze-suit-top" class="text-2xl">♥</span>
+                </div>
+                <div id="squeeze-suit-center" class="text-7xl self-center text-center">♥</div>
+                <div class="flex flex-col items-center leading-none rotate-180">
+                    <span id="squeeze-rank-bot" class="font-black text-3xl font-mono">9</span>
+                    <span id="squeeze-suit-bot" class="text-2xl">♥</span>
+                </div>
+            </div>
+
+            <!-- Mặt sau lá bài che phía trên (Có thể kéo/vuốt nặn) -->
+            <div id="squeeze-cover-card" class="absolute w-56 h-80 sm:w-64 sm:h-92 card-back rounded-xl cursor-grab active:cursor-grabbing shadow-2xl transition-transform duration-75">
+                <div class="text-center p-4 text-amber-300 font-extrabold text-sm pointer-events-none opacity-80">
+                    ✋ Giữ chuột / Chạm để kéo nặn
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Nút Mở Nhanh & Đóng -->
+        <div class="flex items-center gap-3 mt-4">
+            <button onclick="revealSqueezeCardImmediately()" class="btn-gold-3d font-black px-6 py-2 rounded-xl text-sm uppercase tracking-wider">
+                ⚡ Mở Nhanh
+            </button>
+            <button onclick="closeSqueezeModal()" class="btn-dark-3d font-bold px-4 py-2 rounded-xl text-sm">
+                Đóng
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         MODAL CHỌN LÀM NHÀ CÁI KHI ĐẠT 10 ĐIỂM
+         ========================================================================= -->
+    <div id="dealer-claim-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-amber-950 via-stone-900 to-black border-2 border-amber-400 rounded-3xl p-6 max-w-sm w-full text-center shadow-[0_0_50px_rgba(251,191,36,0.6)] animate-bounce">
+            <div class="text-4xl mb-2">👑</div>
+            <h3 class="font-royal font-black text-xl sm:text-2xl text-metallic-gold mb-1">BẠN ĐẠT 10 ĐIỂM!</h3>
+            <p class="text-xs sm:text-sm text-amber-200/90 mb-4">
+                Theo luật Ba Cây Hoàng Gia, bạn được quyền <strong class="text-yellow-300">CƯỚP CÁI (LÀM NHÀ CÁI)</strong> ván tiếp theo và ăn <strong class="text-yellow-300">x3</strong> số tiền cược!
+            </p>
+            <div class="flex flex-col gap-2">
+                <button onclick="acceptDealerRole()" class="btn-gold-3d font-black py-2.5 px-4 rounded-xl text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg">
+                    👑 Nhận Làm Nhà Cái
+                </button>
+                <button onclick="declineDealerRole()" class="btn-dark-3d font-bold py-2 px-4 rounded-xl text-xs text-amber-100">
+                    Bỏ qua (Tiếp tục đặt cược)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         MODAL LUẬT CHƠI BA CÂY
+         ========================================================================= -->
+    <div id="rule-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-stone-900 to-black border border-amber-400 rounded-3xl p-5 max-w-lg w-full text-amber-100 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-amber-400/30 pb-2 mb-3">
+                <h3 class="font-royal font-black text-lg text-metallic-gold">LUẬT CHƠI BA CÂY HOÀNG GIA</h3>
+                <button onclick="closeRuleModal()" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            <div class="text-xs sm:text-sm space-y-2.5 max-h-[70vh] overflow-y-auto pr-1">
+                <p><strong>1. Bộ bài:</strong> Sử dụng 36 lá bài (từ Át đến 9 của 4 chất: Bích ♠, Tép ♣, Rô ♦, Cơ ♥). Không dùng 10, J, Q, K.</p>
+                <p><strong>2. Cách tính điểm:</strong> Điểm = (Lá 1 + Lá 2 + Lá 3) % 10. Điểm 0 tính là <strong>10 Đỏ / 10 Nước</strong> (cao nhất).</p>
+                <p><strong>3. Thứ tự xếp hạng bài:</strong></p>
+                <ul class="list-disc pl-5 space-y-1 text-amber-200">
+                    <li><strong>10 Điểm (10 Đỏ):</strong> Ăn <span class="text-yellow-300 font-black">x3</span> số tiền cược, được quyền <span class="text-yellow-300 font-black">CHỌN LÀM NHÀ CÁI</span> và ăn trọn Hũ Gà!</li>
+                    <li><strong>9 Điểm (9 Nước):</strong> Thắng ăn <span class="text-yellow-300 font-black">x2</span> số tiền cược!</li>
+                    <li><strong>Còn lại (1 - 8 Điểm):</strong> Thắng ăn <span class="text-yellow-300 font-black">x1</span> số tiền cược!</li>
+                    <li><strong>Sáp:</strong> 3 lá cùng số (ví dụ: 9-9-9, A-A-A). Thắng tuyệt đối ăn thưởng <span class="text-yellow-300 font-black">x3</span>!</li>
+                    <li><strong>Đồng Hoa:</strong> 3 lá cùng chất (ví dụ 3 lá Cơ ♥). Thưởng x2!</li>
+                </ul>
+                <p><strong>4. So sánh khi bằng điểm:</strong> So sánh lá bài to nhất trong tay (9 &gt; 8 &gt; ... &gt; A). Nếu lá bài to nhất bằng nhau, so sánh chất: <strong>Cơ ♥ &gt; Rô ♦ &gt; Tép ♣ &gt; Bích ♠</strong>.</p>
+                <p><strong>5. Vào Gà (Pot):</strong> Người chơi có thể góp 1,000 xu vào Hũ Gà mỗi ván. Người chơi có bài 10 điểm cao nhất bàn sẽ ôm toàn bộ số xu trong Gà!</p>
+            </div>
+            <button onclick="closeRuleModal()" class="btn-gold-3d w-full mt-4 py-2 rounded-xl font-black text-xs uppercase">
+                Đã Hiểu
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         JAVASCRIPT ENGINE: GAME LOOP, AUDIO SYNTH, NẶN BÀI & TRẢ THƯỞNG
+         ========================================================================= -->
+    <script>
+        // Danh sách chất & giá trị
+        const SUITS = [
+            { id: 'spade', symbol: '♠', name: 'Bích', color: 'black', rank: 1 },
+            { id: 'club',  symbol: '♣', name: 'Tép',  color: 'black', rank: 2 },
+            { id: 'diamond', symbol: '♦', name: 'Rô', color: 'red',   rank: 3 },
+            { id: 'heart', symbol: '♥', name: 'Cơ',   color: 'red',   rank: 4 }
+        ];
+
+        const RANKS = [
+            { val: 1, name: 'A' },
+            { val: 2, name: '2' },
+            { val: 3, name: '3' },
+            { val: 4, name: '4' },
+            { val: 5, name: '5' },
+            { val: 6, name: '6' },
+            { val: 7, name: '7' },
+            { val: 8, name: '8' },
+            { val: 9, name: '9' }
+        ];
+
+        // Tạo bộ bài 36 lá
+        function createDeck() {
+            const deck = [];
+            for (let s of SUITS) {
+                for (let r of RANKS) {
+                    deck.push({
+                        val: r.val,
+                        name: r.name,
+                        suit: s.id,
+                        symbol: s.symbol,
+                        color: s.color,
+                        suitRank: s.rank
+                    });
+                }
+            }
+            return deck;
+        }
+
+        // State chính của trò chơi
+        let gameState = {
+            balance: 50000,
+            selectedChip: 100,
+            playerBet: 0,
+            hasVaoGa: false,
+            potAmount: 50000,
+            phase: 'BETTING', // 'BETTING' | 'DEALING' | 'SQUEEZING' | 'REVEAL' | 'RESULT'
+            remainingSec: 15,
+            playerHand: [],
+            dealerHand: [],
+            bot1Hand: [],
+            bot2Hand: [],
+            bot1Bet: 5000,
+            bot2Bet: 5000,
+            topSeatBet: 10000,
+            currentDealer: 'dealer', // 'dealer' | 'player' | 'bot1' | 'bot2'
+            soundEnabled: true,
+            isCard3Revealed: false
+        };
+
+        let roundTimer = null;
+        let squeezeCooldownTimer = null;
+
+        // Audio Engine
+        const AudioEngine = (() => {
+            let ctx = null;
+            function getCtx() {
+                if (!ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    ctx = new AudioCtx();
+                }
+                if (ctx.state === 'suspended') ctx.resume();
+                return ctx;
+            }
+
+            return {
+                playChip() {
+                    if (!gameState.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        const osc = c.createOscillator();
+                        const gain = c.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(1400, c.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(2200, c.currentTime + 0.05);
+                        gain.gain.setValueAtTime(0.2, c.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.06);
+                        osc.connect(gain);
+                        gain.connect(c.destination);
+                        osc.start();
+                        osc.stop(c.currentTime + 0.06);
+                    } catch (e) {}
+                },
+
+                playCardDeal() {
+                    if (!gameState.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        const osc = c.createOscillator();
+                        const gain = c.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(450, c.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(120, c.currentTime + 0.08);
+                        gain.gain.setValueAtTime(0.18, c.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.08);
+                        osc.connect(gain);
+                        gain.connect(c.destination);
+                        osc.start();
+                        osc.stop(c.currentTime + 0.08);
+                    } catch (e) {}
+                },
+
+                playCardFlip() {
+                    if (!gameState.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        const osc = c.createOscillator();
+                        const gain = c.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(600, c.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(300, c.currentTime + 0.07);
+                        gain.gain.setValueAtTime(0.22, c.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.07);
+                        osc.connect(gain);
+                        gain.connect(c.destination);
+                        osc.start();
+                        osc.stop(c.currentTime + 0.07);
+                    } catch (e) {}
+                },
+
+                playChipSweep() {
+                    if (!gameState.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        for (let i = 0; i < 4; i++) {
+                            const osc = c.createOscillator();
+                            const gain = c.createGain();
+                            osc.type = 'sine';
+                            const t = c.currentTime + i * 0.055;
+                            osc.frequency.setValueAtTime(1600 + i * 140, t);
+                            osc.frequency.exponentialRampToValueAtTime(2400, t + 0.04);
+                            gain.gain.setValueAtTime(0.18, t);
+                            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                            osc.connect(gain);
+                            gain.connect(c.destination);
+                            osc.start(t);
+                            osc.stop(t + 0.05);
+                        }
+                    } catch (e) {}
+                },
+
+                playWin() {
+                    if (!gameState.soundEnabled) return;
+                    try {
+                        const c = getCtx();
+                        const freqs = [523.25, 659.25, 783.99, 1046.50];
+                        freqs.forEach((f, i) => {
+                            const osc = c.createOscillator();
+                            const gain = c.createGain();
+                            osc.type = 'triangle';
+                            const t = c.currentTime + i * 0.09;
+                            osc.frequency.setValueAtTime(f, t);
+                            gain.gain.setValueAtTime(0.25, t);
+                            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+                            osc.connect(gain);
+                            gain.connect(c.destination);
+                            osc.start(t);
+                            osc.stop(t + 0.35);
+                        });
+                    } catch (e) {}
+                }
+            };
+        })();
+
+        // Hiệu ứng pháo hoa ăn mừng Canvas
+        const CelebrationFX = (() => {
+            const canvas = document.getElementById('fireworks-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animId = null;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            function spawn() {
+                const colors = ['#fbbf24', '#f59e0b', '#ef4444', '#10b981', '#3b82f6', '#ffffff'];
+                for (let i = 0; i < 75; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 3 + Math.random() * 8;
+                    particles.push({
+                        x: canvas.width / 2,
+                        y: canvas.height * 0.45,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        size: 4 + Math.random() * 4,
+                        alpha: 1,
+                        decay: 0.015 + Math.random() * 0.02
+                    });
+                }
+                if (!animId) loop();
+            }
+
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.15; // trọng lực
+                    p.alpha -= p.decay;
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+                    ctx.save();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+                if (particles.length > 0) {
+                    animId = requestAnimationFrame(loop);
+                } else {
+                    animId = null;
+                }
+            }
+
+            return { trigger: spawn };
+        })();
+
+        // =========================================================================
+        // KHỞI TẠO TRÒ CHƠI & ĐỒNG BỘ DỮ LIỆU
+        // =========================================================================
+        function initBaCay() {
+            // Đồng bộ số dư từ Server
+            fetch('/api/user/Player001')
+                .then(r => r.json())
+                .then(res => {
+                    if (res && res.success && res.data && typeof res.data.balance === 'number') {
+                        gameState.balance = res.data.balance;
+                        updateUI();
+                    }
+                }).catch(() => {});
+
+            setupSqueezeCardDrag();
+            startBettingPhase();
+        }
+
+        function formatMoney(num) {
+            return num.toLocaleString('en-US');
+        }
+
+        // =========================================================================
+        // VÒNG LẶP ĐẾM NGƯỢC TỰ ĐỘNG (15S ĐẶT CƯỢC ➔ CHIA BÀI ➔ NẶN BÀI ➔ TRẢ THƯỞNG)
+        // =========================================================================
+        function startBettingPhase() {
+            if (roundTimer) clearInterval(roundTimer);
+            if (squeezeCooldownTimer) clearInterval(squeezeCooldownTimer);
+
+            gameState.phase = 'BETTING';
+            gameState.remainingSec = 15;
+            gameState.isCard3Revealed = false;
+
+            // Reset giao diện bài
+            resetCardsUI();
+            updateTimerUI();
+            updateUI();
+            setStatus('Đang mở nhận cược (15s)... Chọn phỉnh và bấm "Đặt Cược"!');
+
+            roundTimer = setInterval(() => {
+                gameState.remainingSec--;
+                updateTimerUI();
+
+                if (gameState.remainingSec <= 5 && gameState.remainingSec > 0) {
+                    AudioEngine.playChip();
+                }
+
+                if (gameState.remainingSec <= 0) {
+                    clearInterval(roundTimer);
+                    startDealingPhase();
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const tb = document.getElementById('timer-badge');
+            const tt = document.getElementById('timer-text');
+            const ti = document.getElementById('timer-icon');
+
+            if (gameState.phase === 'BETTING') {
+                tt.textContent = `Đang đặt cược: ${gameState.remainingSec}s`;
+                ti.textContent = '⏱️';
+                tb.className = gameState.remainingSec <= 5
+                    ? 'bg-red-950/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.7)] text-red-200 font-extrabold text-xs sm:text-sm flex items-center gap-2 animate-pulse'
+                    : 'bg-black/85 backdrop-blur-md px-4 py-1.5 rounded-full border border-amber-400/70 shadow-[0_0_15px_rgba(251,191,36,0.5)] text-amber-300 font-extrabold text-xs sm:text-sm flex items-center gap-2';
+            } else if (gameState.phase === 'DEALING') {
+                tt.textContent = '🎴 Đang chia 3 lá bài...';
+                ti.textContent = '🎴';
+                tb.className = 'bg-black/85 px-4 py-1.5 rounded-full border border-amber-400/70 text-amber-300 font-extrabold text-xs sm:text-sm flex items-center gap-2';
+            } else if (gameState.phase === 'SQUEEZING') {
+                tt.textContent = `Nặn bài: ${gameState.remainingSec}s`;
+                ti.textContent = '🃏';
+                tb.className = 'bg-yellow-950/90 px-4 py-1.5 rounded-full border border-yellow-400 text-yellow-300 font-extrabold text-xs sm:text-sm flex items-center gap-2 animate-pulse';
+            } else if (gameState.phase === 'RESULT') {
+                tt.textContent = `Ván mới sau: ${gameState.remainingSec}s`;
+                ti.textContent = '🏆';
+                tb.className = 'bg-blue-950/90 px-4 py-1.5 rounded-full border border-cyan-400 text-cyan-200 font-extrabold text-xs sm:text-sm flex items-center gap-2';
+            }
+        }
+
+        function triggerEarlyDeal() {
+            if (gameState.phase !== 'BETTING') return;
+            if (roundTimer) clearInterval(roundTimer);
+            startDealingPhase();
+        }
+
+        // =========================================================================
+        // GIAI ĐOẠN CHIA BÀI 3 LÁ & ĐÁNH GIÁ ĐIỂM SỐ
+        // =========================================================================
+
+        // =========================================================================
+        // HIỆU ỨNG ANIMATION CHIA BÀI & TIỀN CƯỢC BAY (CHIPS FLYING FX)
+        // =========================================================================
+        function flyCardToSlot(deckEl, targetSlotEl, delay = 0, onComplete = null) {
+            if (!deckEl || !targetSlotEl) return;
+            setTimeout(() => {
+                const deckRect = deckEl.getBoundingClientRect();
+                const slotRect = targetSlotEl.getBoundingClientRect();
+
+                const clone = document.createElement('div');
+                clone.className = 'dealing-card-clone';
+                clone.style.left = `${deckRect.left + (deckRect.width - 48) / 2}px`;
+                clone.style.top = `${deckRect.top + (deckRect.height - 68) / 2}px`;
+                document.body.appendChild(clone);
+
+                AudioEngine.playCardDeal();
+
+                const dx = (slotRect.left + slotRect.width / 2) - (deckRect.left + deckRect.width / 2);
+                const dy = (slotRect.top + slotRect.height / 2) - (deckRect.top + deckRect.height / 2);
+                const targetW = slotRect.width || 60;
+                const scale = targetW / 48;
+
+                requestAnimationFrame(() => {
+                    clone.style.transform = `translate(${dx}px, ${dy}px) scale(${scale}) rotate(${dx > 0 ? 10 : -10}deg)`;
+                });
+
+                setTimeout(() => {
+                    clone.remove();
+                    const inner = targetSlotEl.querySelector('.card-inner-3d');
+                    if (inner) {
+                        inner.classList.remove('flipped');
+                    }
+                    targetSlotEl.style.opacity = '1';
+                    targetSlotEl.style.transform = 'scale(1)';
+                    if (onComplete) onComplete();
+                }, 360);
+            }, delay);
+        }
+
+        function flyChips(sourceEl, targetEl, count = 6, chipStyle = null, onComplete = null) {
+            if (!sourceEl || !targetEl) return;
+            const srcRect = sourceEl.getBoundingClientRect();
+            const dstRect = targetEl.getBoundingClientRect();
+
+            const startX = srcRect.left + srcRect.width / 2;
+            const startY = srcRect.top + srcRect.height / 2;
+            const endX = dstRect.left + dstRect.width / 2;
+            const endY = dstRect.top + dstRect.height / 2;
+
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const chip = document.createElement('div');
+                    chip.className = 'chip-fly-clone';
+                    chip.style.left = `${startX - 15}px`;
+                    chip.style.top = `${startY - 15}px`;
+                    chip.style.background = chipStyle || 'linear-gradient(135deg, #ffd700, #b8860b)';
+                    chip.style.border = '2px dashed #ffffff';
+                    chip.innerHTML = '<span style="font-size:10px;font-weight:900;color:#000;display:flex;align-items:center;justify-content:center;height:100%;">🪙</span>';
+                    document.body.appendChild(chip);
+
+                    const jitterX = (Math.random() - 0.5) * 35;
+                    const jitterY = (Math.random() - 0.5) * 35;
+
+                    requestAnimationFrame(() => {
+                        chip.style.transform = `translate(${endX - startX + jitterX}px, ${endY - startY + jitterY}px) scale(0.9) rotate(${Math.random() * 360}deg)`;
+                    });
+
+                    AudioEngine.playChip();
+
+                    setTimeout(() => {
+                        chip.remove();
+                        if (i === count - 1 && onComplete) onComplete();
+                    }, 550);
+                }, i * 60);
+            }
+        }
+
+        function showFloatingText(targetEl, text, isWin = true) {
+            if (!targetEl) return;
+            const rect = targetEl.getBoundingClientRect();
+            const el = document.createElement('div');
+            el.className = `floating-score-text ${isWin ? 'text-amber-300 drop-shadow-[0_0_12px_rgba(251,191,36,0.9)]' : 'text-red-400'}`;
+            el.textContent = text;
+            el.style.left = `${rect.left + rect.width / 2}px`;
+            el.style.top = `${rect.top}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1350);
+        }
+
+        function startDealingPhase() {
+            gameState.phase = 'DEALING';
+            updateTimerUI();
+            updateUI();
+            setStatus('Đang chia bài ra các vị trí... Chúc quý khách may mắn!');
+
+            // Xáo bài và chia 3 lá cho mỗi vị trí
+            const deck = createDeck();
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+
+            gameState.dealerHand = [deck.pop(), deck.pop(), deck.pop()];
+            gameState.playerHand = [deck.pop(), deck.pop(), deck.pop()];
+            gameState.bot1Hand = [deck.pop(), deck.pop(), deck.pop()];
+            gameState.bot2Hand = [deck.pop(), deck.pop(), deck.pop()];
+
+            // 12 lá bài theo thứ tự vòng tròn (Round-Robin Dealing)
+            const dealQueue = [
+                { id: 'card-dealer-0', hand: gameState.dealerHand[0] },
+                { id: 'card-bot1-0',   hand: gameState.bot1Hand[0] },
+                { id: 'card-bot2-0',   hand: gameState.bot2Hand[0] },
+                { id: 'card-player-0', hand: gameState.playerHand[0] },
+
+                { id: 'card-dealer-1', hand: gameState.dealerHand[1] },
+                { id: 'card-bot1-1',   hand: gameState.bot1Hand[1] },
+                { id: 'card-bot2-1',   hand: gameState.bot2Hand[1] },
+                { id: 'card-player-1', hand: gameState.playerHand[1] },
+
+                { id: 'card-dealer-2', hand: gameState.dealerHand[2] },
+                { id: 'card-bot1-2',   hand: gameState.bot1Hand[2] },
+                { id: 'card-bot2-2',   hand: gameState.bot2Hand[2] },
+                { id: 'card-player-2', hand: gameState.playerHand[2] }
+            ];
+
+            const deckEl = document.getElementById('table-deck') || document.getElementById('timer-badge');
+
+            // Ẩn các lá bài ban đầu trước khi chia
+            dealQueue.forEach(item => {
+                const el = document.getElementById(item.id);
+                if (el) {
+                    el.style.opacity = '0';
+                    el.style.transform = 'scale(0.85)';
+                }
+            });
+
+            dealQueue.forEach((item, index) => {
+                const targetEl = document.getElementById(item.id);
+                flyCardToSlot(deckEl, targetEl, index * 100, () => {
+                    if (index === dealQueue.length - 1) {
+                        // Lá cuối cùng đã chia xong
+                        setTimeout(() => {
+                            renderPlayerCard(0, gameState.playerHand[0]);
+                            renderPlayerCard(1, gameState.playerHand[1]);
+                            flipCard('card-player-0');
+                            flipCard('card-player-1');
+                            AudioEngine.playCardFlip();
+                            startSqueezePhase();
+                        }, 350);
+                    }
+                });
+            });
+        }
+
+        // Giai đoạn nặn bài (8s)
+        function startSqueezePhase() {
+            gameState.phase = 'SQUEEZING';
+            gameState.remainingSec = 8;
+            updateTimerUI();
+            setStatus('Hãy chạm vào lá bài thứ 3 để NẶN BÀI hoặc bấm Mở Nhanh!');
+
+            document.getElementById('squeeze-hint').classList.remove('hidden');
+
+            squeezeCooldownTimer = setInterval(() => {
+                gameState.remainingSec--;
+                updateTimerUI();
+
+                if (gameState.remainingSec <= 0) {
+                    clearInterval(squeezeCooldownTimer);
+                    revealAllCardsAndEvaluate();
+                }
+            }, 1000);
+        }
+
+        // Mở toàn bộ bài và so điểm
+        function revealAllCardsAndEvaluate() {
+            if (gameState.phase === 'RESULT') return;
+            if (squeezeCooldownTimer) clearInterval(squeezeCooldownTimer);
+
+            gameState.phase = 'REVEAL';
+            document.getElementById('squeeze-hint').classList.add('hidden');
+            closeSqueezeModal();
+
+            // Lật lá bài thứ 3 của người chơi
+            if (!gameState.isCard3Revealed) {
+                renderPlayerCard(2, gameState.playerHand[2]);
+                flipCard('card-player-2');
+                gameState.isCard3Revealed = true;
+                AudioEngine.playCardFlip();
+            }
+
+            // Lật bài của các bot
+            renderCard('card-bot1-0', gameState.bot1Hand[0]);
+            renderCard('card-bot1-1', gameState.bot1Hand[1]);
+            renderCard('card-bot1-2', gameState.bot1Hand[2]);
+            flipCard('card-bot1-0');
+            flipCard('card-bot1-1');
+            flipCard('card-bot1-2');
+
+            renderCard('card-bot2-0', gameState.bot2Hand[0]);
+            renderCard('card-bot2-1', gameState.bot2Hand[1]);
+            renderCard('card-bot2-2', gameState.bot2Hand[2]);
+            flipCard('card-bot2-0');
+            flipCard('card-bot2-1');
+            flipCard('card-bot2-2');
+
+            // Lật bài của Nhà Cái
+            setTimeout(() => {
+                renderCard('card-dealer-0', gameState.dealerHand[0]);
+                renderCard('card-dealer-1', gameState.dealerHand[1]);
+                renderCard('card-dealer-2', gameState.dealerHand[2]);
+                flipCard('card-dealer-0');
+                flipCard('card-dealer-1');
+                flipCard('card-dealer-2');
+                AudioEngine.playCardFlip();
+
+                // Đánh giá và trả thưởng
+                finalizeRoundResults();
+            }, 600);
+        }
+
+        // =========================================================================
+        // THUẬT TOÁN TÍNH ĐIỂM BA CÂY VIỆT NAM (SÁP, ĐỒNG HOA, 10 ĐỎ, CHẤT)
+        // =========================================================================
+        function evaluateHand(cards) {
+            const vals = cards.map(c => c.val);
+            const sum = vals.reduce((a, b) => a + b, 0);
+            let point = sum % 10;
+            if (point === 0) point = 10; // 10 Nước
+
+            // 1. Kiểm tra Sáp (3 lá cùng số)
+            const isSap = (vals[0] === vals[1] && vals[1] === vals[2]);
+
+            // 2. Kiểm tra Đồng Hoa (3 lá cùng chất)
+            const isDongHoa = (cards[0].suit === cards[1].suit && cards[1].suit === cards[2].suit);
+
+            // Tìm lá bài to nhất để so sánh chất khi bằng điểm
+            const sortedCards = [...cards].sort((a, b) => {
+                if (b.val !== a.val) return b.val - a.val;
+                return b.suitRank - a.suitRank;
+            });
+            const highestCard = sortedCards[0];
+
+            let title = `${point} Nước`;
+            let tier = 1; // 1: thường, 2: 10 điểm, 3: đồng hoa, 4: sáp
+            let multiplier = 1;
+
+            if (isSap) {
+                title = `SÁP ${cards[0].name} (ĂN x3)`;
+                tier = 4;
+                multiplier = 3;
+            } else if (point === 10) {
+                title = `10 ĐỎ (ĂN x3 - LÀM CÁI)`;
+                tier = 3;
+                multiplier = 3; // 10 điểm ăn x3 & được quyền làm Nhà Cái!
+            } else if (point === 9) {
+                title = `9 NƯỚC (ĂN x2)`;
+                tier = 2;
+                multiplier = 2; // 9 điểm ăn x2
+            } else if (isDongHoa) {
+                title = `ĐỒNG HOA (ĂN x2)`;
+                tier = 2;
+                multiplier = 2;
+            } else {
+                title = `${point} Nước (Ăn x1)`;
+                tier = 1;
+                multiplier = 1; // Còn lại x1
+            }
+
+            return {
+                point,
+                isSap,
+                isDongHoa,
+                tier,
+                multiplier,
+                highestCard,
+                title
+            };
+        }
+
+        // So sánh 2 tay bài: trả về > 0 nếu handA thắng, < 0 nếu handB thắng
+        function compareHands(handA, handB) {
+            // So sánh tier (Sáp > Đồng Hoa > 10 điểm > Thường)
+            if (handA.tier !== handB.tier) {
+                return handA.tier - handB.tier;
+            }
+            // Nếu cùng tier thường: so sánh điểm
+            if (handA.point !== handB.point) {
+                return handA.point - handB.point;
+            }
+            // Bằng điểm: so sánh giá trị lá cao nhất
+            if (handA.highestCard.val !== handB.highestCard.val) {
+                return handA.highestCard.val - handB.highestCard.val;
+            }
+            // Bằng giá trị: so sánh chất (Cơ > Rô > Tép > Bích)
+            return handA.highestCard.suitRank - handB.highestCard.suitRank;
+        }
+
+        // =========================================================================
+        // KẾT THÚC VÁN: TRẢ THƯỞNG & ĐỒNG BỘ SỐ DƯ
+        // =========================================================================
+        function finalizeRoundResults() {
+            gameState.phase = 'RESULT';
+            gameState.remainingSec = 5;
+            updateTimerUI();
+
+            const dealerScore = evaluateHand(gameState.dealerHand);
+            const playerScore = evaluateHand(gameState.playerHand);
+            const bot1Score = evaluateHand(gameState.bot1Hand);
+            const bot2Score = evaluateHand(gameState.bot2Hand);
+
+            // Hiển thị huy hiệu điểm các vị trí
+            showBadge('dealer-point-badge', dealerScore.title);
+            showBadge('player-point-badge', playerScore.title);
+            showBadge('bot1-point-badge', bot1Score.title);
+            showBadge('bot2-point-badge', bot2Score.title);
+
+            const announcement = document.getElementById('table-announcement');
+            announcement.classList.remove('hidden');
+
+            const dealerSeat = document.getElementById('seat-dealer');
+            const playerSeat = document.getElementById('seat-player');
+            const bot1Seat = document.getElementById('seat-bot1');
+            const bot2Seat = document.getElementById('seat-bot2');
+            const potEl = document.getElementById('table-pot') || document.getElementById('pot-amount-display');
+
+            // TRƯỜNG HỢP 1: BẠN LÀ NHÀ CÁI (CẦM CHƯƠNG)
+            if (gameState.currentDealer === 'player') {
+                let netProfit = 0;
+                let wonCount = 0;
+                let lostCount = 0;
+
+                // 1. Đối đầu với Khách VIP (Ghế đỉnh bàn)
+                const beatTop = compareHands(playerScore, dealerScore) > 0;
+                if (beatTop) {
+                    const winFromTop = gameState.topSeatBet * playerScore.multiplier;
+                    netProfit += winFromTop;
+                    wonCount++;
+                    flyChips(dealerSeat, playerSeat, 6, 'linear-gradient(135deg, #ffd700, #b8860b)');
+                    showFloatingText(playerSeat, `+${formatMoney(winFromTop)} xu`, true);
+                    showFloatingText(dealerSeat, `-${formatMoney(winFromTop)} xu`, false);
+                } else {
+                    const payToTop = gameState.topSeatBet * dealerScore.multiplier;
+                    netProfit -= payToTop;
+                    lostCount++;
+                    flyChips(playerSeat, dealerSeat, 6, 'linear-gradient(135deg, #ef4444, #991b1b)');
+                    showFloatingText(playerSeat, `-${formatMoney(payToTop)} xu`, false);
+                    showFloatingText(dealerSeat, `+${formatMoney(payToTop)} xu`, true);
+                }
+
+                // 2. Đối đầu với Bot 1 (Đại Gia Nam)
+                const beatBot1 = compareHands(playerScore, bot1Score) > 0;
+                if (beatBot1) {
+                    const winFromBot1 = gameState.bot1Bet * playerScore.multiplier;
+                    netProfit += winFromBot1;
+                    wonCount++;
+                    flyChips(bot1Seat, playerSeat, 5, 'linear-gradient(135deg, #ffd700, #b8860b)');
+                    showFloatingText(bot1Seat, `-${formatMoney(winFromBot1)} xu`, false);
+                } else {
+                    const payToBot1 = gameState.bot1Bet * bot1Score.multiplier;
+                    netProfit -= payToBot1;
+                    lostCount++;
+                    flyChips(playerSeat, bot1Seat, 5, 'linear-gradient(135deg, #ef4444, #991b1b)');
+                    showFloatingText(bot1Seat, `+${formatMoney(payToBot1)} xu`, true);
+                }
+
+                // 3. Đối đầu với Bot 2 (Bạch Thủ Phát)
+                const beatBot2 = compareHands(playerScore, bot2Score) > 0;
+                if (beatBot2) {
+                    const winFromBot2 = gameState.bot2Bet * playerScore.multiplier;
+                    netProfit += winFromBot2;
+                    wonCount++;
+                    flyChips(bot2Seat, playerSeat, 5, 'linear-gradient(135deg, #ffd700, #b8860b)');
+                    showFloatingText(bot2Seat, `-${formatMoney(winFromBot2)} xu`, false);
+                } else {
+                    const payToBot2 = gameState.bot2Bet * bot2Score.multiplier;
+                    netProfit -= payToBot2;
+                    lostCount++;
+                    flyChips(playerSeat, bot2Seat, 5, 'linear-gradient(135deg, #ef4444, #991b1b)');
+                    showFloatingText(bot2Seat, `+${formatMoney(payToBot2)} xu`, true);
+                }
+
+                gameState.balance += netProfit;
+
+                if (netProfit >= 0) {
+                    AudioEngine.playWin();
+                    CelebrationFX.trigger();
+                    announcement.className = 'mt-2 px-6 py-2 rounded-full font-black text-sm sm:text-base bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 text-red-950 border-2 border-white shadow-[0_0_25px_#ffd700] animate-bounce';
+                    announcement.textContent = `👑 CẦM CÁI THẮNG ${wonCount}/3 CỬA (+${formatMoney(netProfit)} xu)!`;
+                    setStatus(`Bạn đang làm Nhà Cái: Ăn ${wonCount} cửa, đền ${lostCount} cửa. Lãi ròng: +${formatMoney(netProfit)} xu.`);
+                } else {
+                    announcement.className = 'mt-2 px-5 py-1.5 rounded-full font-black text-xs sm:text-sm bg-red-950/95 border border-red-500 text-red-200 shadow-xl';
+                    announcement.textContent = `👑 CẦM CÁI ĐỀN TIỀN (${lostCount}/3 CỬA THUA: -${formatMoney(Math.abs(netProfit))} xu)`;
+                    setStatus(`Ván này bạn cầm cái bị thua ${lostCount} cửa. Tổng đền: -${formatMoney(Math.abs(netProfit))} xu.`);
+                }
+                AudioEngine.playChipSweep();
+            } 
+            // TRƯỜNG HỢP 2: BẠN LÀ NGƯỜI CHƠI BÌNH THƯỜNG
+            else {
+                const targetDealerScore = (gameState.currentDealer === 'bot1') ? bot1Score : dealerScore;
+                const isPlayerWin = compareHands(playerScore, targetDealerScore) > 0;
+                let winAmount = 0;
+
+                if (gameState.playerBet === 0) {
+                    announcement.className = 'mt-2 px-5 py-1.5 rounded-full font-black text-xs sm:text-sm bg-stone-900 border border-amber-400 text-amber-200 shadow-xl';
+                    announcement.textContent = `Bạn chưa đặt cược • Nhà Cái: ${targetDealerScore.title}`;
+                    setStatus('Ván này bạn chưa đặt cược. Chuẩn bị cho ván tiếp theo!');
+                } else if (isPlayerWin) {
+                    // Thắng Nhà Cái: 10 điểm ăn x3, 9 điểm ăn x2, còn lại x1!
+                    winAmount = gameState.playerBet * playerScore.multiplier;
+                    let totalWin = gameState.playerBet + winAmount;
+
+                    // Kiểm tra ăn Hũ Gà nếu có Vào Gà và được 10 điểm cao nhất
+                    if (gameState.hasVaoGa && playerScore.point === 10) {
+                        const isHighest10 = (compareHands(playerScore, dealerScore) > 0) &&
+                                            (compareHands(playerScore, bot1Score) > 0) &&
+                                            (compareHands(playerScore, bot2Score) > 0);
+                        if (isHighest10) {
+                            totalWin += gameState.potAmount;
+                            flyChips(potEl, playerSeat, 16, 'linear-gradient(135deg, #fbbf24, #f59e0b)');
+                            showFloatingText(playerSeat, `🍗 TRÚNG HŨ GÀ +${formatMoney(gameState.potAmount)}!`, true);
+                            gameState.potAmount = 50000;
+                            document.getElementById('pot-amount-display').textContent = `${formatMoney(gameState.potAmount)} xu`;
+                        }
+                    }
+
+                    gameState.balance += totalWin;
+                    AudioEngine.playWin();
+                    CelebrationFX.trigger();
+                    flyChips(dealerSeat, playerSeat, 10, 'linear-gradient(135deg, #ffd700, #b8860b)');
+                    showFloatingText(playerSeat, `+${formatMoney(winAmount)} xu`, true);
+                    showFloatingText(dealerSeat, `-${formatMoney(winAmount)} xu`, false);
+                    AudioEngine.playChipSweep();
+
+                    announcement.className = 'mt-2 px-6 py-2 rounded-full font-black text-sm sm:text-base bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 text-red-950 border-2 border-white shadow-[0_0_25px_#ffd700] animate-bounce';
+                    announcement.textContent = `👑 THẮNG NHÀ CÁI +${formatMoney(winAmount)} xu (${playerScore.title})!`;
+                    setStatus(`Chúc mừng! Bạn thắng Nhà Cái với ${playerScore.title}. Lãi ròng: +${formatMoney(winAmount)} xu.`);
+                } else {
+                    // Thua Nhà Cái: đền theo hệ số của Nhà Cái
+                    const lossAmount = gameState.playerBet * targetDealerScore.multiplier;
+                    flyChips(playerSeat, dealerSeat, 8, 'linear-gradient(135deg, #ef4444, #991b1b)');
+                    showFloatingText(playerSeat, `-${formatMoney(lossAmount)} xu`, false);
+                    showFloatingText(dealerSeat, `+${formatMoney(lossAmount)} xu`, true);
+                    AudioEngine.playChipSweep();
+
+                    announcement.className = 'mt-2 px-5 py-1.5 rounded-full font-black text-xs sm:text-sm bg-red-950/95 border border-red-500 text-red-200 shadow-xl';
+                    announcement.textContent = `Nhà Cái Thắng • -${formatMoney(lossAmount)} xu (${targetDealerScore.title})`;
+                    setStatus(`Chưa may mắn! Nhà Cái đạt ${targetDealerScore.title}. Bạn mất -${formatMoney(lossAmount)} xu.`);
+                }
+
+                // Hiệu ứng phỉnh cho Bot 1 & Bot 2 đối đầu với Nhà Cái
+                const isBot1Win = compareHands(bot1Score, targetDealerScore) > 0;
+                if (isBot1Win) {
+                    flyChips(dealerSeat, bot1Seat, 5);
+                    showFloatingText(bot1Seat, `+${formatMoney(gameState.bot1Bet * bot1Score.multiplier)} xu`, true);
+                } else {
+                    flyChips(bot1Seat, dealerSeat, 5, 'linear-gradient(135deg, #ef4444, #991b1b)');
+                    showFloatingText(bot1Seat, `-${formatMoney(gameState.bot1Bet)} xu`, false);
+                }
+
+                const isBot2Win = compareHands(bot2Score, targetDealerScore) > 0;
+                if (isBot2Win) {
+                    flyChips(dealerSeat, bot2Seat, 5);
+                    showFloatingText(bot2Seat, `+${formatMoney(gameState.bot2Bet * bot2Score.multiplier)} xu`, true);
+                } else {
+                    flyChips(bot2Seat, dealerSeat, 5, 'linear-gradient(135deg, #ef4444, #991b1b)');
+                    showFloatingText(bot2Seat, `-${formatMoney(gameState.bot2Bet)} xu`, false);
+                }
+            }
+
+            // Đồng bộ số dư mới về Server
+            fetch('/api/user/Player001/sync-balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ balance: gameState.balance })
+            }).catch(() => {});
+
+            updateUI();
+
+            // RULE ĐẶC BIỆT: NẾU BẠN ĐẠT 10 ĐIỂM -> ĐƯỢC CHỌN LÀM NHÀ CÁI Ở VÁN TIẾP THEO!
+            if (playerScore.point === 10 && gameState.currentDealer !== 'player') {
+                setTimeout(() => {
+                    openDealerClaimModal();
+                }, 1100);
+            } else if (dealerScore.point !== 10 && bot1Score.point === 10 && gameState.currentDealer === 'dealer') {
+                // Nếu Bot 1 đạt 10 điểm và bạn không đạt 10 điểm, Bot 1 nhận làm cái
+                setTimeout(() => {
+                    setDealerRole('bot1');
+                    setStatus('🧔 Đại Gia Nam đạt 10 điểm và nhận quyền làm Nhà Cái ván tiếp theo!');
+                }, 1600);
+            }
+
+            // Đếm ngược 5 giây kết quả trước khi bắt đầu ván mới
+            let cooldown = 5;
+            const cooldownTimer = setInterval(() => {
+                cooldown--;
+                gameState.remainingSec = cooldown;
+                updateTimerUI();
+
+                if (cooldown <= 0) {
+                    clearInterval(cooldownTimer);
+                    gameState.playerBet = 0;
+                    gameState.hasVaoGa = false;
+                    document.getElementById('ga-status-badge').classList.add('hidden');
+                    startBettingPhase();
+                }
+            }, 1000);
+        }
+
+        // =========================================================================
+        // HỆ THỐNG CƯỚP CÁI & QUẢN LÝ VAI TRÒ NHÀ CÁI (DEALER ROLES)
+        // =========================================================================
+        function openDealerClaimModal() {
+            document.getElementById('dealer-claim-modal').classList.remove('hidden');
+        }
+
+        function closeDealerClaimModal() {
+            document.getElementById('dealer-claim-modal').classList.add('hidden');
+        }
+
+        function acceptDealerRole() {
+            closeDealerClaimModal();
+            setDealerRole('player');
+            AudioEngine.playWin();
+            CelebrationFX.trigger();
+            setStatus('👑 Bạn đã chính thức nhận quyền LÀM NHÀ CÁI! Tất cả người chơi khác sẽ đặt cược đối đầu với bạn.');
+        }
+
+        function declineDealerRole() {
+            closeDealerClaimModal();
+            setStatus('Bạn đã từ chối quyền làm Nhà Cái. Tiếp tục làm người chơi đặt cược.');
+        }
+
+        function relinquishDealerRole() {
+            setDealerRole('dealer');
+            setStatus('Bạn đã hạ chương/trả cái. Nhà Cái Hoàng Gia tiếp tục cầm cái.');
+            updateUI();
+        }
+
+        function setDealerRole(role) {
+            gameState.currentDealer = role;
+            updateDealerUI();
+            updateUI();
+        }
+
+        function updateDealerUI() {
+            const dealerSeatTitle = document.getElementById('dealer-seat-title');
+            const playerCrownBadge = document.getElementById('player-dealer-crown');
+            const btnRelinquish = document.getElementById('btn-relinquish-dealer');
+
+            if (gameState.currentDealer === 'player') {
+                if (dealerSeatTitle) dealerSeatTitle.innerHTML = 'Khách VIP (Chơi với bạn)';
+                if (playerCrownBadge) playerCrownBadge.classList.remove('hidden');
+                if (btnRelinquish) btnRelinquish.classList.remove('hidden');
+            } else if (gameState.currentDealer === 'bot1') {
+                if (dealerSeatTitle) dealerSeatTitle.innerHTML = 'Đại Gia Nam (Nhà Cái)';
+                if (playerCrownBadge) playerCrownBadge.classList.add('hidden');
+                if (btnRelinquish) btnRelinquish.classList.add('hidden');
+            } else {
+                if (dealerSeatTitle) dealerSeatTitle.innerHTML = 'Nhà Cái Hoàng Gia';
+                if (playerCrownBadge) playerCrownBadge.classList.add('hidden');
+                if (btnRelinquish) btnRelinquish.classList.add('hidden');
+            }
+        }
+
+        function renderCard(containerId, card) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const front = container.querySelector('.card-front');
+            if (!front) return;
+
+            front.className = `card-face card-front ${card.color === 'red' ? 'red-suit' : 'black-suit'}`;
+            front.innerHTML = `
+                <div class="flex flex-col items-center leading-none">
+                    <span class="font-black text-xs sm:text-sm font-mono">${card.name}</span>
+                    <span class="text-xs sm:text-sm">${card.symbol}</span>
+                </div>
+                <div class="text-xl sm:text-2xl text-center self-center opacity-90">${card.symbol}</div>
+                <div class="flex flex-col items-center leading-none rotate-180">
+                    <span class="font-black text-xs sm:text-sm font-mono">${card.name}</span>
+                    <span class="text-xs sm:text-sm">${card.symbol}</span>
+                </div>
+            `;
+        }
+
+        function renderPlayerCard(idx, card) {
+            renderCard(`card-player-${idx}`, card);
+        }
+
+        function flipCard(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const inner = container.querySelector('.card-inner-3d');
+            if (inner) inner.classList.add('flipped');
+        }
+
+        function resetCardsUI() {
+            document.querySelectorAll('.card-inner-3d').forEach(inner => {
+                inner.classList.remove('flipped');
+            });
+            document.querySelectorAll('[id$="-point-badge"]').forEach(badge => {
+                badge.classList.add('hidden');
+                badge.textContent = '';
+            });
+            document.getElementById('table-announcement').classList.add('hidden');
+            document.getElementById('squeeze-hint').classList.add('hidden');
+            document.querySelectorAll('.card-container-3d').forEach(slot => {
+                slot.style.opacity = '1';
+                slot.style.transform = 'scale(1)';
+            });
+        }
+
+        function showBadge(badgeId, text) {
+            const badge = document.getElementById(badgeId);
+            if (!badge) return;
+            badge.textContent = text;
+            badge.classList.remove('hidden');
+        }
+
+        // =========================================================================
+        // MODAL NẶN BÀI TƯƠNG TÁC (SQUEEZE MODAL DRAG)
+        // =========================================================================
+        function openSqueezeModal() {
+            if (gameState.phase !== 'SQUEEZING') return;
+            if (gameState.isCard3Revealed) return;
+
+            const card = gameState.playerHand[2];
+            const underCard = document.getElementById('squeeze-under-card');
+            underCard.className = `w-56 h-80 sm:w-64 sm:h-92 bg-white rounded-xl shadow-2xl flex flex-col justify-between p-4 border border-gray-300 select-none ${card.color === 'red' ? 'text-red-600' : 'text-gray-900'}`;
+
+            document.getElementById('squeeze-rank-top').textContent = card.name;
+            document.getElementById('squeeze-suit-top').textContent = card.symbol;
+            document.getElementById('squeeze-suit-center').textContent = card.symbol;
+            document.getElementById('squeeze-rank-bot').textContent = card.name;
+            document.getElementById('squeeze-suit-bot').textContent = card.symbol;
+
+            const cover = document.getElementById('squeeze-cover-card');
+            cover.style.transform = 'translate(0px, 0px) rotate(0deg)';
+
+            document.getElementById('squeeze-modal').classList.remove('hidden');
+        }
+
+        function closeSqueezeModal() {
+            document.getElementById('squeeze-modal').classList.add('hidden');
+        }
+
+        function revealSqueezeCardImmediately() {
+            closeSqueezeModal();
+            revealAllCardsAndEvaluate();
+        }
+
+        function setupSqueezeCardDrag() {
+            const cover = document.getElementById('squeeze-cover-card');
+            let isDragging = false;
+            let startX = 0, startY = 0;
+
+            function onStart(e) {
+                isDragging = true;
+                const pt = e.touches ? e.touches[0] : e;
+                startX = pt.clientX;
+                startY = pt.clientY;
+            }
+
+            function onMove(e) {
+                if (!isDragging) return;
+                const pt = e.touches ? e.touches[0] : e;
+                const dx = pt.clientX - startX;
+                const dy = pt.clientY - startY;
+
+                cover.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx * 0.05}deg)`;
+
+                // Nếu kéo lệch hơn 110px, tự động mở bài
+                if (Math.hypot(dx, dy) > 110) {
+                    isDragging = false;
+                    cover.style.transition = 'transform 0.3s ease';
+                    cover.style.transform = `translate(${dx * 2.5}px, ${dy * 2.5}px)`;
+                    setTimeout(() => {
+                        revealSqueezeCardImmediately();
+                    }, 250);
+                }
+            }
+
+            function onEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                cover.style.transition = 'transform 0.2s ease';
+                cover.style.transform = 'translate(0px, 0px) rotate(0deg)';
+                setTimeout(() => { cover.style.transition = ''; }, 200);
+            }
+
+            cover.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            cover.addEventListener('touchstart', onStart, { passive: true });
+            window.addEventListener('touchmove', onMove, { passive: true });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        // =========================================================================
+        // ĐIỀU KHIỂN CƯỢC CỦA NGƯỜI CHƠI
+        // =========================================================================
+        function selectChip(amount) {
+            gameState.selectedChip = amount;
+            AudioEngine.playChip();
+            document.querySelectorAll('.chip-btn-3d').forEach(btn => {
+                btn.classList.toggle('selected', Number(btn.dataset.chip) === amount);
+            });
+        }
+
+        function placePlayerBet() {
+            if (gameState.phase !== 'BETTING') return;
+            if (gameState.balance < gameState.selectedChip) {
+                setStatus('Số dư không đủ cho phỉnh cược này!');
+                return;
+            }
+
+            gameState.balance -= gameState.selectedChip;
+            gameState.playerBet += gameState.selectedChip;
+            AudioEngine.playChip();
+            flyChips(document.getElementById('btn-bet'), document.getElementById('player-bet-display'), 3);
+            showFloatingText(document.getElementById('player-bet-display'), `+${formatMoney(gameState.selectedChip)}`, true);
+            updateUI();
+            setStatus(`Đã đặt thêm +${formatMoney(gameState.selectedChip)} vào cửa cược!`);
+        }
+
+        function doublePlayerBet() {
+            if (gameState.phase !== 'BETTING' || gameState.playerBet === 0) return;
+            if (gameState.balance < gameState.playerBet) {
+                setStatus('Số dư không đủ để nhân đôi (X2) tiền cược!');
+                return;
+            }
+
+            gameState.balance -= gameState.playerBet;
+            gameState.playerBet *= 2;
+            AudioEngine.playChip();
+            flyChips(document.getElementById('btn-double'), document.getElementById('player-bet-display'), 5);
+            showFloatingText(document.getElementById('player-bet-display'), `X2`, true);
+            updateUI();
+            setStatus('Đã nhân đôi (X2) tổng tiền cược thành công!');
+        }
+
+        function toggleVaoGa() {
+            if (gameState.phase !== 'BETTING') return;
+            if (!gameState.hasVaoGa) {
+                if (gameState.balance < 1000) {
+                    setStatus('Số dư không đủ 1,000 xu để Vào Gà!');
+                    return;
+                }
+                gameState.balance -= 1000;
+                gameState.hasVaoGa = true;
+                gameState.potAmount += 1000;
+                document.getElementById('ga-status-badge').classList.remove('hidden');
+                document.getElementById('pot-amount-display').textContent = `${formatMoney(gameState.potAmount)} xu`;
+                AudioEngine.playChip();
+                flyChips(document.getElementById('btn-vaoga'), document.getElementById('table-pot'), 3);
+                showFloatingText(document.getElementById('table-pot'), '+1,000 Gà', true);
+                updateUI();
+                setStatus('Đã Vào Gà (+1,000 xu)! Nếu đạt 10 Nước cao nhất bạn sẽ ăn trọn Hũ Gà.');
+            } else {
+                gameState.balance += 1000;
+                gameState.hasVaoGa = false;
+                gameState.potAmount -= 1000;
+                document.getElementById('ga-status-badge').classList.add('hidden');
+                document.getElementById('pot-amount-display').textContent = `${formatMoney(gameState.potAmount)} xu`;
+                AudioEngine.playChip();
+                updateUI();
+                setStatus('Đã hủy tham gia Hũ Gà và hoàn lại 1,000 xu.');
+            }
+        }
+
+        function clearPlayerBet() {
+            if (gameState.phase !== 'BETTING' || gameState.playerBet === 0) return;
+            gameState.balance += gameState.playerBet;
+            gameState.playerBet = 0;
+            AudioEngine.playChip();
+            updateUI();
+            setStatus('Đã thu hồi toàn bộ tiền cược.');
+        }
+
+        function updateUI() {
+            document.getElementById('balance-display').textContent = formatMoney(gameState.balance);
+            document.getElementById('player-bet-display').textContent = `${formatMoney(gameState.playerBet)} xu`;
+
+            const isBetting = (gameState.phase === 'BETTING');
+            const isPlayerDealer = (gameState.currentDealer === 'player');
+
+            // Khi bạn làm Nhà Cái, bạn không cần đặt cược (người chơi khác cược với bạn)
+            document.getElementById('btn-bet').disabled = (!isBetting || isPlayerDealer);
+            document.getElementById('btn-double').disabled = (!isBetting || isPlayerDealer || gameState.playerBet === 0 || gameState.balance < gameState.playerBet);
+            document.getElementById('btn-clear').disabled = (!isBetting || isPlayerDealer || gameState.playerBet === 0);
+            document.getElementById('btn-vaoga').disabled = (!isBetting || isPlayerDealer);
+            document.getElementById('btn-quick-deal').disabled = !isBetting;
+
+            if (isPlayerDealer) {
+                document.getElementById('player-bet-display').textContent = '👑 ĐANG CẦM CÁI';
+            }
+        }
+
+        function setStatus(msg) {
+            document.getElementById('action-status-bar').textContent = msg;
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            document.getElementById('sound-icon').textContent = gameState.soundEnabled ? '🔊' : '🔇';
+            if (gameState.soundEnabled) AudioEngine.playChip();
+        }
+
+        function topUpBalance() {
+            gameState.balance += 50000;
+            AudioEngine.playWin();
+            CelebrationFX.trigger();
+            updateUI();
+            setStatus('Hoàng Gia ban thưởng +50,000 xu vào tài khoản của bạn!');
+
+            // Đồng bộ về server
+            fetch('/api/user/Player001/sync-balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ balance: gameState.balance })
+            }).catch(() => {});
+        }
+
+        function openRuleModal() {
+            document.getElementById('rule-modal').classList.remove('hidden');
+        }
+
+        function closeRuleModal() {
+            document.getElementById('rule-modal').classList.add('hidden');
+        }
+
+        window.onload = initBaCay;
+    </script>
+</body>
+</html>

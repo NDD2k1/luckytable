@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tài Xỉu — Lucky Table</title>
+  <meta name="description" content="Tài Xỉu Lucky Table - Casino 3D đỉnh cao phong cách Á Đông với Bát Rồng Vàng.">
+  <link rel="stylesheet" href="css/style.css?v=12?v=10">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+</head>
+<body>
+
+  <!-- MASTER VIEWPORT -->
+  <div class="game-viewport">
+
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <!-- Profile / User Balance -->
+      <div class="header-profile">
+        <div class="avatar-wrapper" title="Ảnh đại diện">
+          <img src="assets/avatar.png" alt="Player001 Avatar" class="avatar-img">
+        </div>
+        <div class="profile-meta">
+          <div class="player-name-row">
+            <span>Player001</span>
+            <span class="crown-icon">👑</span>
+          </div>
+          <div class="player-balance-pill" title="Số dư xu ảo">
+            <span class="gold-coin">🪙</span>
+            <span class="top-balance-amount" id="top-balance">12,350</span>
+            <button class="btn-add-coin" id="btn-quick-add-coin" title="Thêm 5.000 xu">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Logo Banner (Crisp 3D Typography + Ribbon) -->
+      <div class="header-center-logo">
+        <div class="logo-main-text-row">
+          <span class="floating-logo-die left">🎲</span>
+          <span class="logo-title-text">Tài Xỉu</span>
+          <span class="floating-logo-die right">🎲</span>
+        </div>
+        <div class="logo-ribbon-tag">Thử vận may - Nhận niềm vui!</div>
+      </div>
+
+      <!-- Gold Action Buttons -->
+      <div class="header-actions">
+        <div class="action-circle-item">
+          <a href="/" class="btn-circle-action" id="btn-back-home" title="Về Sảnh Chờ" style="text-decoration:none; display:flex; align-items:center; justify-content:center; color:#fff;">🏠</a>
+          <span class="action-label">Về Sảnh</span>
+        </div>
+        <div class="action-circle-item">
+          <button class="btn-circle-action" id="btn-open-bxh" title="Bảng xếp hạng">🏆</button>
+          <span class="action-label">BXH</span>
+        </div>
+        <div class="action-circle-item">
+          <button class="btn-circle-action" id="btn-open-history" title="Lịch sử chi tiết">📋</button>
+          <span class="action-label">Lịch sử</span>
+        </div>
+        <div class="action-circle-item">
+          <button class="btn-circle-action" id="btn-open-settings" title="Cài đặt">⚙️</button>
+          <span class="action-label">Cài đặt</span>
+        </div>
+        <div class="action-circle-item">
+          <button class="btn-circle-action" id="btn-sound-toggle" title="Âm thanh">
+            <span id="sound-icon-display">🔊</span>
+          </button>
+          <span class="action-label">Âm thanh</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN STAGE (LEFT: RULES | CENTER: PLATE & DOORS | RIGHT: RECENT HISTORY) -->
+    <main class="main-stage-grid">
+
+      <!-- LEFT: LUẬT CHƠI CARD -->
+      <aside class="rules-panel-card">
+        <div class="panel-title-row">
+          <span class="title-icon-badge">?</span>
+          <span>Luật chơi</span>
+        </div>
+        <div class="rules-dice-preview">
+          <div class="preview-dice-row">
+            <span>🎲</span>
+            <span>🎲</span>
+            <span>🎲</span>
+          </div>
+          <div class="preview-caption">3 xúc xắc (6 mặt)</div>
+        </div>
+        <div class="rules-rule-row">
+          <span class="rule-pill-badge xiu">Xỉu</span>
+          <span class="rule-desc-text">Tổng điểm từ 3 – 9</span>
+        </div>
+        <div class="rules-rule-row">
+          <span class="rule-pill-badge tai">Tài</span>
+          <span class="rule-desc-text">Tổng điểm từ 10 – 18</span>
+        </div>
+      </aside>
+
+      <!-- CENTER: PLATE, DRAGON CUP & DOORS WITH XÓC BUTTON -->
+      <section class="center-arena-stage">
+        
+        <!-- PLATE & DRAGON CUP -->
+        <div class="plate-master-stage">
+
+
+          <!-- Red Velvet Felt Plate holding 3D Dice -->
+          <div class="plate-felt-arena" id="plate-felt">
+            <div class="dice-container-3d" id="dice-container">
+              <!-- 3 Xúc xắc 3D được sinh bởi JS -->
+            </div>
+          </div>
+
+          <!-- Porcelain Dragon Cup (Bát Úp Rồng Vàng) -->
+          <img src="assets/dragon_cup.png" alt="Bát Rồng Vàng" class="dragon-cup-cover covered" id="dragon-cup" title="Nhấn để Mở Bát!">
+        </div>
+
+        <!-- Status Ribbon Banner -->
+        <div class="status-ribbon-banner" id="status-ribbon">
+          Nhấn Xóc để bắt đầu
+        </div>
+
+        <!-- DOORS & GIANT GOLDEN XÓC BUTTON -->
+        <div class="doors-and-xoc-row">
+          <!-- CỬA XỈU (BLUE FACETED CRYSTAL) -->
+          <div class="door-facet-btn door-xiu" id="door-xiu" title="Đặt cược cửa Xỉu (3 - 9)">
+            <span class="door-die-graphic">🎲</span>
+            <div class="door-facet-content">
+              <span class="door-main-name">Xỉu</span>
+              <span class="door-range-tag">(3 – 9)</span>
+              <span class="door-placed-badge" id="bet-badge-xiu">0 xu</span>
+            </div>
+          </div>
+
+
+
+          <!-- CỬA TÀI (RED FACETED CRYSTAL) -->
+          <div class="door-facet-btn door-tai" id="door-tai" title="Đặt cược cửa Tài (10 - 18)">
+            <div class="door-facet-content">
+              <span class="door-main-name">Tài</span>
+              <span class="door-range-tag">(10 – 18)</span>
+              <span class="door-placed-badge" id="bet-badge-tai">0 xu</span>
+            </div>
+            <span class="door-die-graphic">🎲</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT: LỊCH SỬ GẦN ĐÂY & THỐNG KÊ -->
+      <aside class="history-panel-card">
+        <div class="panel-title-row">
+          <span>📊</span>
+          <span>Lịch sử gần đây</span>
+        </div>
+        <!-- 2x5 Bead Road Grid (10 recent games) -->
+        <div class="bead-grid-10" id="bead-road-grid">
+          <!-- Rendered dynamically by JS -->
+        </div>
+
+        <div class="stats-divider-row">
+          <span>🕒</span>
+          <span>Thống kê</span>
+        </div>
+        <div class="stat-bar-group">
+          <div class="stat-item-row">
+            <span class="stat-label-text">Tài</span>
+            <div class="stat-progress-track">
+              <div class="stat-fill-bar tai" id="stat-bar-tai" style="width: 52%;"></div>
+            </div>
+            <span class="stat-pct-text" id="stat-pct-tai">52%</span>
+          </div>
+          <div class="stat-item-row">
+            <span class="stat-label-text">Xỉu</span>
+            <div class="stat-progress-track">
+              <div class="stat-fill-bar xiu" id="stat-bar-xiu" style="width: 48%;"></div>
+            </div>
+            <span class="stat-pct-text" id="stat-pct-xiu">48%</span>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+
+    <!-- BOTTOM CONTROLS BAR: BALANCE | CHIPS TRAY | ACTION BUTTONS -->
+    <footer class="bottom-controls-bar">
+
+      <!-- Bottom Left: Balance Display -->
+      <div class="bottom-balance-card" title="Số dư xu ảo hiện tại của bạn">
+        <span class="balance-title-label">Số dư hiện tại</span>
+        <div class="balance-number-row">
+          <span class="gold-coin">🪙</span>
+          <span class="balance-big-amount" id="user-balance">12,350</span>
+        </div>
+      </div>
+
+      <!-- Center: Chip Slider Tray (Guaranteed 100% Center Alignment) -->
+      <div class="chip-slider-tray">
+        <button class="tray-arrow-btn" id="chip-prev" title="Lùi chip">&lt;</button>
+        <div class="chips-container">
+          <button class="chip-img-btn" data-value="100" title="100 Xu">
+            <img src="assets/chip_100.png?v=2" alt="100 Xu">
+          </button>
+          <button class="chip-img-btn active" data-value="500" title="500 Xu">
+            <img src="assets/chip_500.png?v=2" alt="500 Xu">
+          </button>
+          <button class="chip-img-btn" data-value="1000" title="1.000 Xu">
+            <img src="assets/chip_1k.png?v=2" alt="1K Xu">
+          </button>
+          <button class="chip-img-btn" data-value="5000" title="5.000 Xu">
+            <img src="assets/chip_5k.png?v=2" alt="5K Xu">
+          </button>
+          <button class="chip-img-btn" data-value="10000" title="10.000 Xu">
+            <img src="assets/chip_10k.png?v=2" alt="10K Xu">
+          </button>
+        </div>
+        <button class="tray-arrow-btn" id="chip-next" title="Tiến chip">&gt;</button>
+      </div>
+
+      <!-- Bottom Right: Action Buttons -->
+      <div class="bottom-action-buttons">
+        <button class="btn-bottom-pill purple" id="btn-clear-bet" title="Hủy cược lượt này">
+          <span>⤺</span> Hủy cược
+        </button>
+        <button class="btn-bottom-pill green" id="btn-confirm-bet" title="Xác nhận đặt cược">
+          <span>✔</span> Đặt cược
+        </button>
+      </div>
+
+    </footer>
+
+  </div>
+
+  <!-- ==========================================================================
+       MODALS
+       ========================================================================== -->
+
+  <!-- MODAL: BẢNG XẾP HẠNG (BXH) -->
+  <div class="modal-overlay" id="modal-bxh">
+    <div class="modal-card-box">
+      <div class="modal-header-bar">
+        <h3 class="modal-title-text">🏆 Bảng Xếp Hạng Đại Gia</h3>
+        <button class="modal-btn-close" id="btn-close-bxh">&times;</button>
+      </div>
+      <table class="bxh-list-table">
+        <thead>
+          <tr>
+            <th>Hạng</th>
+            <th>Người chơi</th>
+            <th>Số xu</th>
+            <th>Tỷ lệ thắng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="bxh-rank-badge">🥇 1</span></td>
+            <td>👑 KingOfDice</td>
+            <td>985,000 xu</td>
+            <td style="color: #2ecc71;">68%</td>
+          </tr>
+          <tr>
+            <td><span class="bxh-rank-badge">🥈 2</span></td>
+            <td>🐉 LuckyTiger</td>
+            <td>640,000 xu</td>
+            <td style="color: #2ecc71;">64%</td>
+          </tr>
+          <tr>
+            <td><span class="bxh-rank-badge">🥉 3</span></td>
+            <td>✨ DaiGia88</td>
+            <td>420,000 xu</td>
+            <td style="color: #2ecc71;">61%</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>🔥 Player001 (Bạn)</td>
+            <td id="bxh-user-balance">12,350 xu</td>
+            <td id="bxh-user-winrate">55%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL: LỊCH SỬ CHI TIẾT -->
+  <div class="modal-overlay" id="modal-history">
+    <div class="modal-card-box">
+      <div class="modal-header-bar">
+        <h3 class="modal-title-text">📋 Nhật Ký Lịch Sử Cược</h3>
+        <button class="modal-btn-close" id="btn-close-history">&times;</button>
+      </div>
+      <table class="bxh-list-table">
+        <thead>
+          <tr>
+            <th>Thời gian</th>
+            <th>Xúc xắc</th>
+            <th>Điểm</th>
+            <th>Kết quả</th>
+            <th>Cược & Trả thưởng</th>
+          </tr>
+        </thead>
+        <tbody id="detailed-history-tbody">
+          <!-- Rendered by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL: CÀI ĐẶT -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal-card-box">
+      <div class="modal-header-bar">
+        <h3 class="modal-title-text">⚙️ Cài Đặt Trò Chơi</h3>
+        <button class="modal-btn-close" id="btn-close-settings">&times;</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <span>🔊 Hiệu ứng âm thanh</span>
+          <input type="checkbox" id="setting-sound" checked style="width: 20px; height: 20px;">
+        </label>
+        <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <button class="btn-bottom-pill purple" id="btn-reset-demo" style="width: 100%; justify-content: center;">
+          🔄 Đặt lại 10.000 xu & xóa lịch sử
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-popup" id="toast-popup"></div>
+
+  <!-- JAVASCRIPT MODULES -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/room-overlay.js"></script>
+  <script type="module" src="js/storage.js"></script>
+  <script type="module" src="js/dice.js"></script>
+  <script type="module" src="js/game.js?v=11"></script>
+</body>
+</html>

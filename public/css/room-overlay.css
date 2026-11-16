@@ -1,0 +1,601 @@
+/**
+ * Multiplayer Friend Rooms - Stylesheet (Lucky Table Casino)
+ * Giao diện phòng chơi chung với bạn bè, đồng bộ cược thời gian thực, chat phòng & danh sách người chơi
+ */
+
+/* ==========================================================================
+   LOBBY MULTIPLAYER SECTION STYLES
+   ========================================================================== */
+.multiplayer-section {
+  background: linear-gradient(135deg, rgba(35, 12, 22, 0.9) 0%, rgba(15, 6, 10, 0.95) 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 20px;
+  padding: 26px 30px;
+  margin-bottom: 35px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), inset 0 0 25px rgba(212, 175, 55, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.multiplayer-section::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.multiplayer-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding-bottom: 16px;
+}
+
+.multiplayer-title-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.multiplayer-icon-glow {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
+}
+
+.multiplayer-heading {
+  font-size: 1.45rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffe066 0%, #d4af37 50%, #aa8010 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.multiplayer-subtext {
+  font-size: 0.85rem;
+  color: #c9a87c;
+  margin-top: 2px;
+}
+
+.multiplayer-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-create-room {
+  background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+  border: 1.5px solid #f1c40f;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 9px 18px;
+  border-radius: 22px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.45);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.btn-create-room:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(243, 156, 18, 0.7);
+}
+
+.join-room-input-group {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  border-radius: 22px;
+  padding: 2px 4px 2px 14px;
+}
+
+.input-room-code {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffd700;
+  font-size: 0.9rem;
+  font-weight: 800;
+  width: 140px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.input-room-code::placeholder {
+  color: rgba(200, 180, 150, 0.5);
+  font-weight: 500;
+  font-size: 0.82rem;
+  text-transform: none;
+}
+
+.btn-join-code {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  border: none;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.82rem;
+  padding: 7px 14px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-join-code:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 12px rgba(46, 204, 113, 0.6);
+}
+
+/* Rooms Grid */
+.rooms-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+}
+
+.room-card-box {
+  background: rgba(20, 8, 14, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.room-card-box:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 215, 0, 0.8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+.room-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.room-game-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.room-game-badge.taixiu {
+  background: rgba(231, 76, 60, 0.25);
+  color: #ff7675;
+  border: 1px solid rgba(231, 76, 60, 0.5);
+}
+
+.room-game-badge.baucua {
+  background: rgba(243, 156, 18, 0.25);
+  color: #f39c12;
+  border: 1px solid rgba(243, 156, 18, 0.5);
+}
+
+.room-game-badge.bacay {
+  background: rgba(46, 204, 113, 0.25);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.5);
+}
+
+.room-code-tag {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  font-weight: 900;
+  font-size: 0.82rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  font-family: monospace;
+}
+
+.room-title-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.room-host-line {
+  font-size: 0.8rem;
+  color: #c0a080;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.room-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+}
+
+.room-player-count {
+  color: #58d68d;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-enter-room {
+  width: 100%;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  border: 1px solid #58d68d;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 8px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+}
+
+.btn-enter-room:hover {
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.5);
+  transform: translateY(-1px);
+}
+
+.no-rooms-notice {
+  text-align: center;
+  padding: 30px;
+  color: #baa;
+  font-size: 0.95rem;
+  grid-column: 1 / -1;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 14px;
+  border: 1px dashed rgba(212, 175, 55, 0.3);
+}
+
+/* ==========================================================================
+   IN-GAME MULTIPLAYER FLOATING PANEL (CHƠI CHUNG TRONG MÀN GAME)
+   ========================================================================== */
+.room-floating-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.room-toggle-pill {
+  background: rgba(18, 8, 14, 0.92);
+  border: 1.5px solid #d4af37;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.3);
+  transition: all 0.2s;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.room-toggle-pill:hover {
+  transform: scale(1.03);
+  border-color: #ffd700;
+}
+
+.room-live-dot {
+  width: 8px;
+  height: 8px;
+  background: #2ecc71;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #2ecc71;
+  animation: liveBlink 1.5s infinite;
+}
+
+@keyframes liveBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Popup Drawer Panel */
+.room-overlay-drawer {
+  position: fixed;
+  bottom: 70px;
+  left: 20px;
+  width: 340px;
+  max-height: 520px;
+  background: rgba(15, 6, 11, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid #d4af37;
+  border-radius: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(212, 175, 55, 0.25);
+  display: flex;
+  flex-direction: column;
+  z-index: 10000;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.room-drawer-header {
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-header-title {
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #ffd700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.room-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-room-tool {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #fff;
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-room-tool:hover {
+  background: rgba(212, 175, 55, 0.3);
+  border-color: #ffd700;
+}
+
+.room-drawer-body {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Friend Roster Box */
+.friend-roster-box {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.friend-roster-title {
+  font-size: 0.75rem;
+  color: #c9a87c;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.friend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.friend-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.friend-item-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.friend-item-balance {
+  color: #ffd700;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+/* Room Live Chat & Logs */
+.room-chat-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  padding: 8px;
+  height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.chat-msg-row {
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.chat-msg-author {
+  font-weight: 800;
+  color: #ffe066;
+  margin-right: 4px;
+}
+
+.chat-msg-author.system {
+  color: #58d68d;
+}
+
+.chat-msg-text {
+  color: #e0d0c0;
+}
+
+.chat-msg-row.bet {
+  background: rgba(243, 156, 18, 0.15);
+  border-left: 2px solid #f39c12;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #f1c40f;
+  font-weight: 700;
+}
+
+.chat-msg-row.win {
+  background: rgba(46, 204, 113, 0.2);
+  border-left: 2px solid #2ecc71;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #58d68d;
+  font-weight: 800;
+}
+
+/* Chat Input Bar */
+.room-chat-input-bar {
+  display: flex;
+  gap: 6px;
+}
+
+.room-chat-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  padding: 7px 10px;
+  color: #fff;
+  font-size: 0.82rem;
+  outline: none;
+}
+
+.btn-send-chat {
+  background: var(--gold-gradient, linear-gradient(135deg, #ffd700, #b8860b));
+  border: none;
+  color: #111;
+  font-weight: 900;
+  padding: 0 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Quick Emotes Bar */
+.room-quick-emotes {
+  display: flex;
+  gap: 4px;
+  justify-content: space-between;
+}
+
+.btn-emote-fast {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 6px;
+  padding: 3px 0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-emote-fast:hover {
+  background: rgba(212, 175, 55, 0.25);
+  transform: scale(1.15);
+}
+
+/* Realtime Friend Bet Toast Banner on Screen */
+.friend-bet-banner-toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: linear-gradient(135deg, rgba(26, 10, 16, 0.95) 0%, rgba(50, 15, 25, 0.95) 100%);
+  border: 1.5px solid #ffd700;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 215, 0, 0.4);
+  border-radius: 30px;
+  padding: 8px 20px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10001;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.friend-bet-banner-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* Modal Create Room */
+.modal-create-room-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.modal-create-room-card {
+  width: 90%;
+  max-width: 460px;
+  background: linear-gradient(135deg, #1b0a12 0%, #0d0609 100%);
+  border: 1.5px solid #d4af37;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.3);
+}

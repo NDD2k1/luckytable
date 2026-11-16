@@ -1,0 +1,27 @@
+{
+  "name": "tai-xiu-lucky-table",
+  "version": "1.0.0",
+  "description": "Tài Xỉu Lucky Table - Realtime Casino Game Server & Dynamic Pity Engine",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "tai-xiu",
+    "casino",
+    "socket.io",
+    "express",
+    "realtime-game"
+  ],
+  "author": "snine",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "socket.io": "^4.8.1",
+    "sql.js": "^1.16.0"
+  }
+}

@@ -1,0 +1,35 @@
+# ==============================================================================
+# Docker Compose - Lucky Table Casino Portal & Multiplayer Engine
+# Triển khai 1 lệnh: docker compose up -d
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  casino-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lucky-table-casino:latest
+    container_name: lucky-table-casino
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      # Gắn thư mục data từ máy chủ vào container để lưu trữ SQLite bền vững
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

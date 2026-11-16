@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUCKY TABLE — Cổng Game Casino & Giải Trí Quốc Tế</title>
+  <meta name="description" content="Cổng Game Casino Quốc Tế: Tài Xỉu Bát Rồng Vàng, Xóc Đĩa, Bầu Cua, Nổ Hũ Slots và Bắn Cá 3D.">
+  <link rel="stylesheet" href="css/portal.css?v=1">
+  <link rel="stylesheet" href="css/style.css?v=12?v=1012">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+</head>
+<body>
+
+  <!-- TOP PORTAL HEADER -->
+  <header class="portal-header">
+    <div class="header-container">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="portal-brand">
+        <span class="brand-logo-icon">👑</span>
+        <div class="brand-text-group">
+          <span class="brand-name">Lucky Table</span>
+          <span class="brand-slogan">Cổng Game Quốc Tế</span>
+        </div>
+      </a>
+
+      <!-- Navigation Menu Links -->
+      <ul class="portal-nav-menu">
+        <li><a href="/" class="nav-link-btn active">🏠 Trang Chủ</a></li>
+        <li><a href="/taixiu" class="nav-link-btn">🎲 Tài Xỉu 3D</a></li>
+        <li><a href="/baucua" class="nav-link-btn">🦀 Bầu Cua 3D</a></li>
+        <li><a href="#games-section" class="nav-link-btn">🎰 Kho Trò Chơi</a></li>
+        <li><a href="#news-section" class="nav-link-btn">📰 Tin Tức & Sự Kiện</a></li>
+      </ul>
+
+      <!-- User Bar: Balance & Action Buttons -->
+      <div class="portal-user-bar">
+        <!-- Balance Pill -->
+        <div class="user-balance-pill" title="Số dư ví hiện tại">
+          <span class="coin-icon">🪙</span>
+          <span class="balance-amount" id="header-balance">10,000</span>
+        </div>
+
+        <!-- Nạp Tiền Button -->
+        <button class="btn-deposit-gold" id="btn-open-deposit" title="Nạp thêm xu">
+          <span>+</span>
+          <span>Nạp Tiền</span>
+        </button>
+
+        <!-- Rút Tiền Button -->
+        <button class="btn-withdraw-gold" id="btn-open-withdraw" title="Rút xu về ngân hàng">
+          <span>💳</span>
+          <span>Rút Tiền</span>
+        </button>
+
+        <!-- Profile Widget -->
+        <div class="user-profile-badge" id="btn-open-profile" title="Xem thông tin tài khoản">
+          <img src="assets/avatar.png" alt="Avatar" class="user-avatar-mini" id="header-avatar">
+          <span class="user-name-label" id="header-username">Player001</span>
+          <span class="vip-badge-tag" id="header-vip">VIP 1</span>
+        </div>
+
+        <!-- Settings Button -->
+        <button class="nav-link-btn" id="btn-open-settings" title="Cài đặt hệ thống" style="padding: 8px;">
+          ⚙️
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- TICKER BAR REALTIME NOTIFICATIONS -->
+  <div class="ticker-bar">
+    <div class="ticker-icon-label">
+      <span>📢</span>
+      <span>TIN NÓNG:</span>
+    </div>
+    <div class="ticker-track-wrap">
+      <div class="ticker-marquee">
+        🎉 Chúc mừng <strong>Player001</strong> vừa tham gia sảnh Lucky Table! 🚀 Sự kiện tặng +100% lần nạp đầu tiên qua Cổng Ngân Hàng QR Code & MoMo đang diễn ra! 🔥 Hũ Tài Xỉu Bát Rồng Vàng tuần này đã tích lũy hơn 10.000.000 xu may mắn! 👑 Đua Top rinh Vương Miện VIP mỗi Chủ Nhật hàng tuần!
+      </div>
+    </div>
+  </div>
+
+  <!-- PORTAL MAIN CONTENT -->
+  <main class="portal-main-container">
+
+    <!-- HERO PROMOTION BANNER -->
+    <section class="hero-slider-banner">
+      <div class="hero-banner-content">
+        <span class="hero-tag">🔥 TRÒ CHƠI NỔI BẬT NHẤT</span>
+        <h1 class="hero-title">TÀI XỈU BÁT RỒNG VÀNG</h1>
+        <p class="hero-desc">
+          Trải nghiệm siêu phẩm Tài Xỉu phong cách Casino 3D đỉnh cao. Bát Rồng Vàng rung lắc chân thực, xúc xắc 3D xoay chuẩn mật mã học, chu kỳ 15s kịch tính và thuật toán cân bằng cảm xúc thông minh!
+        </p>
+        <a href="/taixiu" class="btn-hero-cta">
+          <span>🎲 VÀO BÀN CHƠI NGAY</span>
+          <span>➔</span>
+        </a>
+      </div>
+      <div class="hero-banner-graphic">
+        <img src="assets/dragon_cup.png" alt="Bát Rồng Vàng" class="hero-dragon-preview">
+      </div>
+    </section>
+
+    <!-- GAME LOBBY SECTION -->
+    <section class="portal-lobby-section" id="games-section">
+      <div class="lobby-section-header">
+        <div class="section-title-wrap">
+          <span class="section-icon">🎮</span>
+          <h2 class="section-title">Kho Trò Chơi Casino</h2>
+        </div>
+
+        <!-- Filter Category Tabs -->
+        <div class="category-filter-tabs">
+          <button class="tab-filter-btn active" data-category="all">Tất Cả</button>
+          <button class="tab-filter-btn" data-category="dângian">🎲 Dân Gian</button>
+          <button class="tab-filter-btn" data-category="slots">🎰 Nổ Hũ Slots</button>
+          <button class="tab-filter-btn" data-category="cards">🃏 Game Bài</button>
+        </div>
+      </div>
+
+      <!-- Game Cards Grid -->
+      <div class="game-cards-grid">
+        <!-- GAME 1: TÀI XỈU (FEATURED - ĐANG HOẠT ĐỘNG 100%) -->
+        <div class="game-card-item" data-category="dângian">
+          <div class="card-thumb-wrap">
+            <img src="assets/casino_bg.jpg" alt="Tài Xỉu Bát Rồng" class="card-thumb-img">
+            <span class="card-badge-status active">🟢 ĐANG MỞ</span>
+            <span class="card-online-count">👥 1,842 người chơi</span>
+          </div>
+          <div class="card-info-body">
+            <div>
+              <h3 class="card-game-title">🎲 Tài Xỉu — Bát Rồng Vàng</h3>
+              <p class="card-game-desc">Casino 3D Live 15s đếm ngược, xúc xắc ngẫu nhiên mật mã & thuật toán cân bằng cảm xúc Smart Pity.</p>
+            </div>
+            <a href="/taixiu" class="btn-card-play">CHƠI NGAY ➔</a>
+          </div>
+        </div>
+
+        <!-- GAME 2: XÓC ĐĨA 3D (DEMO/COMMING SOON) -->
+        <div class="game-card-item" data-category="dângian">
+          <div class="card-thumb-wrap">
+            <img src="assets/casino_bg.jpg" alt="Xóc Đĩa 3D" class="card-thumb-img" style="filter: hue-rotate(90deg);">
+            <span class="card-badge-status">⏳ SẮP RA MẮT</span>
+            <span class="card-online-count">👥 Chờ ván mới</span>
+          </div>
+          <div class="card-info-body">
+            <div>
+              <h3 class="card-game-title">🥢 Xóc Đĩa — Tứ Linh 3D</h3>
+              <p class="card-game-desc">Luật chơi Chẵn Lẻ 4 đồng xu quân vị truyền thống với bát đĩa gốm sứ sang trọng.</p>
+            </div>
+            <button class="btn-card-play disabled">Sắp Khởi Chạy</button>
+          </div>
+        </div>
+
+        <!-- GAME 3: BẦU CUA TÔM CÁ HOÀNG GIA 3D (ĐANG MỞ) -->
+        <div class="game-card-item" data-category="dângian">
+          <div class="card-thumb-wrap">
+            <img src="assets/casino_bg.jpg" alt="Bầu Cua 3D" class="card-thumb-img" style="filter: hue-rotate(180deg);">
+            <span class="card-badge-status active">🟢 ĐANG MỞ</span>
+            <span class="card-online-count">👥 1,350 người chơi</span>
+          </div>
+          <div class="card-info-body">
+            <div>
+              <h3 class="card-game-title">🦀 Bầu Cua — Hoàng Gia 3D</h3>
+              <p class="card-game-desc">Bầu Cua Tôm Cá Gà Nai 3D WebGL chân thực, tương tác kéo mở bát sơn mài, hiệu ứng pháo hoa rực rỡ.</p>
+            </div>
+            <a href="/baucua" class="btn-card-play">CHƠI NGAY ➔</a>
+          </div>
+        </div>
+
+        <!-- GAME 4: NỔ HŨ TÂY DU KÝ -->
+        <div class="game-card-item" data-category="slots">
+          <div class="card-thumb-wrap">
+            <img src="assets/casino_bg.jpg" alt="Slot Tây Du Ký" class="card-thumb-img" style="filter: hue-rotate(270deg);">
+            <span class="card-badge-status">🎰 JACKPOT: 5.800.000</span>
+            <span class="card-online-count">👥 892 người</span>
+          </div>
+          <div class="card-info-body">
+            <div>
+              <h3 class="card-game-title">🎰 Nổ Hũ — Tây Du Ký 777</h3>
+              <p class="card-game-desc">Vòng quay may mắn 5 cuộn 25 dòng cược, săn hũ Jackpot nổ tung hàng triệu xu.</p>
+            </div>
+            <button class="btn-card-play disabled">Sắp Khởi Chạy</button>
+          </div>
+        </div>
+
+        <!-- GAME 5: BA CÂY HOÀNG GIA VIP (ĐANG MỞ) -->
+        <div class="game-card-item" data-category="cards">
+          <div class="card-thumb-wrap">
+            <img src="assets/casino_bg.jpg" alt="Ba Cây Hoàng Gia VIP" class="card-thumb-img" style="filter: hue-rotate(120deg) contrast(1.15);">
+            <span class="card-badge-status active">🟢 ĐANG MỞ</span>
+            <span class="card-online-count">👥 2,480 người chơi</span>
+          </div>
+          <div class="card-info-body">
+            <div>
+              <h3 class="card-game-title">🎴 Ba Cây — Hoàng Gia VIP</h3>
+              <p class="card-game-desc">Bàn bài nỉ xanh sang trọng, chia 3 lá bay 3D, tính năng NẶN BÀI cực phê, cược Gà nhân 3 tiền thưởng!</p>
+            </div>
+            <a href="/bacay" class="btn-card-play">CHƠI NGAY ➔</a>
+          </div>
+        </div>
+
+        <!-- GAME 6: BẮN CÁ THẦN TÀI -->
+        <div class="game-card-item" data-category="slots">
+          <div class="card-thumb-wrap">
+            <img src="assets/casino_bg.jpg" alt="Bắn Cá" class="card-thumb-img" style="filter: hue-rotate(45deg);">
+            <span class="card-badge-status">🐟 3D OCEAN</span>
+            <span class="card-online-count">👥 1,120 người</span>
+          </div>
+          <div class="card-info-body">
+            <div>
+              <h3 class="card-game-title">🐟 Bắn Cá — Hải Vương 3D</h3>
+              <p class="card-game-desc">Săn rồng vàng đại dương, súng laser đạn nổ, thu hoạch ngọc báu ngập màn hình.</p>
+            </div>
+            <button class="btn-card-play disabled">Sắp Khởi Chạy</button>
+          </div>
+        </div>
+
+            </div>
+    </section>
+
+    <!-- NEWS & PROMOTIONS SECTION -->
+    <section class="portal-news-section" id="news-section">
+      <div class="section-title-wrap">
+        <span class="section-icon">📰</span>
+        <h2 class="section-title">Tin Tức & Sự Kiện Hệ Thống</h2>
+      </div>
+
+      <div class="news-list-grid" id="news-list-container">
+        <!-- Nạp động qua API /api/news -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PORTAL FOOTER -->
+  <footer class="portal-footer">
+    <p>© 2026 LUCKY TABLE CASINO ENTERTAINMENT. Game mô phỏng giải trí sử dụng xu ảo. Không hỗ trợ nạp/rút tiền thật.</p>
+    <p style="margin-top: 6px; font-size: 0.78rem;">Hệ thống phát triển bằng Node.js Express & Realtime Socket.io.</p>
+  </footer>
+
+  <!-- ==========================================================================
+       MODAL 1: NẠP TIỀN (DEPOSIT)
+       ========================================================================== -->
+  <div class="portal-modal-overlay" id="modal-deposit">
+    <div class="portal-modal-card">
+      <div class="modal-header-row">
+        <h3 class="modal-title-heading">🪙 Nạp Xu May Mắn</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <!-- Payment Method Tabs -->
+      <div class="payment-method-nav">
+        <button class="method-tab-btn active" data-method="BANK_QR">🏦 Ngân Hàng QR</button>
+        <button class="method-tab-btn" data-method="MOMO">📱 Ví MoMo</button>
+        <button class="method-tab-btn" data-method="CARD">💳 Thẻ Cào</button>
+      </div>
+
+      <!-- Bank QR Simulation Display -->
+      <div class="bank-qr-box">
+        <div style="font-weight: 800; color: #2c3e50; font-size: 1rem; margin-bottom: 6px;">QUÉT MÃ VIETQR TỰ ĐỘNG</div>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LUCKYTABLE_PLAYER001" alt="VietQR Code" class="qr-code-img">
+        <div class="qr-meta-line">Ngân hàng: <strong>MB BANK</strong></div>
+        <div class="qr-meta-line">Số TK: <strong>0999988889999</strong></div>
+        <div class="qr-meta-line">Chủ TK: <strong>CONG TY LUCKY TABLE</strong></div>
+        <div class="qr-meta-line">Nội dung: <strong>LUCKY PLAYER001</strong></div>
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-label-text">Nhập số xu muốn nạp:</label>
+        <input type="number" class="form-input-text" id="deposit-amount-input" value="10000" min="1000" step="1000">
+        <div class="quick-amount-tags">
+          <button class="amount-chip-btn deposit-chip" data-amount="5000">+5.000</button>
+          <button class="amount-chip-btn deposit-chip" data-amount="10000">+10.000</button>
+          <button class="amount-chip-btn deposit-chip" data-amount="50000">+50.000</button>
+          <button class="amount-chip-btn deposit-chip" data-amount="100000">+100.000</button>
+        </div>
+      </div>
+
+      <button class="btn-form-submit" id="btn-confirm-deposit">✓ XÁC NHẬN NẠP XU NGAY</button>
+    </div>
+
+  </div>
+
+  <!-- ==========================================================================
+       MODALS
+       ========================================================================== -->
+MODAL 2: RÚT TIỀN (WITHDRAW)  <div class="portal-modal-overlay" id="modal-withdraw">
+    <div class="portal-modal-card">
+      <div class="modal-header-row">
+        <h3 class="modal-title-heading">💳 Rút Xu Về ĐạiTài GiaKhoản</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-label-text">Chọn Ngân hàng nhận:</label>
+        <select class="form-select-box" id="withdraw-bank-select">
+          <option value="MB Bank">MB Bank (Quân Đội)</option>
+          <option value="Vietcombank">Vietcombank</option>
+          <option value="Techcombank">Techcombank</option>
+          <option value="ACB">ACB Á Châu</option>
+          <option value="VPBank">VPBank</option>
+        </select>
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-label-text">Số tài khoản ngân hàng:</label>
+        <input type="text" class="form-input-text" id="withdraw-acc-num" placeholder="VD: 190388889999" value="190388889999">
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-label-text">Tên chủ tài khoản (viết hoa không dấu):</label>
+        <input type="text" class="form-input-text" id="withdraw-acc-name" placeholder="VD: NGUYEN VAN A" value="NGUYEN VAN A">
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-label-text">Số xu muốn rút (Tối thiểu 10.000 xu):</label>
+        <input type="number" class="form-input-text" id="withdraw-amount-input" value="10000" min="10000" step="5000">
+      </div>
+
+      <button class="btn-form-submit withdraw" id="btn-confirm-withdraw">✓ GỬI YÊU CẦU RÚT XU</button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 3: THÔNG TIN TÀI KHOẢN & LỊCH SỬ GIAO DỊCH
+       ========================================================================== -->
+  <div class="portal-modal-overlay" id="modal-profile">
+    <div class="portal-modal-card" style="max-width: 650px;">
+      <div class="modal-header-row">
+        <h3 class="modal-title-heading">👤 Hồ Sơ Người Chơi</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px; background: rgba(0,0,0,0.4); padding: 14px; border-radius: 14px; border: 1px solid rgba(212,175,55,0.3);">
+        <img src="assets/avatar.png" alt="Avatar" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid #ffd700;">
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span style="font-size: 1.2rem; font-weight: 900; color: #fff;" id="profile-display-name">Player001</span>
+            <span class="vip-badge-tag" id="profile-vip-text">VIP 1</span>
+          </div>
+          <div style="font-size: 0.85rem; color: #aaa;">ID Người Chơi: <code>PLAYER001</code></div>
+          <div style="font-size: 1rem; color: #ffd700; font-weight: 800; margin-top: 4px;">
+            Số dư: <span id="profile-balance-text">10,000 xu</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-label-text">Tên hiển thị:</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" class="form-input-text" id="profile-username-input" value="Player001">
+          <button class="amount-chip-btn" id="btn-save-profile" style="white-space: nowrap; padding: 0 20px;">Lưu Đổi Tên</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <h4 style="font-size: 1.05rem; color: #ffd700; margin-bottom: 10px; font-weight: 800;">📋 Lịch Sử Giao Dịch Gần Đây</h4>
+        <div style="max-height: 200px; overflow-y: auto; border: 1px solid rgba(212,175,55,0.25); border-radius: 10px;">
+          <table class="txn-history-table">
+            <thead>
+              <tr>
+                <th>Mã GD</th>
+                <th>Loại</th>
+                <th>Số Xu</th>
+                <th>Trạng Thái</th>
+              </tr>
+            </thead>
+            <tbody id="txn-history-tbody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 4: CÀI ĐẶT & CẤU HÌNH ADMIN PITY ENGINE
+       ========================================================================== -->
+  <div class="portal-modal-overlay" id="modal-settings">
+    <div class="portal-modal-card">
+      <div class="modal-header-row">
+        <h3 class="modal-title-heading">⚙️ Cài Đặt Hệ Thống & Pity Engine</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <span>🔊 Hiệu ứng âm thanh</span>
+          <input type="checkbox" id="setting-sound" checked style="width: 20px; height: 20px;">
+        </label>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+
+        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <div>
+            <div style="font-weight: 800; color: #ffd700;">🧠 Thuật toán Cân Bằng Cảm Xúc (Smart Pity)</div>
+            <div style="font-size: 11px; color: #aaa;">All-in 50/50 & Cứu thua liên tiếp (70% - 85% thắng)</div>
+          </div>
+          <input type="checkbox" id="setting-pity" checked style="width: 20px; height: 20px;">
+        </label>
+
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; font-size: 12px; line-height: 1.6; color: #ccc;">
+          <div>📡 <strong>Trạng thái Server:</strong> <span style="color: #2ecc71; font-weight: bold;">🟢 Đang kết nối Node.js Realtime</span></div>
+          <div>🎲 <strong>Cơ chế All-in:</strong> 50% Thắng / 50% Thua nghẹt thở</div>
+          <div>📈 <strong>Dây đen (Thua >= 2 ván):</strong> Nâng tỷ lệ thắng lên 75% - 85%</div>
+        </div>
+
+        <button class="amount-chip-btn" id="btn-reset-demo" style="width: 100%; text-align: center; padding: 12px 0;">
+          🔄 Đặt lại 10.000 xu cho tài khoản
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST POPUP NOTIFICATION -->
+  <div class="toast-popup" id="toast-popup"></div>
+
+  <!-- JAVASCRIPT CONTROLLERS -->
+  <script src="js/portal.js?v=1?v=11"></script>
+</body>
+</html>

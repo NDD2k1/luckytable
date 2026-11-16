@@ -1,0 +1,1039 @@
+/**
+ * Portal & Game Lobby Stylesheet - Lucky Table Casino Portal
+ * Giao diện Cổng Game Quốc Tế đẳng cấp, luxury vàng - đỏ rượu vang - tối hiện đại
+ */
+
+:root {
+  --primary-gold: #ffd700;
+  --gold-gradient: linear-gradient(135deg, #ffe066 0%, #d4af37 50%, #aa8010 100%);
+  --dark-bg: #0d0609;
+  --dark-card: rgba(26, 10, 16, 0.85);
+  --dark-card-border: rgba(212, 175, 55, 0.35);
+  --wine-red: #7e0f1f;
+  --wine-gradient: linear-gradient(135deg, #a81c2f 0%, #630c18 100%);
+  --emerald-green: #2ecc71;
+  --green-gradient: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--dark-bg);
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(126, 15, 31, 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse at 80% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 60%),
+    url('../assets/casino_bg.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   PORTAL HEADER & NAVIGATION
+   ========================================================================== */
+.portal-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13, 6, 9, 0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1.5px solid var(--dark-card-border);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.8);
+  width: 100%;
+}
+
+.header-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: nowrap;
+}
+
+.portal-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.brand-logo-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+  animation: logoPulse 2.5s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.brand-text-group {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-size: 1.35rem;
+  font-weight: 900;
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.brand-slogan {
+  font-size: 0.7rem;
+  color: #c9a87c;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Nav Menu Links - Absolutely NO line wrapping */
+.portal-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.portal-nav-menu li {
+  display: inline-block;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  border-radius: 20px;
+  text-decoration: none;
+  color: #e0d0c0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  word-break: keep-all;
+}
+
+.nav-link-btn:hover, .nav-link-btn.active {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.45);
+  color: var(--primary-gold);
+  transform: translateY(-1px);
+}
+
+/* User Account & Balance Bar */
+.portal-user-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.user-balance-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1.5px solid #d4af37;
+  border-radius: 30px;
+  padding: 6px 12px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(212, 175, 55, 0.25);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.coin-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.balance-amount {
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--primary-gold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Action Buttons (Nạp / Rút) - Absolutely NO line wrapping */
+.btn-deposit-gold {
+  background: var(--green-gradient);
+  border: 1.5px solid #58d68d;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.84rem;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  word-break: keep-all;
+}
+
+.btn-deposit-gold:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+}
+
+.btn-withdraw-gold {
+  background: var(--wine-gradient);
+  border: 1.5px solid #e74c3c;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.84rem;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.35);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  word-break: keep-all;
+}
+
+.btn-withdraw-gold:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.55);
+}
+
+.user-profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 30px;
+  padding: 4px 12px 4px 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.user-profile-badge:hover {
+  border-color: var(--primary-gold);
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.user-avatar-mini {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ffd700;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.user-name-label {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.vip-badge-tag {
+  background: linear-gradient(135deg, #f39c12, #d35400);
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 8px;
+  color: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   TICKER RUNNING TEXT
+   ========================================================================== */
+.ticker-bar {
+  background: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  padding: 8px 24px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ticker-icon-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--primary-gold);
+  white-space: nowrap;
+}
+
+.ticker-track-wrap {
+  overflow: hidden;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.ticker-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marqueeText 26s linear infinite;
+  font-size: 0.88rem;
+  color: #f0e0d0;
+}
+
+@keyframes marqueeText {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* ==========================================================================
+   PORTAL MAIN CONTENT
+   ========================================================================== */
+.portal-main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  flex: 1;
+  width: 100%;
+}
+
+/* HERO PROMO BANNER */
+.hero-slider-banner {
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid #d4af37;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85), inset 0 2px 4px rgba(255, 215, 0, 0.3);
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, #2b060d 0%, #150205 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 48px;
+}
+
+.hero-slider-banner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  background: radial-gradient(circle at center, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-banner-content {
+  max-width: 620px;
+  z-index: 2;
+}
+
+.hero-tag {
+  display: inline-block;
+  background: var(--wine-gradient);
+  border: 1px solid #ff7675;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.hero-title {
+  font-size: 2.3rem;
+  font-weight: 900;
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.hero-desc {
+  font-size: 1rem;
+  color: #e0d0c0;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.btn-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--gold-gradient);
+  border: 2px solid #fff;
+  color: #3b1e04;
+  font-size: 1.1rem;
+  font-weight: 900;
+  padding: 12px 32px;
+  border-radius: 30px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.6);
+  transition: all 0.25s ease;
+}
+
+.btn-hero-cta:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 12px 30px rgba(255, 215, 0, 0.85);
+}
+
+.hero-banner-graphic {
+  z-index: 2;
+  position: relative;
+}
+
+.hero-dragon-preview {
+  width: 240px;
+  height: auto;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.9));
+  animation: floatCup 3s infinite ease-in-out;
+}
+
+@keyframes floatCup {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(3deg); }
+}
+
+/* ==========================================================================
+   GAME LOBBY SECTION (CATEGORIES & CARDS)
+   ========================================================================== */
+.lobby-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon {
+  font-size: 1.6rem;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+/* Filter category tabs */
+.category-filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--dark-card-border);
+  padding: 4px;
+  border-radius: 30px;
+}
+
+.tab-filter-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: none;
+  background: transparent;
+  color: #c9b097;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-filter-btn:hover {
+  color: #fff;
+}
+
+.tab-filter-btn.active {
+  background: var(--gold-gradient);
+  color: #3b1e04;
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.5);
+}
+
+/* Game Cards Grid */
+.game-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+  align-items: start; /* Không kéo dài chiều cao theo card bên cạnh */
+}
+
+.game-card-item {
+  background: var(--dark-card);
+  border: 1.5px solid var(--dark-card-border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  align-self: start; /* Chiều cao hoàn toàn độc lập, không phụ thuộc vào card bên cạnh */
+}
+
+.game-card-item:hover {
+  transform: translateY(-8px);
+  border-color: #ffd700;
+  box-shadow: 0 16px 36px rgba(212, 175, 55, 0.35);
+}
+
+.card-thumb-wrap {
+  width: 100%;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  background: #190509;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.game-card-item:hover .card-thumb-img {
+  transform: scale(1.08);
+}
+
+.card-badge-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--wine-gradient);
+  border: 1px solid #ff7675;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.card-badge-status.active {
+  background: var(--green-gradient);
+  border-color: #58d68d;
+}
+
+.card-online-count {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  color: #ffd700;
+  font-weight: 700;
+}
+
+.card-info-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-game-title {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.card-game-desc {
+  font-size: 0.82rem;
+  color: #bfa892;
+  line-height: 1.45;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.btn-card-play {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--gold-gradient);
+  color: #3b1e04;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 10px 0;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-card-play:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 215, 0, 0.65);
+}
+
+.btn-card-play.disabled {
+  background: #444;
+  color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   NEWS & ANNOUNCEMENT SECTION
+   ========================================================================== */
+.portal-news-section {
+  background: var(--dark-card);
+  border: 1.5px solid var(--dark-card-border);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 40px;
+}
+
+.news-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.news-card-box {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 14px;
+  padding: 16px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.news-card-box:hover {
+  border-color: #ffd700;
+  transform: translateY(-3px);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.news-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.news-tag {
+  background: var(--wine-gradient);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.news-date {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.news-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.news-snippet {
+  font-size: 0.82rem;
+  color: #bbb;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   PORTAL FOOTER
+   ========================================================================== */
+.portal-footer {
+  background: rgba(8, 3, 5, 0.95);
+  border-top: 1.5px solid var(--dark-card-border);
+  padding: 30px 24px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #8c735d;
+}
+
+.portal-footer a {
+  color: var(--primary-gold);
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   PORTAL MODALS (NẠP TIỀN, RÚT TIỀN, TÀI KHOẢN, CÀI ĐẶT)
+   ========================================================================== */
+.portal-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  padding: 20px;
+}
+
+.portal-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.portal-modal-card {
+  background: linear-gradient(135deg, #22080d 0%, #120204 100%);
+  border: 2px solid #d4af37;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), inset 0 2px 4px rgba(255, 215, 0, 0.4);
+  padding: 24px;
+  position: relative;
+}
+
+.modal-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+}
+
+.modal-title-heading {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--primary-gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #ffd700;
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.modal-close-btn:hover {
+  transform: rotate(90deg);
+  color: #ff7675;
+}
+
+/* Modal Form Controls */
+.form-group-item {
+  margin-bottom: 16px;
+}
+
+.form-label-text {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e0d0c0;
+  margin-bottom: 6px;
+}
+
+.form-input-text, .form-select-box {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input-text:focus, .form-select-box:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.quick-amount-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.amount-chip-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: #ffd700;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.amount-chip-btn:hover {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #ffd700;
+}
+
+.btn-form-submit {
+  width: 100%;
+  background: var(--green-gradient);
+  border: 2px solid #58d68d;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 900;
+  padding: 12px 0;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.btn-form-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(46, 204, 113, 0.6);
+}
+
+.btn-form-submit.withdraw {
+  background: var(--wine-gradient);
+  border-color: #e74c3c;
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.btn-form-submit.withdraw:hover {
+  box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+}
+
+/* Payment tabs (Ngân Hàng, Momo, Thẻ cào) */
+.payment-method-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.method-tab-btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 10px;
+  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  color: #ccc;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.method-tab-btn.active {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+/* Bank QR Demo Box */
+.bank-qr-box {
+  background: #fff;
+  color: #111;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.qr-code-img {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 10px auto;
+  display: block;
+}
+
+.qr-meta-line {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  margin: 4px 0;
+}
+
+.qr-meta-line strong {
+  color: #c0392b;
+}
+
+/* Table in Modal (Lịch sử giao dịch) */
+.txn-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+.txn-history-table th {
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffd700;
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.txn-history-table td {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive */
+@media (max-width: 1320px) {
+  .header-container {
+    padding: 8px 14px;
+    gap: 10px;
+  }
+  .portal-brand {
+    gap: 8px;
+  }
+  .brand-logo-icon {
+    font-size: 1.6rem;
+  }
+  .brand-name {
+    font-size: 1.15rem;
+  }
+  .brand-slogan {
+    font-size: 0.62rem;
+  }
+  .portal-nav-menu {
+    gap: 4px;
+  }
+  .nav-link-btn {
+    padding: 6px 9px;
+    font-size: 0.82rem;
+    gap: 4px;
+  }
+  .portal-user-bar {
+    gap: 6px;
+  }
+  .user-balance-pill {
+    padding: 5px 9px;
+  }
+  .balance-amount {
+    font-size: 0.92rem;
+  }
+  .btn-deposit-gold,
+  .btn-withdraw-gold {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    gap: 3px;
+  }
+  .user-profile-badge {
+    padding: 3px 8px 3px 3px;
+    gap: 6px;
+  }
+  .user-avatar-mini {
+    width: 28px;
+    height: 28px;
+  }
+  .user-name-label {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 1080px) {
+  .portal-nav-menu {
+    gap: 2px;
+  }
+  .nav-link-btn {
+    padding: 5px 7px;
+    font-size: 0.78rem;
+  }
+  .user-name-label {
+    display: none;
+  }
+}
+
+@media (max-width: 920px) {
+  .portal-nav-menu {
+    display: none;
+  }
+  .hero-slider-banner {
+    flex-direction: column;
+    padding: 24px;
+    text-align: center;
+  }
+  .hero-dragon-preview {
+    display: none;
+  }
+}
