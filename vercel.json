@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/taixiu",
+      "destination": "/public/taixiu.html"
+    },
+    {
+      "source": "/baucua",
+      "destination": "/public/baucua.html"
+    },
+    {
+      "source": "/bacay",
+      "destination": "/public/bacay.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/public/$1"
+    }
+  ]
+}

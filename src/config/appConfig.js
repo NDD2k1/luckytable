@@ -12,5 +12,5 @@ export const appConfig = {
   env: process.env.NODE_ENV || 'development',
   corsOrigin: '*',
   publicDir: path.join(__dirname, '../../public'),
-  dataDir: path.join(__dirname, '../../data')
+  dataDir: process.env.VERCEL ? '/tmp' : path.join(__dirname, '../../data')
 };
