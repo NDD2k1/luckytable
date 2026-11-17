@@ -1565,17 +1565,11 @@
             const front = container.querySelector('.card-front');
             if (!front) return;
 
-            front.className = `card-face card-front ${card.color === 'red' ? 'red-suit' : 'black-suit'}`;
+            front.className = `card-face card-front ${card.color === 'red' ? 'red-suit' : 'black-suit'} overflow-hidden !p-0`;
+            const suitName = card.suit === 'spade' ? 'spades' : (card.suit === 'club' ? 'clubs' : (card.suit === 'diamond' ? 'diamonds' : 'hearts'));
+            const imagePath = `/assets/cards/${card.name}_${suitName}.png`;
             front.innerHTML = `
-                <div class="flex flex-col items-center leading-none">
-                    <span class="font-black text-xs sm:text-sm font-mono">${card.name}</span>
-                    <span class="text-xs sm:text-sm">${card.symbol}</span>
-                </div>
-                <div class="text-xl sm:text-2xl text-center self-center opacity-90">${card.symbol}</div>
-                <div class="flex flex-col items-center leading-none rotate-180">
-                    <span class="font-black text-xs sm:text-sm font-mono">${card.name}</span>
-                    <span class="text-xs sm:text-sm">${card.symbol}</span>
-                </div>
+                <img src="${imagePath}" alt="${card.name}${card.symbol}" class="w-full h-full object-fill pointer-events-none select-none rounded-[6px]" />
             `;
         }
 
@@ -1622,13 +1616,11 @@
 
             const card = gameState.playerHand[2];
             const underCard = document.getElementById('squeeze-under-card');
-            underCard.className = `w-56 h-80 sm:w-64 sm:h-92 bg-white rounded-xl shadow-2xl flex flex-col justify-between p-4 border border-gray-300 select-none ${card.color === 'red' ? 'text-red-600' : 'text-gray-900'}`;
+            const suitName = card.suit === 'spade' ? 'spades' : (card.suit === 'club' ? 'clubs' : (card.suit === 'diamond' ? 'diamonds' : 'hearts'));
+            const imagePath = `/assets/cards/${card.name}_${suitName}.png`;
 
-            document.getElementById('squeeze-rank-top').textContent = card.name;
-            document.getElementById('squeeze-suit-top').textContent = card.symbol;
-            document.getElementById('squeeze-suit-center').textContent = card.symbol;
-            document.getElementById('squeeze-rank-bot').textContent = card.name;
-            document.getElementById('squeeze-suit-bot').textContent = card.symbol;
+            underCard.className = `w-56 h-80 sm:w-64 sm:h-92 bg-white rounded-xl shadow-2xl flex items-center justify-center !p-0 border border-gray-300 select-none overflow-hidden`;
+            underCard.innerHTML = `<img src="${imagePath}" class="w-full h-full object-fill pointer-events-none select-none rounded-xl" />`;
 
             const cover = document.getElementById('squeeze-cover-card');
             cover.style.transform = 'translate(0px, 0px) rotate(0deg)';

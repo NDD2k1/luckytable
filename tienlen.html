@@ -50,40 +50,51 @@
         inset 0 0 70px rgba(0, 0, 0, 0.7);
       position: relative;
     }
-    /* Realistic Playing Card */
+    /* Realistic Playing Card with 52-Card Image Deck */
     .playing-card {
-      width: 58px;
-      height: 84px;
-      border-radius: 7px;
+      width: 54px;
+      height: 76px;
+      border-radius: 6px;
       background: #ffffff;
-      color: #111;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.3);
       cursor: pointer;
       position: relative;
       transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.18s ease;
       flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    @media (min-width: 640px) {
+    @media (min-width: 480px) {
       .playing-card {
-        width: 72px;
-        height: 105px;
+        width: 64px;
+        height: 90px;
+        border-radius: 7px;
+      }
+    }
+    @media (min-width: 768px) {
+      .playing-card {
+        width: 76px;
+        height: 106px;
         border-radius: 8px;
       }
     }
     @media (min-width: 1024px) {
       .playing-card {
-        width: 82px;
-        height: 118px;
+        width: 86px;
+        height: 120px;
         border-radius: 9px;
       }
     }
     .playing-card.selected {
-      transform: translateY(-24px) scale(1.04) !important;
-      box-shadow: 0 12px 25px rgba(0,0,0,0.65), 0 0 0 3px #fbbf24, 0 0 15px rgba(251,191,36,0.6) !important;
-      z-index: 30 !important;
+      transform: translateY(-22px) scale(1.05) !important;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.75), 0 0 0 3px #fbbf24, 0 0 20px rgba(251,191,36,0.9) !important;
+      z-index: 40 !important;
     }
     .playing-card:hover:not(.selected) {
       transform: translateY(-8px);
+      z-index: 25;
     }
     .card-red {
       color: #dc2626;
@@ -144,13 +155,14 @@
     /* Ghost Card for throwing animation */
     .ghost-card {
       position: fixed;
-      width: 60px;
-      height: 86px;
-      border-radius: 7px;
+      width: 54px;
+      height: 76px;
+      border-radius: 6px;
       pointer-events: none;
       z-index: 9990;
       box-shadow: 0 10px 25px rgba(0,0,0,0.7);
       transition: all 0.42s cubic-bezier(0.2, 0.9, 0.3, 1);
+      overflow: hidden;
     }
   </style>
 </head>
@@ -602,7 +614,7 @@
       };
     })();
 
-    // 52 Playing Cards Definition
+    // 52 Playing Cards Definition with Real Deck Assets
     const SUITS = [
       { id: 1, name: 'spades', symbol: '♠', color: 'card-black' },
       { id: 2, name: 'clubs', symbol: '♣', color: 'card-black' },
@@ -616,6 +628,17 @@
       13: 'K', 14: 'A', 15: '2'
     };
 
+    // Preload all 52 card images for instant smooth rendering
+    (function preloadDeckImages() {
+      for (let r = 3; r <= 15; r++) {
+        const rank = RANK_LABELS[r];
+        for (const s of SUITS) {
+          const img = new Image();
+          img.src = `/assets/cards/${rank}_${s.name}.png`;
+        }
+      }
+    })();
+
     function createDeck() {
       const deck = [];
       for (let r = 3; r <= 15; r++) {
@@ -626,6 +649,8 @@
             label: RANK_LABELS[r],
             symbol: s.symbol,
             color: s.color,
+            suitName: s.name,
+            image: `/assets/cards/${RANK_LABELS[r]}_${s.name}.png`,
             score: r * 10 + s.id
           });
         }
@@ -1064,8 +1089,8 @@
 
         cards.forEach((c, idx) => {
           const ghost = document.createElement('div');
-          ghost.className = `ghost-card ${c.color} bg-white flex flex-col justify-between p-1 text-xs font-black shadow-2xl`;
-          ghost.innerHTML = `<span>${c.label}${c.symbol}</span><span class="text-center text-lg">${c.symbol}</span>`;
+          ghost.className = 'ghost-card bg-white shadow-2xl overflow-hidden';
+          ghost.innerHTML = `<img src="${c.image}" alt="${c.label}${c.symbol}" class="w-full h-full object-fill pointer-events-none" />`;
           ghost.style.left = (fromRect.left + fromRect.width / 2 + idx * 10 - 25) + 'px';
           ghost.style.top = (fromRect.top + fromRect.height / 2 - 35) + 'px';
           document.body.appendChild(ghost);
@@ -1393,22 +1418,22 @@
 
         document.getElementById('player-card-count').textContent = `${hand.length} lá`;
 
+        // Responsive dynamic card spacing: always leaves card index visible
+        let overlapClass = '-space-x-6 min-[480px]:-space-x-8 md:-space-x-11 lg:-space-x-12';
+        if (hand.length <= 4) {
+          overlapClass = '-space-x-2 sm:-space-x-3';
+        } else if (hand.length <= 8) {
+          overlapClass = '-space-x-4 min-[480px]:-space-x-5 md:-space-x-8';
+        }
+        container.className = `flex items-center justify-center ${overlapClass} overflow-visible min-h-[80px] sm:min-h-[110px] md:min-h-[130px]`;
+
         container.innerHTML = hand.map((card, idx) => {
           const isSelected = this.selectedIndices.has(idx);
           return `
-            <div class="playing-card ${isSelected ? 'selected' : ''} ${card.color} flex flex-col justify-between p-1.5 sm:p-2"
-                 onclick="game.toggleCardSelection(${idx})">
-              <div class="flex flex-col items-center leading-none">
-                <span class="font-black text-xs sm:text-base">${card.label}</span>
-                <span class="text-xs sm:text-sm">${card.symbol}</span>
-              </div>
-              <div class="flex justify-center my-auto text-base sm:text-2xl opacity-80">
-                ${card.symbol}
-              </div>
-              <div class="flex flex-col items-center leading-none rotate-180">
-                <span class="font-black text-xs sm:text-base">${card.label}</span>
-                <span class="text-xs sm:text-sm">${card.symbol}</span>
-              </div>
+            <div class="playing-card ${isSelected ? 'selected' : ''} bg-white shadow-xl select-none"
+                 onclick="game.toggleCardSelection(${idx})"
+                 title="${card.label}${card.symbol}">
+              <img src="${card.image}" alt="${card.label}${card.symbol}" class="w-full h-full object-fill pointer-events-none select-none rounded-[6px] sm:rounded-[7px] md:rounded-[8px]" />
             </div>
           `;
         }).join('');
@@ -1447,21 +1472,11 @@
         cardsEl.style.display = 'flex';
 
         cardsEl.innerHTML = this.currentPile.cards.map((card, i) => {
-          const rotation = (i - this.currentPile.cards.length / 2) * 4;
+          const rotation = (i - this.currentPile.cards.length / 2) * 5;
           return `
-          <div class="playing-card ${card.color} flex flex-col justify-between p-1.5 sm:p-2 pointer-events-none scale-90 sm:scale-100 shadow-xl"
+          <div class="playing-card pointer-events-none scale-95 sm:scale-100 shadow-2xl bg-white overflow-hidden"
                style="transform: rotate(${rotation}deg);">
-            <div class="flex flex-col items-center leading-none">
-              <span class="font-black text-xs sm:text-base">${card.label}</span>
-              <span class="text-xs sm:text-sm">${card.symbol}</span>
-            </div>
-            <div class="flex justify-center my-auto text-base sm:text-2xl opacity-80">
-              ${card.symbol}
-            </div>
-            <div class="flex flex-col items-center leading-none rotate-180">
-              <span class="font-black text-xs sm:text-base">${card.label}</span>
-              <span class="text-xs sm:text-sm">${card.symbol}</span>
-            </div>
+            <img src="${card.image}" alt="${card.label}${card.symbol}" class="w-full h-full object-fill pointer-events-none select-none rounded-[6px] sm:rounded-[7px] md:rounded-[8px]" />
           </div>
         `;
         }).join('');
