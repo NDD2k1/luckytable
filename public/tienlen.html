@@ -48,6 +48,7 @@
         0 0 0 6px #150a06,
         0 0 50px rgba(0, 0, 0, 0.95),
         inset 0 0 70px rgba(0, 0, 0, 0.7);
+      position: relative;
     }
     /* Realistic Playing Card */
     .playing-card {
@@ -104,9 +105,60 @@
       0% { box-shadow: 0 0 0 3px #fbbf24, 0 0 15px rgba(251,191,36,0.6); }
       100% { box-shadow: 0 0 0 4px #f59e0b, 0 0 30px rgba(245,158,11,0.95); }
     }
+
+    /* ANIMATIONS: FLYING COINS & SCORES */
+    .flying-gold-coin {
+      position: fixed;
+      font-size: 24px;
+      pointer-events: none;
+      z-index: 9999;
+      filter: drop-shadow(0 4px 8px rgba(255, 215, 0, 0.8));
+    }
+    .floating-score-text {
+      position: absolute;
+      font-weight: 900;
+      font-size: 1.15rem;
+      pointer-events: none;
+      z-index: 9999;
+      animation: float-up-fade 1.8s ease-out forwards;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 12px currentColor;
+    }
+    @keyframes float-up-fade {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      20% { transform: translateY(-12px) scale(1.2); opacity: 1; }
+      80% { transform: translateY(-38px) scale(1.0); opacity: 1; }
+      100% { transform: translateY(-55px) scale(0.9); opacity: 0; }
+    }
+    .winner-crown-drop {
+      position: absolute;
+      top: -32px;
+      font-size: 36px;
+      animation: bounce-crown 1s infinite alternate cubic-bezier(0.2, 0.9, 0.3, 1);
+      filter: drop-shadow(0 0 14px #fbbf24);
+      z-index: 35;
+    }
+    @keyframes bounce-crown {
+      0% { transform: translateY(-6px) scale(1); }
+      100% { transform: translateY(4px) scale(1.25); }
+    }
+    /* Ghost Card for throwing animation */
+    .ghost-card {
+      position: fixed;
+      width: 60px;
+      height: 86px;
+      border-radius: 7px;
+      pointer-events: none;
+      z-index: 9990;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      transition: all 0.42s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
   </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen relative">
+
+  <!-- FX CANVASES FOR FIREWORKS & FLYING PARTICLES -->
+  <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+  <div id="coin-fly-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
 
   <!-- TOP NAVBAR -->
   <header class="w-full bg-black/75 border-b border-amber-500/40 px-3 py-2 backdrop-blur-md sticky top-0 z-40">
@@ -174,14 +226,12 @@
       
       <!-- TOP SEAT: BOT NORTH -->
       <div class="w-full flex justify-center z-10">
-        <div id="seat-north" class="flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-2xl">
-          <!-- Opponent Cards Remaining Stack -->
+        <div id="seat-north" class="relative flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-2xl">
           <div class="flex items-center -space-x-4 mb-1" id="cards-north-visual">
             <div class="w-7 h-10 sm:w-9 sm:h-12 rounded card-back"></div>
             <div class="w-7 h-10 sm:w-9 sm:h-12 rounded card-back"></div>
             <div class="w-7 h-10 sm:w-9 sm:h-12 rounded card-back"></div>
           </div>
-          <!-- Avatar & Meta -->
           <div class="flex items-center gap-2 bg-black/70 border border-amber-500/40 rounded-full px-3 py-1 shadow-md">
             <span class="text-lg">👑</span>
             <div>
@@ -197,7 +247,7 @@
       <div class="flex items-center justify-between my-auto relative w-full px-1 sm:px-6 z-10">
         
         <!-- LEFT SEAT: BOT WEST -->
-        <div id="seat-west" class="flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-2xl max-w-[120px]">
+        <div id="seat-west" class="relative flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-2xl max-w-[120px]">
           <div class="flex flex-col -space-y-6 mb-1" id="cards-west-visual">
             <div class="w-9 h-11 sm:w-11 sm:h-14 rounded card-back"></div>
             <div class="w-9 h-11 sm:w-11 sm:h-14 rounded card-back"></div>
@@ -213,14 +263,20 @@
         </div>
 
         <!-- CENTER TABLE: DISCARD PILE & TURN STATUS -->
-        <div class="flex-1 flex flex-col items-center justify-center text-center px-2 py-4">
+        <div class="flex-1 flex flex-col items-center justify-center text-center px-2 py-4 relative">
+          
+          <!-- Center Deal Deck (shown during dealing animation) -->
+          <div id="deal-deck-center" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-24 rounded-lg card-back shadow-2xl z-30 pointer-events-none transition-all duration-400 scale-0 opacity-0 flex items-center justify-center">
+            <span class="text-xs font-black text-white/90">52</span>
+          </div>
+
           <!-- Notification / Turn Ribbon -->
           <div id="game-status-ribbon" class="mb-3 px-4 py-1.5 rounded-full bg-black/80 border border-amber-400 text-amber-300 text-xs sm:text-sm font-black shadow-lg animate-pulse" data-i18n="tienlen.status.waiting">
             Đang chuẩn bị chia bài...
           </div>
 
           <!-- Discarded Cards On Table -->
-          <div id="table-pile-container" class="min-h-[100px] sm:min-h-[125px] flex items-center justify-center p-2 rounded-2xl bg-black/25 border border-white/5 w-full max-w-md">
+          <div id="table-pile-container" class="min-h-[105px] sm:min-h-[130px] flex items-center justify-center p-2 rounded-2xl bg-black/25 border border-white/5 w-full max-w-md">
             <span class="text-xs text-neutral-400 font-semibold" id="table-pile-empty">Bàn trống — Đánh tự do</span>
             <div id="table-pile-cards" class="flex items-center justify-center -space-x-5 sm:-space-x-7 flex-wrap" style="display: none;"></div>
           </div>
@@ -230,7 +286,7 @@
         </div>
 
         <!-- RIGHT SEAT: BOT EAST -->
-        <div id="seat-east" class="flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-2xl max-w-[120px]">
+        <div id="seat-east" class="relative flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-2xl max-w-[120px]">
           <div class="flex flex-col -space-y-6 mb-1" id="cards-east-visual">
             <div class="w-9 h-11 sm:w-11 sm:h-14 rounded card-back"></div>
             <div class="w-9 h-11 sm:w-11 sm:h-14 rounded card-back"></div>
@@ -252,27 +308,22 @@
         
         <!-- Action Buttons Toolbar (Above Cards) -->
         <div class="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap justify-center">
-          <!-- Sort Button -->
           <button id="btn-sort" class="px-3.5 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 text-neutral-200 text-xs font-bold transition flex items-center gap-1 shadow">
             <span>🔄</span> <span data-i18n="tienlen.btn.sort">Xếp Bài</span>
           </button>
 
-          <!-- Hint Button -->
           <button id="btn-hint" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400 text-amber-300 text-xs font-bold transition flex items-center gap-1 shadow">
             <span>💡</span> <span data-i18n="tienlen.btn.hint">Gợi Ý</span>
           </button>
 
-          <!-- Pass Button -->
           <button id="btn-pass" class="px-4 py-1.5 rounded-xl bg-red-900/80 hover:bg-red-800 border border-red-500 text-white text-xs font-extrabold transition flex items-center gap-1 shadow disabled:opacity-40 disabled:cursor-not-allowed">
             <span>⛔</span> <span data-i18n="tienlen.btn.pass">Bỏ Lượt</span>
           </button>
 
-          <!-- Play Cards Button -->
           <button id="btn-play-cards" class="px-6 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white text-xs sm:text-sm font-black shadow-xl transition active:scale-95 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
             <span>⚡</span> <span data-i18n="tienlen.btn.play">Đánh Bài</span>
           </button>
 
-          <!-- New Round Button (When game ends) -->
           <button id="btn-new-round" style="display: none;" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 hover:brightness-110 text-black text-xs sm:text-sm font-black shadow-xl transition flex items-center gap-1.5">
             <span>✨</span> <span data-i18n="tienlen.btn.new_round">Ván Mới</span>
           </button>
@@ -286,7 +337,7 @@
         </div>
 
         <!-- Player Profile Badge Bottom -->
-        <div id="seat-player" class="flex items-center gap-2 bg-black/80 border border-amber-500/50 rounded-full px-4 py-1 mt-1 shadow-lg">
+        <div id="seat-player" class="relative flex items-center gap-2 bg-black/80 border border-amber-500/50 rounded-full px-4 py-1 mt-1 shadow-lg transition-all duration-300">
           <div class="w-6 h-6 rounded-full bg-amber-500/30 border border-amber-400 flex items-center justify-center text-xs">
             👤
           </div>
@@ -299,6 +350,22 @@
 
     </div>
   </main>
+
+  <!-- WINNER CEREMONY CELEBRATION OVERLAY (VINH DANH NGƯỜI THẮNG) -->
+  <div id="winner-ceremony-overlay" class="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4 backdrop-blur-md transition-opacity duration-500 opacity-0 pointer-events-none">
+    <div class="flex flex-col items-center text-center space-y-3 transform transition-transform duration-500 scale-95 animate-bounce">
+      <div class="text-6xl sm:text-7xl">👑</div>
+      <div class="px-6 py-1.5 rounded-full bg-amber-500/30 border border-amber-400 text-amber-300 font-extrabold text-xs tracking-widest uppercase" id="ceremony-winner-badge">
+        VINH DANH QUÁN QUÂN
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-black text-metallic-gold font-royal" id="ceremony-winner-name">
+        BẠN ĐÃ VỀ NHẤT!
+      </h2>
+      <div class="text-xl sm:text-2xl font-black text-emerald-400 bg-black/60 px-5 py-2 rounded-2xl border border-emerald-500/40" id="ceremony-winner-coins">
+        +30.000 xu
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: LUẬT CHƠI TIẾN LÊN -->
   <div id="modal-rules" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
@@ -333,16 +400,14 @@
     </div>
   </div>
 
-  <!-- MODAL: KẾT QUẢ VÁN ĐẤU (VICTORY MODAL) -->
+  <!-- MODAL: KẾT QUẢ VÁN ĐẤU (RANKINGS MODAL) -->
   <div id="modal-gameover" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
     <div class="bg-stone-900 border-2 border-amber-400 rounded-3xl max-w-md w-full p-6 text-center text-white shadow-2xl relative space-y-4">
       <div class="text-5xl" id="gameover-icon">🏆</div>
       <h3 class="text-xl font-black text-amber-300 font-royal" id="gameover-title" data-i18n="tienlen.modal.victory">KẾT QUẢ VÁN ĐẤU</h3>
       <p class="text-xs text-neutral-300" id="gameover-desc">Ván đấu đã kết thúc!</p>
 
-      <div class="space-y-2 text-xs" id="gameover-rankings">
-        <!-- Rendered by JS -->
-      </div>
+      <div class="space-y-2 text-xs" id="gameover-rankings"></div>
 
       <div class="pt-3 border-t border-amber-500/20 flex gap-3 justify-center">
         <a href="/" class="px-5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold text-xs transition">
@@ -355,7 +420,7 @@
     </div>
   </div>
 
-  <!-- AUDIO ENGINE & GAME LOGIC -->
+  <!-- AUDIO ENGINE & CELEBRATION FX & GAME LOGIC -->
   <script>
     // Audio Synthesis Engine
     const AudioEngine = (() => {
@@ -385,14 +450,47 @@
             osc.stop(c.currentTime + 0.08);
           } catch(e){}
         },
+        playWhoosh() {
+          try {
+            const c = getCtx();
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(320, c.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(140, c.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.2, c.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, c.currentTime + 0.12);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start();
+            osc.stop(c.currentTime + 0.12);
+          } catch(e){}
+        },
+        playCoinClink() {
+          try {
+            const c = getCtx();
+            [1200, 1600, 2100].forEach((freq, i) => {
+              const osc = c.createOscillator();
+              const gain = c.createGain();
+              osc.type = 'sine';
+              osc.frequency.value = freq;
+              gain.gain.setValueAtTime(0.18, c.currentTime + i * 0.04);
+              gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + i * 0.04 + 0.18);
+              osc.connect(gain);
+              gain.connect(c.destination);
+              osc.start(c.currentTime + i * 0.04);
+              osc.stop(c.currentTime + i * 0.04 + 0.18);
+            });
+          } catch(e){}
+        },
         playChop() {
           try {
             const c = getCtx();
             const osc = c.createOscillator();
             const gain = c.createGain();
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(180, c.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(600, c.currentTime + 0.2);
+            osc.frequency.setValueAtTime(160, c.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(750, c.currentTime + 0.22);
             gain.gain.setValueAtTime(0.5, c.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, c.currentTime + 0.25);
             osc.connect(gain);
@@ -404,26 +502,107 @@
         playWin() {
           try {
             const c = getCtx();
-            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, idx) => {
               const osc = c.createOscillator();
               const gain = c.createGain();
               osc.type = 'sine';
               osc.frequency.value = freq;
-              gain.gain.setValueAtTime(0.2, c.currentTime + idx * 0.1);
-              gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + idx * 0.1 + 0.3);
+              gain.gain.setValueAtTime(0.22, c.currentTime + idx * 0.09);
+              gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + idx * 0.09 + 0.35);
               osc.connect(gain);
               gain.connect(c.destination);
-              osc.start(c.currentTime + idx * 0.1);
-              osc.stop(c.currentTime + idx * 0.1 + 0.3);
+              osc.start(c.currentTime + idx * 0.09);
+              osc.stop(c.currentTime + idx * 0.09 + 0.35);
             });
           } catch(e){}
         }
       };
     })();
 
+    // Fireworks & Confetti Canvas Engine
+    const CelebrationFX = (() => {
+      const canvas = document.getElementById('fx-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animId = null;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function spawnBurst() {
+        const colors = ['#ffd700', '#fff099', '#ff3333', '#22c55e', '#38bdf8', '#e879f9'];
+        for (let i = 0; i < 110; i++) {
+          const isCoin = Math.random() > 0.45;
+          particles.push({
+            x: canvas.width * (0.2 + Math.random() * 0.6),
+            y: canvas.height * 0.4,
+            vx: (Math.random() - 0.5) * 16,
+            vy: -6 - Math.random() * 11,
+            gravity: 0.3,
+            size: isCoin ? (7 + Math.random() * 4) : (4 + Math.random() * 3),
+            color: colors[Math.floor(Math.random() * colors.length)],
+            isCoin,
+            angle: Math.random() * Math.PI * 2,
+            spin: (Math.random() - 0.5) * 0.28,
+            alpha: 1
+          });
+        }
+        if (!animId) loop();
+      }
+
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravity;
+          p.angle += p.spin;
+          p.alpha -= 0.012;
+
+          if (p.alpha > 0) {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, p.alpha);
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.angle);
+            if (p.isCoin) {
+              ctx.fillStyle = '#ffd700';
+              ctx.beginPath();
+              ctx.ellipse(0, 0, p.size, p.size * Math.abs(Math.cos(p.angle * 2)), 0, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.strokeStyle = '#92400e';
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            } else {
+              ctx.fillStyle = p.color;
+              ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+            }
+            ctx.restore();
+          }
+        });
+
+        particles = particles.filter(p => p.alpha > 0);
+        if (particles.length > 0) {
+          animId = requestAnimationFrame(loop);
+        } else {
+          animId = null;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      return {
+        burst() {
+          spawnBurst();
+          setTimeout(spawnBurst, 400);
+          setTimeout(spawnBurst, 850);
+        }
+      };
+    })();
+
     // 52 Playing Cards Definition
-    // Ranks: 3=3, 4=4... 10=10, J=11, Q=12, K=13, A=14, 2=15
-    // Suits: Spades=1, Clubs=2, Diamonds=3, Hearts=4
     const SUITS = [
       { id: 1, name: 'spades', symbol: '♠', color: 'card-black' },
       { id: 2, name: 'clubs', symbol: '♣', color: 'card-black' },
@@ -451,7 +630,6 @@
           });
         }
       }
-      // Shuffle Fisher-Yates
       for (let i = deck.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -459,7 +637,7 @@
       return deck;
     }
 
-    // Tien Len Hand Evaluator
+    // Hand Evaluator
     const Evaluator = {
       evaluate(cards) {
         if (!cards || cards.length === 0) return null;
@@ -477,17 +655,17 @@
           return { type: 'PAIR', highest, length: 2, name: `Đôi ${sorted[0].label}` };
         }
 
-        // 3. Triple (Sám cô)
+        // 3. Triple
         if (n === 3 && sorted[0].rank === sorted[1].rank && sorted[1].rank === sorted[2].rank) {
           return { type: 'TRIPLE', highest, length: 3, name: `Sám cô ${sorted[0].label}` };
         }
 
-        // 4. Four of a kind (Tứ quý)
+        // 4. Four of a kind
         if (n === 4 && sorted[0].rank === sorted[1].rank && sorted[1].rank === sorted[2].rank && sorted[2].rank === sorted[3].rank) {
           return { type: 'FOUR_OF_A_KIND', highest, length: 4, name: `Tứ quý ${sorted[0].label}` };
         }
 
-        // 5. Straight (Sảnh: 3 or more consecutive ranks, no 2s allowed)
+        // 5. Straight (no 2s allowed)
         if (n >= 3) {
           let isStraight = true;
           for (let i = 0; i < n - 1; i++) {
@@ -501,7 +679,7 @@
           }
         }
 
-        // 6. Three pairs sequence (3 đôi thông: 6 cards, 3 consecutive pairs)
+        // 6. 3 pairs sequence
         if (n === 6) {
           if (sorted[0].rank === sorted[1].rank &&
               sorted[2].rank === sorted[3].rank &&
@@ -513,27 +691,24 @@
           }
         }
 
-        return null; // Invalid combination
+        return null;
       },
 
       canBeat(playedCombo, currentCombo) {
         if (!playedCombo) return false;
-        if (!currentCombo) return true; // Leading new round
+        if (!currentCombo) return true;
 
-        // 1. Same combo type & length: highest card decides
         if (playedCombo.type === currentCombo.type && playedCombo.length === currentCombo.length) {
           return playedCombo.highest.score > currentCombo.highest.score;
         }
 
-        // 2. Chặt Heo & Tứ Quý special rules:
-        // Tứ Quý chops single 2 (Heo) or smaller Tứ Quý
+        // Special chops
         if (playedCombo.type === 'FOUR_OF_A_KIND') {
           if (currentCombo.type === 'SINGLE' && currentCombo.highest.rank === 15) return true;
           if (currentCombo.type === 'PAIR' && currentCombo.highest.rank === 15) return true;
           if (currentCombo.type === 'FOUR_OF_A_KIND' && playedCombo.highest.score > currentCombo.highest.score) return true;
         }
 
-        // 3 Đôi Thông chops single 2 (Heo) or smaller 3 Đôi Thông
         if (playedCombo.type === 'THREE_PAIRS_SEQUENCE') {
           if (currentCombo.type === 'SINGLE' && currentCombo.highest.rank === 15) return true;
           if (currentCombo.type === 'THREE_PAIRS_SEQUENCE' && playedCombo.highest.score > currentCombo.highest.score) return true;
@@ -543,7 +718,7 @@
       }
     };
 
-    // Tiến Lên Main Game Controller
+    // Main Game Controller
     class TienLenGame {
       constructor() {
         this.players = [
@@ -553,7 +728,7 @@
           { id: 3, name: 'Đại Gia Đông', isBot: true, hand: [], passed: false, rank: 0 }
         ];
         this.currentTurn = 0;
-        this.currentPile = null; // { combo, cards, playerIndex }
+        this.currentPile = null;
         this.selectedIndices = new Set();
         this.roundWinners = [];
         this.roomBet = 10000;
@@ -565,7 +740,6 @@
       }
 
       init() {
-        // Sync player identity from Wallet
         if (window.Wallet) {
           const u = window.Wallet.getUser();
           this.players[0].name = u.username || 'Player001';
@@ -586,12 +760,10 @@
       }
 
       bindEvents() {
-        // Room bet change
         document.getElementById('select-room-bet').addEventListener('change', (e) => {
           this.roomBet = parseInt(e.target.value, 10);
         });
 
-        // Rules modal
         document.getElementById('btn-rules').addEventListener('click', () => {
           document.getElementById('modal-rules').style.display = 'flex';
         });
@@ -602,13 +774,11 @@
           document.getElementById('modal-rules').style.display = 'none';
         });
 
-        // Sound toggle
         document.getElementById('btn-sound-toggle').addEventListener('click', () => {
           this.soundEnabled = !this.soundEnabled;
           document.getElementById('btn-sound-toggle').textContent = this.soundEnabled ? '🔊' : '🔇';
         });
 
-        // Sort hand
         document.getElementById('btn-sort').addEventListener('click', () => {
           this.sortByRank = !this.sortByRank;
           this.sortHand(0);
@@ -616,22 +786,18 @@
           this.renderPlayerHand();
         });
 
-        // Play cards
         document.getElementById('btn-play-cards').addEventListener('click', () => {
           this.handlePlayerPlay();
         });
 
-        // Pass turn
         document.getElementById('btn-pass').addEventListener('click', () => {
           this.handlePlayerPass();
         });
 
-        // Hint button
         document.getElementById('btn-hint').addEventListener('click', () => {
           this.provideHint();
         });
 
-        // New round button
         document.getElementById('btn-new-round').addEventListener('click', () => {
           this.startNewGame();
         });
@@ -641,12 +807,14 @@
         });
       }
 
-      startNewGame() {
+      async startNewGame() {
         clearTimeout(this.turnTimer);
         document.getElementById('modal-gameover').style.display = 'none';
         document.getElementById('btn-new-round').style.display = 'none';
 
-        // Reset players
+        // Clean crowns
+        document.querySelectorAll('.winner-crown-drop').forEach(el => el.remove());
+
         this.players.forEach(p => {
           p.hand = [];
           p.passed = false;
@@ -656,7 +824,6 @@
         this.currentPile = null;
         this.selectedIndices.clear();
 
-        // Deal 13 cards to each player
         const deck = createDeck();
         for (let i = 0; i < 13; i++) {
           for (let p = 0; p < 4; p++) {
@@ -664,12 +831,10 @@
           }
         }
 
-        // Sort each player hand
         for (let p = 0; p < 4; p++) {
           this.sortHand(p);
         }
 
-        // Determine who goes first: player who holds 3 Spades (3♠)
         let startingPlayer = 0;
         for (let p = 0; p < 4; p++) {
           if (this.players[p].hand.some(c => c.rank === 3 && c.suit === 1)) {
@@ -677,8 +842,12 @@
             break;
           }
         }
-
         this.currentTurn = startingPlayer;
+
+        // 1. ANIMATION CHIA BÀI (DEALING ANIMATION)
+        this.setRibbon('🎴 Đang chia 13 lá bài cho mỗi người chơi...');
+        await this.animateDealingCards();
+
         this.renderAll();
 
         const starterName = this.players[startingPlayer].id === 0 ? 'Bạn (có 3♠)' : this.players[startingPlayer].name;
@@ -686,6 +855,53 @@
         AudioEngine.playSnap();
 
         this.startTurn();
+      }
+
+      // ANIMATION 1: CHIA BÀI (DEALING)
+      async animateDealingCards() {
+        const deckCenter = document.getElementById('deal-deck-center');
+        deckCenter.style.opacity = '1';
+        deckCenter.style.transform = 'translate(-50%, -50%) scale(1)';
+
+        const seats = [
+          document.getElementById('seat-player'),
+          document.getElementById('seat-west'),
+          document.getElementById('seat-north'),
+          document.getElementById('seat-east')
+        ];
+
+        for (let wave = 0; wave < 3; wave++) {
+          for (let p = 0; p < 4; p++) {
+            this.spawnGhostCard(deckCenter, seats[p]);
+            AudioEngine.playWhoosh();
+            await new Promise(r => setTimeout(r, 60));
+          }
+        }
+
+        await new Promise(r => setTimeout(r, 180));
+        deckCenter.style.opacity = '0';
+        deckCenter.style.transform = 'translate(-50%, -50%) scale(0)';
+      }
+
+      spawnGhostCard(fromEl, toEl) {
+        if (!fromEl || !toEl) return;
+        const fromRect = fromEl.getBoundingClientRect();
+        const toRect = toEl.getBoundingClientRect();
+
+        const ghost = document.createElement('div');
+        ghost.className = 'ghost-card card-back';
+        ghost.style.left = fromRect.left + 'px';
+        ghost.style.top = fromRect.top + 'px';
+        document.body.appendChild(ghost);
+
+        requestAnimationFrame(() => {
+          ghost.style.left = (toRect.left + toRect.width / 2 - 30) + 'px';
+          ghost.style.top = (toRect.top + toRect.height / 2 - 43) + 'px';
+          ghost.style.transform = 'scale(0.8) rotate(360deg)';
+          ghost.style.opacity = '0.4';
+        });
+
+        setTimeout(() => ghost.remove(), 420);
       }
 
       sortHand(playerIdx) {
@@ -700,7 +916,6 @@
       startTurn() {
         clearTimeout(this.turnTimer);
 
-        // Check if round should clear (all other active players passed)
         const activePlayers = this.players.filter(p => p.hand.length > 0);
         if (activePlayers.length <= 1) {
           this.endGame();
@@ -709,7 +924,6 @@
 
         const unpassed = activePlayers.filter(p => !p.passed);
         if (unpassed.length === 1 && this.currentPile !== null) {
-          // New round! Pile cleared
           const leader = unpassed[0];
           this.currentPile = null;
           this.players.forEach(p => p.passed = false);
@@ -721,7 +935,6 @@
 
         const current = this.players[this.currentTurn];
 
-        // Skip if player already won or passed
         if (current.hand.length === 0 || current.passed) {
           this.nextTurn();
           return;
@@ -730,11 +943,9 @@
         this.renderTurnHighlights();
 
         if (current.isBot) {
-          // Bot plays after small delay
           this.setRibbon(`Lượt của ${current.name}...`);
-          this.turnTimer = setTimeout(() => this.botPlay(current), 1100 + Math.random() * 600);
+          this.turnTimer = setTimeout(() => this.botPlay(current), 1100 + Math.random() * 500);
         } else {
-          // User turn
           this.setRibbon('⚡ Đến lượt bạn! Chọn bài và bấm Đánh Bài');
           document.getElementById('btn-play-cards').disabled = false;
           document.getElementById('btn-pass').disabled = this.currentPile === null;
@@ -766,7 +977,6 @@
           return;
         }
 
-        // Legal Play!
         this.executePlay(0, selectedCards, combo);
       }
 
@@ -783,14 +993,23 @@
         this.nextTurn();
       }
 
+      // ANIMATION 2: ĐÁNH BÀI (THROW CARDS TO PILE) & ANIMATION 3: ĂN TIỀN / CHẶT HEO
       executePlay(playerIdx, cards, combo) {
         const player = this.players[playerIdx];
+        const seatEl = this.getSeatElement(playerIdx);
 
-        // Check if chặt heo (chopping a 2)
+        // 2. Play card throw animation from seat to table pile
+        this.animatePlayThrow(seatEl, cards);
+
+        // 3. ANIMATION ĂN TIỀN KHI CHẶT HEO
         if (this.currentPile && this.currentPile.combo.highest.rank === 15 && combo.type !== 'SINGLE') {
           AudioEngine.playChop();
           const bonusCoins = this.roomBet * 2;
           this.setRibbon(`💥 ${player.id === 0 ? 'BẠN' : player.name} CHẶT HEO! (+${bonusCoins.toLocaleString()} xu)`);
+          
+          const loserSeat = this.getSeatElement(this.currentPile.playerIndex);
+          this.animateMoneyTransfer(loserSeat, seatEl, bonusCoins);
+
           if (player.id === 0 && window.Wallet) window.Wallet.addBalance(bonusCoins);
           else if (this.currentPile.playerIndex === 0 && window.Wallet) window.Wallet.deductBalance(bonusCoins);
         } else {
@@ -805,19 +1024,22 @@
         this.currentPile = { combo, cards, playerIndex: playerIdx };
         this.selectedIndices.clear();
 
-        // Check if player finished hand
+        // 4. ANIMATION VINH DANH KHI VỀ NHẤT
         if (player.hand.length === 0) {
           this.roundWinners.push(player);
           player.rank = this.roundWinners.length;
-          const medals = ['🥇 VỀ NHẤT!', '🥈 VỀ NHÌ', '🥉 VỀ BA'];
-          const rankLabel = medals[player.rank - 1] || 'VỀ ĐÍCH';
-          this.setRibbon(`🎉 ${player.id === 0 ? 'BẠN' : player.name} ${rankLabel}`);
-          if (player.id === 0) AudioEngine.playWin();
+          
+          if (player.rank === 1) {
+            // First place champion ceremony!
+            this.triggerWinnerCeremony(player, this.roomBet * 3);
+          } else {
+            const medals = ['', '🥈 VỀ NHÌ', '🥉 VỀ BA'];
+            this.setRibbon(`🎉 ${player.id === 0 ? 'BẠN' : player.name} ${medals[player.rank - 1]}`);
+          }
         }
 
         this.renderAll();
 
-        // Check end game
         const remaining = this.players.filter(p => p.hand.length > 0);
         if (remaining.length <= 1) {
           this.endGame();
@@ -827,13 +1049,141 @@
         this.nextTurn();
       }
 
+      getSeatElement(playerIdx) {
+        if (playerIdx === 0) return document.getElementById('seat-player');
+        if (playerIdx === 1) return document.getElementById('seat-west');
+        if (playerIdx === 2) return document.getElementById('seat-north');
+        return document.getElementById('seat-east');
+      }
+
+      animatePlayThrow(seatEl, cards) {
+        if (!seatEl) return;
+        const pileEl = document.getElementById('table-pile-container');
+        const fromRect = seatEl.getBoundingClientRect();
+        const toRect = pileEl.getBoundingClientRect();
+
+        cards.forEach((c, idx) => {
+          const ghost = document.createElement('div');
+          ghost.className = `ghost-card ${c.color} bg-white flex flex-col justify-between p-1 text-xs font-black shadow-2xl`;
+          ghost.innerHTML = `<span>${c.label}${c.symbol}</span><span class="text-center text-lg">${c.symbol}</span>`;
+          ghost.style.left = (fromRect.left + fromRect.width / 2 + idx * 10 - 25) + 'px';
+          ghost.style.top = (fromRect.top + fromRect.height / 2 - 35) + 'px';
+          document.body.appendChild(ghost);
+
+          requestAnimationFrame(() => {
+            ghost.style.left = (toRect.left + toRect.width / 2 + (idx - cards.length / 2) * 22) + 'px';
+            ghost.style.top = (toRect.top + toRect.height / 2 - 40) + 'px';
+            ghost.style.transform = `scale(1.08) rotate(${(Math.random() - 0.5) * 16}deg)`;
+          });
+
+          setTimeout(() => ghost.remove(), 420);
+        });
+      }
+
+      // ANIMATION 3: ĂN TIỀN (FLYING GOLD COINS)
+      animateMoneyTransfer(fromSeat, toSeat, amount) {
+        const container = document.getElementById('coin-fly-container');
+        if (!container || !fromSeat || !toSeat) return;
+
+        const fromRect = fromSeat.getBoundingClientRect();
+        const toRect = toSeat.getBoundingClientRect();
+
+        const startX = fromRect.left + fromRect.width / 2;
+        const startY = fromRect.top + fromRect.height / 2;
+        const endX = toRect.left + toRect.width / 2;
+        const endY = toRect.top + toRect.height / 2;
+
+        this.showFloatingText(fromSeat, `-${amount.toLocaleString()} xu`, '#ef4444');
+
+        for (let i = 0; i < 12; i++) {
+          setTimeout(() => {
+            const coin = document.createElement('div');
+            coin.className = 'flying-gold-coin';
+            coin.textContent = '🪙';
+            coin.style.left = startX + 'px';
+            coin.style.top = startY + 'px';
+            container.appendChild(coin);
+
+            const midX = (startX + endX) / 2 + (Math.random() - 0.5) * 90;
+            const midY = Math.min(startY, endY) - 50 - Math.random() * 40;
+            const duration = 550 + Math.random() * 150;
+            const startTime = performance.now();
+
+            function anim(now) {
+              const elapsed = now - startTime;
+              const progress = Math.min(1, elapsed / duration);
+              const x = (1 - progress) * (1 - progress) * startX + 2 * (1 - progress) * progress * midX + progress * progress * endX;
+              const y = (1 - progress) * (1 - progress) * startY + 2 * (1 - progress) * progress * midY + progress * progress * endY;
+
+              coin.style.transform = `translate(${x - startX}px, ${y - startY}px) scale(${1 + Math.sin(progress * Math.PI) * 0.4}) rotate(${progress * 720}deg)`;
+              coin.style.opacity = progress > 0.85 ? (1 - progress) / 0.15 : 1;
+
+              if (progress < 1) {
+                requestAnimationFrame(anim);
+              } else {
+                coin.remove();
+                if (i === 11) {
+                  AudioEngine.playCoinClink();
+                  this.showFloatingText(toSeat, `+${amount.toLocaleString()} xu`, '#10b981');
+                }
+              }
+            }
+            requestAnimationFrame(anim);
+          }, i * 45);
+        }
+      }
+
+      showFloatingText(parentEl, text, color) {
+        if (!parentEl) return;
+        const rect = parentEl.getBoundingClientRect();
+        const span = document.createElement('span');
+        span.className = 'floating-score-text';
+        span.textContent = text;
+        span.style.color = color;
+        span.style.left = (rect.left + rect.width / 2 - 40) + 'px';
+        span.style.top = (rect.top - 10) + 'px';
+        document.body.appendChild(span);
+        setTimeout(() => span.remove(), 1800);
+      }
+
+      // ANIMATION 4: VINH DANH NGƯỜI THẮNG (WINNER CEREMONY)
+      triggerWinnerCeremony(winnerPlayer, coinsWon) {
+        AudioEngine.playWin();
+        CelebrationFX.burst();
+
+        const overlay = document.getElementById('winner-ceremony-overlay');
+        const winnerNameEl = document.getElementById('ceremony-winner-name');
+        const winnerBadgeEl = document.getElementById('ceremony-winner-badge');
+        const winnerCoinsEl = document.getElementById('ceremony-winner-coins');
+
+        const isUser = winnerPlayer.id === 0;
+        winnerNameEl.textContent = isUser ? 'BẠN ĐÃ VỀ NHẤT!' : `${winnerPlayer.name} VỀ NHẤT!`;
+        winnerBadgeEl.textContent = isUser ? '🏆 VINH DANH QUÁN QUÂN BÀN ĐẤU' : '🏆 CHIẾN THẮNG VANG DỘI';
+        winnerCoinsEl.textContent = `+${coinsWon.toLocaleString()} xu`;
+
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100');
+
+        // Drop golden crown on winner seat
+        const seatEl = this.getSeatElement(winnerPlayer.id);
+        if (seatEl) {
+          const crown = document.createElement('div');
+          crown.className = 'winner-crown-drop';
+          crown.textContent = '👑';
+          seatEl.appendChild(crown);
+        }
+
+        setTimeout(() => {
+          overlay.classList.remove('opacity-100');
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+        }, 3200);
+      }
+
       botPlay(bot) {
         const hand = bot.hand;
         const currentCombo = this.currentPile ? this.currentPile.combo : null;
 
-        // If leading: play smallest single, pair, or triple
         if (!currentCombo) {
-          // Play smallest card (or pair if available)
           const firstCard = hand[0];
           const pair = hand.filter(c => c.rank === firstCard.rank);
           if (pair.length >= 2) {
@@ -845,8 +1195,6 @@
           return;
         }
 
-        // If following: search for smallest legal play
-        // 1. Single
         if (currentCombo.type === 'SINGLE') {
           for (const card of hand) {
             const combo = Evaluator.evaluate([card]);
@@ -857,7 +1205,6 @@
           }
         }
 
-        // 2. Pair
         if (currentCombo.type === 'PAIR') {
           const rankGroups = {};
           hand.forEach(c => {
@@ -876,7 +1223,6 @@
           }
         }
 
-        // 3. Triple
         if (currentCombo.type === 'TRIPLE') {
           const rankGroups = {};
           hand.forEach(c => {
@@ -895,9 +1241,7 @@
           }
         }
 
-        // 4. Straight
         if (currentCombo.type === 'STRAIGHT') {
-          // Attempt simple straight search
           const len = currentCombo.length;
           for (let startIdx = 0; startIdx <= hand.length - len; startIdx++) {
             const slice = hand.slice(startIdx, startIdx + len);
@@ -909,7 +1253,6 @@
           }
         }
 
-        // Bot cannot beat or chooses to pass
         bot.passed = true;
         this.setRibbon(`${bot.name} đã bỏ lượt`);
         this.renderAll();
@@ -924,13 +1267,11 @@
         this.selectedIndices.clear();
 
         if (!currentCombo) {
-          // Hint smallest single
           this.selectedIndices.add(0);
           this.renderPlayerHand();
           return;
         }
 
-        // Search single
         if (currentCombo.type === 'SINGLE') {
           for (let i = 0; i < hand.length; i++) {
             const combo = Evaluator.evaluate([hand[i]]);
@@ -942,7 +1283,6 @@
           }
         }
 
-        // Search pair
         if (currentCombo.type === 'PAIR') {
           for (let i = 0; i < hand.length - 1; i++) {
             for (let j = i + 1; j < hand.length; j++) {
@@ -965,14 +1305,12 @@
       endGame() {
         clearTimeout(this.turnTimer);
 
-        // Add remaining last player as 4th place
         const lastPlayer = this.players.find(p => p.hand.length > 0);
         if (lastPlayer) {
           lastPlayer.rank = 4;
           this.roundWinners.push(lastPlayer);
         }
 
-        // Payout Calculations
         const bet = this.roomBet;
         const results = this.players.map(p => {
           let coinsChange = 0;
@@ -993,36 +1331,49 @@
           return { player: p, coinsChange, title };
         });
 
-        // Sync player balance
+        // Trigger money transfer animation from losers to winners
+        const winner = results.find(r => r.player.rank === 1);
+        const losers = results.filter(r => r.player.rank > 2);
+        if (winner) {
+          const winnerSeat = this.getSeatElement(winner.player.id);
+          losers.forEach((l, idx) => {
+            setTimeout(() => {
+              const loserSeat = this.getSeatElement(l.player.id);
+              this.animateMoneyTransfer(loserSeat, winnerSeat, Math.abs(l.coinsChange));
+            }, idx * 300);
+          });
+        }
+
         const playerResult = results.find(r => r.player.id === 0);
         if (playerResult && window.Wallet) {
           if (playerResult.coinsChange > 0) window.Wallet.addBalance(playerResult.coinsChange);
           else if (playerResult.coinsChange < 0) window.Wallet.deductBalance(Math.abs(playerResult.coinsChange));
         }
 
-        // Show Gameover Modal
-        const modal = document.getElementById('modal-gameover');
-        const rankingsContainer = document.getElementById('gameover-rankings');
-        const iconEl = document.getElementById('gameover-icon');
-        const titleEl = document.getElementById('gameover-title');
+        setTimeout(() => {
+          const modal = document.getElementById('modal-gameover');
+          const rankingsContainer = document.getElementById('gameover-rankings');
+          const iconEl = document.getElementById('gameover-icon');
+          const titleEl = document.getElementById('gameover-title');
 
-        iconEl.textContent = playerResult.player.rank === 1 ? '🏆' : (playerResult.player.rank === 4 ? '💀' : '✨');
-        titleEl.textContent = playerResult.player.rank === 1 ? 'BẠN ĐÃ VỀ NHẤT!' : `BẠN ${playerResult.title}`;
+          iconEl.textContent = playerResult.player.rank === 1 ? '🏆' : (playerResult.player.rank === 4 ? '💀' : '✨');
+          titleEl.textContent = playerResult.player.rank === 1 ? 'BẠN ĐÃ VỀ NHẤT!' : `BẠN ${playerResult.title}`;
 
-        rankingsContainer.innerHTML = results.sort((a, b) => a.player.rank - b.player.rank).map(r => `
-          <div class="flex items-center justify-between p-2 rounded-xl bg-black/60 border border-white/5">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-white">${r.title}</span>
-              <span class="text-neutral-300">${r.player.id === 0 ? 'Bạn' : r.player.name}</span>
+          rankingsContainer.innerHTML = results.sort((a, b) => a.player.rank - b.player.rank).map(r => `
+            <div class="flex items-center justify-between p-2 rounded-xl bg-black/60 border border-white/5">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white">${r.title}</span>
+                <span class="text-neutral-300">${r.player.id === 0 ? 'Bạn' : r.player.name}</span>
+              </div>
+              <span class="font-black ${r.coinsChange >= 0 ? 'text-emerald-400' : 'text-red-400'}">
+                ${r.coinsChange >= 0 ? '+' : ''}${r.coinsChange.toLocaleString()} xu
+              </span>
             </div>
-            <span class="font-black ${r.coinsChange >= 0 ? 'text-emerald-400' : 'text-red-400'}">
-              ${r.coinsChange >= 0 ? '+' : ''}${r.coinsChange.toLocaleString()} xu
-            </span>
-          </div>
-        `).join('');
+          `).join('');
 
-        modal.style.display = 'flex';
-        document.getElementById('btn-new-round').style.display = 'inline-flex';
+          modal.style.display = 'flex';
+          document.getElementById('btn-new-round').style.display = 'inline-flex';
+        }, 1500);
       }
 
       setRibbon(text) {
@@ -1095,8 +1446,11 @@
         emptyEl.style.display = 'none';
         cardsEl.style.display = 'flex';
 
-        cardsEl.innerHTML = this.currentPile.cards.map(card => `
-          <div class="playing-card ${card.color} flex flex-col justify-between p-1.5 sm:p-2 pointer-events-none scale-90 sm:scale-100">
+        cardsEl.innerHTML = this.currentPile.cards.map((card, i) => {
+          const rotation = (i - this.currentPile.cards.length / 2) * 4;
+          return `
+          <div class="playing-card ${card.color} flex flex-col justify-between p-1.5 sm:p-2 pointer-events-none scale-90 sm:scale-100 shadow-xl"
+               style="transform: rotate(${rotation}deg);">
             <div class="flex flex-col items-center leading-none">
               <span class="font-black text-xs sm:text-base">${card.label}</span>
               <span class="text-xs sm:text-sm">${card.symbol}</span>
@@ -1109,7 +1463,8 @@
               <span class="text-xs sm:text-sm">${card.symbol}</span>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
 
         const owner = this.players[this.currentPile.playerIndex];
         const ownerName = owner.id === 0 ? 'Bạn' : owner.name;
