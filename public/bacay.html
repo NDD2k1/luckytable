@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/css/room-overlay.css">
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/room-overlay.js"></script>
+    <script src="/js/wallet.js"></script>
+    <script src="/js/i18n.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
     <style>
@@ -889,15 +891,24 @@
         // KHỞI TẠO TRÒ CHƠI & ĐỒNG BỘ DỮ LIỆU
         // =========================================================================
         function initBaCay() {
-            // Đồng bộ số dư từ Server
-            fetch('/api/user/Player001')
-                .then(r => r.json())
-                .then(res => {
-                    if (res && res.success && res.data && typeof res.data.balance === 'number') {
-                        gameState.balance = res.data.balance;
-                        updateUI();
-                    }
-                }).catch(() => {});
+            // Đồng bộ số dư từ Wallet & Server
+            if (window.Wallet) {
+                gameState.balance = window.Wallet.getBalance();
+                updateUI();
+                window.Wallet.syncWithServer().then(bal => {
+                    gameState.balance = bal;
+                    updateUI();
+                });
+            } else {
+                fetch('/api/user/Player001')
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res && res.success && res.data && typeof res.data.balance === 'number') {
+                            gameState.balance = res.data.balance;
+                            updateUI();
+                        }
+                    }).catch(() => {});
+            }
 
             setupSqueezeCardDrag();
             startBettingPhase();
@@ -1446,11 +1457,15 @@
             }
 
             // Đồng bộ số dư mới về Server
-            fetch('/api/user/Player001/sync-balance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ balance: gameState.balance })
-            }).catch(() => {});
+            if (window.Wallet) {
+                window.Wallet.setBalance(gameState.balance);
+            } else {
+                fetch('/api/user/Player001/sync-balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ balance: gameState.balance })
+                }).catch(() => {});
+            }
 
             updateUI();
 
@@ -1792,11 +1807,15 @@
             setStatus('Hoàng Gia ban thưởng +50,000 xu vào tài khoản của bạn!');
 
             // Đồng bộ về server
-            fetch('/api/user/Player001/sync-balance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ balance: gameState.balance })
-            }).catch(() => {});
+            if (window.Wallet) {
+                window.Wallet.setBalance(gameState.balance);
+            } else {
+                fetch('/api/user/Player001/sync-balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ balance: gameState.balance })
+                }).catch(() => {});
+            }
         }
 
         function openRuleModal() {

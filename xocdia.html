@@ -7,6 +7,7 @@
   <meta name="description" content="Xóc Đĩa Tứ Linh 3D - Casino Dân Gian Bát Sứ Quân Vị Đỏ Trắng, Tự Tay Nặn Bát Chẵn Lẻ Cực Phê.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/room-overlay.css">
+  <script src="/js/wallet.js"></script>
   <script src="/js/i18n.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/room-overlay.js"></script>
@@ -630,7 +631,7 @@
     class XocDiaGame {
       constructor() {
         this.state = GameState.BETTING;
-        this.balance = parseInt(localStorage.getItem('lucky_casino_balance') || '50000', 10);
+        this.balance = (window.Wallet ? window.Wallet.getBalance() : parseInt(localStorage.getItem('lucky_casino_balance') || '50000', 10));
         this.selectedChip = 500;
         
         // Cược nhiều cửa
@@ -658,6 +659,7 @@
       }
 
       init() {
+        if (window.Wallet) { window.Wallet.syncWithServer().then(() => { this.balance = window.Wallet.getBalance(); this.updateBalanceUI(); }); }
         this.updateBalanceUI();
         this.initHistory();
         this.bindEvents();
@@ -975,15 +977,11 @@
       }
 
       saveBalance() {
-        localStorage.setItem('lucky_casino_balance', this.balance.toString());
-        localStorage.setItem('tai_xiu_balance', this.balance.toString());
-        const userSaved = localStorage.getItem('lucky_casino_user');
-        if (userSaved) {
-          try {
-            const u = JSON.parse(userSaved);
-            u.balance = this.balance;
-            localStorage.setItem('lucky_casino_user', JSON.stringify(u));
-          } catch(e) {}
+        if (window.Wallet) {
+          window.Wallet.setBalance(this.balance);
+        } else {
+          localStorage.setItem('lucky_casino_balance', this.balance.toString());
+          localStorage.setItem('tai_xiu_balance', this.balance.toString());
         }
       }
 

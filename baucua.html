@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/css/room-overlay.css">
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/room-overlay.js"></script>
+    <script src="/js/wallet.js"></script>
+    <script src="/js/i18n.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
     <style>
@@ -785,7 +787,7 @@
         };
 
         let state = {
-            balance: 50000,
+            balance: (window.Wallet ? window.Wallet.getBalance() : parseInt(localStorage.getItem('lucky_casino_balance') || '50000', 10)),
             selectedChip: 100,
             bets: { nai: 0, bau: 0, ga: 0, ca: 0, cua: 0, tom: 0 },
             betHistoryChips: { nai: [], bau: [], ga: [], ca: [], cua: [], tom: [] },
@@ -1524,15 +1526,24 @@
             renderBoard();
             updateUI();
 
-            // Đồng bộ số dư thực tế từ Server Cổng Game
-            fetch('/api/user/Player001')
-                .then(r => r.json())
-                .then(res => {
-                    if (res && res.success && res.data && typeof res.data.balance === 'number') {
-                        state.balance = res.data.balance;
-                        updateUI();
-                    }
-                }).catch(() => {});
+            // Đồng bộ số dư thực tế từ Wallet & Server
+            if (window.Wallet) {
+                state.balance = window.Wallet.getBalance();
+                updateUI();
+                window.Wallet.syncWithServer().then(bal => {
+                    state.balance = bal;
+                    updateUI();
+                });
+            } else {
+                fetch('/api/user/Player001')
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res && res.success && res.data && typeof res.data.balance === 'number') {
+                            state.balance = res.data.balance;
+                            updateUI();
+                        }
+                    }).catch(() => {});
+            }
 
             // Khởi động vòng lặp tự động 15s đếm ngược cho Bầu Cua
             startBettingRound();
@@ -1951,12 +1962,16 @@
             if (state.history.length > 5) state.history.pop();
             renderHistory();
 
-            // Đồng bộ số dư mới về Server
-            fetch('/api/user/Player001/sync-balance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ balance: state.balance })
-            }).catch(() => {});
+            // Đồng bộ số dư mới qua Wallet
+            if (window.Wallet) {
+                window.Wallet.setBalance(state.balance);
+            } else {
+                fetch('/api/user/Player001/sync-balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ balance: state.balance })
+                }).catch(() => {});
+            }
 
             updateUI();
 

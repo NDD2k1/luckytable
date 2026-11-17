@@ -59,6 +59,20 @@ class TaiXiuGame {
     this.bindEvents();
     this.bindSqueezeGestures();
     this.renderDiceElements();
+        // Đồng bộ số dư và thông tin người chơi từ Wallet
+    if (typeof window !== 'undefined' && window.Wallet) {
+      this.balance = window.Wallet.getBalance();
+      window.Wallet.syncWithServer().then(() => {
+        this.balance = window.Wallet.getBalance();
+        this.updateBalanceDisplays();
+      });
+      const user = window.Wallet.getUser();
+      if (user && user.username) {
+        const nameEl = document.querySelector('.player-name-row span');
+        if (nameEl) nameEl.textContent = user.username;
+      }
+    }
+
     this.updateBalanceDisplays();
     this.renderBeadRoadAndStats();
     this.updateSoundDisplay();

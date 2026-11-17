@@ -24,6 +24,24 @@ class PortalController {
   init() {
     this.cacheElements();
     this.bindEvents();
+    // Real-time balance synchronization across games and tabs
+    window.addEventListener('balanceChanged', (e) => {
+      if (this.user && typeof e.detail.balance === 'number') {
+        this.user.balance = e.detail.balance;
+        this.updateUserUI();
+      }
+    });
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'lucky_casino_balance' && e.newValue) {
+        const bal = parseInt(e.newValue, 10);
+        if (!isNaN(bal) && this.user) {
+          this.user.balance = bal;
+          this.updateUserUI();
+        }
+      }
+    });
+
     this.fetchUserData();
     this.fetchNews();
     this.fetchRooms();
@@ -605,27 +623,24 @@ class PortalController {
   }
 
     fetchUserData() {
-    const saved = localStorage.getItem('lucky_casino_user');
-    if (saved) {
-      try {
-        this.user = JSON.parse(saved);
-        this.updateUserUI();
-      } catch (e) {}
-    }
+    if (typeof window !== 'undefined' && window.Wallet) {
+      this.user = window.Wallet.getUser();
+      this.user.balance = window.Wallet.getBalance();
+      this.updateUserUI();
 
-    const currentId = this.user && this.user.id ? this.user.id : 'Player001';
-    fetch('/api/user/' + currentId)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.data) {
-          this.user = data.data;
-          this.updateUserUI();
-          localStorage.setItem('lucky_casino_user', JSON.stringify(this.user));
-        }
-      })
-      .catch(() => {
+      window.Wallet.syncWithServer().then(() => {
+        this.user.balance = window.Wallet.getBalance();
         this.updateUserUI();
       });
+    } else {
+      const saved = localStorage.getItem('lucky_casino_user');
+      if (saved) {
+        try {
+          this.user = JSON.parse(saved);
+          this.updateUserUI();
+        } catch (e) {}
+      }
+    }
   }
 
   handleLogout() {
