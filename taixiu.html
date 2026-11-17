@@ -50,17 +50,18 @@
           <button class="btn-circle-action" id="btn-toggle-squeeze" title="Bật/Tắt tính năng tự tay nặn bát">
             <span id="squeeze-icon">🖐️</span>
           </button>
-          <span class="action-label" id="squeeze-label">Nặn: BẬT</span>
+          <span class="action-label" id="squeeze-label" data-i18n="game.squeeze.on">Nặn: BẬT</span>
         </div>
                 <div class="action-circle-item">
-          <button class="btn-circle-action btn-lang-toggle" title="Switch Language / Đổi Ngôn Ngữ" style="font-size:0.8rem; font-weight:800;">
+          <button class="btn-circle-action btn-lang-toggle" title="Switch Language / Đổi Ngôn Ngữ" style="font-size:0.75rem; font-weight:800; display:flex; align-items:center; justify-content:center; gap:2px;">
+            <span class="lang-switcher-flag">🇻🇳</span>
             <span class="lang-switcher-text">VI</span>
           </button>
           <span class="action-label">Ngôn Ngữ</span>
         </div>
         <div class="action-circle-item">
           <a href="/" class="btn-circle-action" id="btn-back-home" title="Về Sảnh Chờ" style="text-decoration:none; display:flex; align-items:center; justify-content:center; color:#fff;">🏠</a>
-          <span class="action-label">Về Sảnh</span>
+          <span class="action-label" data-i18n="game.back_lobby">Về Sảnh</span>
         </div>
         <div class="action-circle-item">
           <button class="btn-circle-action" id="btn-open-bxh" title="Bảng xếp hạng">🏆</button>
@@ -118,12 +119,12 @@
 
           <!-- Hướng Dẫn & Gợi Ý Nặn Bát (Hiện khi vào trạng thái NẶN) -->
           <div class="squeeze-guide-toast" id="squeeze-guide" style="display: none;">
-            <span>🖐️</span> Kéo giữ Bát Rồng để nặn hé lộ xúc xắc!
+            <span data-i18n="game.squeeze.guide">🖐️ Kéo giữ Bát Rồng để nặn hé lộ xúc xắc!</span>
           </div>
 
           <!-- Nút Mở Nhanh khi đang nặn -->
           <button class="btn-quick-open-cup" id="btn-quick-open" style="display: none;" title="Bỏ qua nặn để mở bát xem kết quả ngay">
-            ⚡ Mở Bát Ngay
+            <span data-i18n="game.squeeze.quick_open">⚡ Mở Bát Ngay</span>
           </button>
 
           <!-- Red Velvet Felt Plate holding 3D Dice -->
@@ -148,7 +149,7 @@
           <div class="door-facet-btn door-xiu" id="door-xiu" title="Đặt cược cửa Xỉu (3 - 9)">
             <span class="door-die-graphic">🎲</span>
             <div class="door-facet-content">
-              <span class="door-main-name">Xỉu</span>
+              <span class="door-main-name" data-i18n="door.xiu">Xỉu</span>
               <span class="door-range-tag">(3 – 9)</span>
               <span class="door-placed-badge" id="bet-badge-xiu">0 xu</span>
             </div>
@@ -157,7 +158,7 @@
           <!-- CỬA TÀI (RED FACETED CRYSTAL) -->
           <div class="door-facet-btn door-tai" id="door-tai" title="Đặt cược cửa Tài (10 - 18)">
             <div class="door-facet-content">
-              <span class="door-main-name">Tài</span>
+              <span class="door-main-name" data-i18n="door.tai">Tài</span>
               <span class="door-range-tag">(10 – 18)</span>
               <span class="door-placed-badge" id="bet-badge-tai">0 xu</span>
             </div>
@@ -240,10 +241,10 @@
       <!-- Bottom Right: Action Buttons -->
       <div class="bottom-action-buttons">
         <button class="btn-bottom-pill purple" id="btn-clear-bet" title="Hủy cược lượt này">
-          <span>⤺</span> Hủy cược
+          <span data-i18n="game.clear_bet">⤺ Hủy Cược</span>
         </button>
         <button class="btn-bottom-pill green" id="btn-confirm-bet" title="Xác nhận đặt cược">
-          <span>✔</span> Đặt cược
+          <span data-i18n="game.confirm_bet">✔ Đặt Cược</span>
         </button>
       </div>
 
@@ -356,6 +357,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/room-overlay.js"></script>
   <script src="js/wallet.js"></script>
+  <script src="js/i18n.js"></script>
   <script type="module" src="js/storage.js"></script>
   <script type="module" src="js/dice.js"></script>
   <script type="module" src="js/game.js?v=13"></script>

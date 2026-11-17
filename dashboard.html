@@ -59,25 +59,25 @@
   <div id="admin-auth-guard" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
     <div class="admin-card max-w-md w-full p-6 border-2 border-amber-500 text-center relative shadow-2xl">
       <div class="text-4xl mb-3">👑</div>
-      <h2 class="text-xl font-black text-amber-300 uppercase tracking-wider mb-2 font-royal">Xác Thực Quản Trị Viên</h2>
-      <p class="text-xs text-neutral-300 mb-5">Vui lòng đăng nhập với tài khoản Admin để truy cập trung tâm điều hành.</p>
+      <h2 class="text-xl font-black text-amber-300 uppercase tracking-wider mb-2 font-royal" data-i18n="admin.guard.title">Xác Thực Quản Trị Viên</h2>
+      <p class="text-xs text-neutral-300 mb-5" data-i18n="admin.guard.desc">Vui lòng đăng nhập với tài khoản Admin để truy cập trung tâm điều hành.</p>
       
       <form id="admin-login-form" class="space-y-4 text-left">
         <div>
-          <label class="text-xs font-bold text-amber-200 block mb-1">Tài khoản Admin:</label>
+          <label class="text-xs font-bold text-amber-200 block mb-1" data-i18n="admin.guard.user_label">Tài khoản Admin:</label>
           <input type="text" id="admin-user-input" value="admin" class="w-full bg-black/60 border border-amber-500/50 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-amber-400">
         </div>
         <div>
-          <label class="text-xs font-bold text-amber-200 block mb-1">Mật khẩu:</label>
-          <input type="password" id="admin-pass-input" placeholder="Nhập mật khẩu admin..." class="w-full bg-black/60 border border-amber-500/50 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-amber-400">
+          <label class="text-xs font-bold text-amber-200 block mb-1" data-i18n="admin.guard.pass_label">Mật khẩu:</label>
+          <input type="password" id="admin-pass-input" data-i18n-placeholder="admin.guard.pass_placeholder" placeholder="Nhập mật khẩu admin..." class="w-full bg-black/60 border border-amber-500/50 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-amber-400">
         </div>
         <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-extrabold text-sm shadow-lg transition">
-          🔓 Mở Khóa Bảng Điều Khiển
+          <span data-i18n="admin.guard.btn_unlock">🔓 Mở Khóa Bảng Điều Khiển</span>
         </button>
       </form>
       <div class="mt-4 pt-3 border-t border-amber-500/20 text-xs text-neutral-400 flex justify-between items-center">
-        <span>Gợi ý: <code>admin</code> / <code>admin123</code></span>
-        <a href="/" class="text-amber-400 hover:underline">🏠 Về Sảnh</a>
+        <span><span data-i18n="admin.guard.hint">Gợi ý:</span> <code>admin</code> / <code>admin123</code></span>
+        <a href="/" class="text-amber-400 hover:underline" data-i18n="admin.guard.back_lobby">🏠 Về Sảnh</a>
       </div>
     </div>
   </div>
@@ -89,13 +89,13 @@
       <!-- Brand -->
       <div class="flex items-center gap-3">
         <a href="/" class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs transition flex items-center gap-1.5">
-          🏠 <span>Về Sảnh</span>
+          <span data-i18n="admin.nav.back_lobby">🏠 Về Sảnh</span>
         </a>
         <div class="flex items-center gap-2">
           <span class="text-2xl">👑</span>
           <div>
-            <h1 class="text-base sm:text-lg font-black gold-gradient-text uppercase font-royal tracking-wide">Trung Tâm Quản Trị</h1>
-            <span class="text-[10px] text-amber-200/60 block">Hệ Thống Casino Lucky Table &bull; Live Admin</span>
+            <h1 class="text-base sm:text-lg font-black gold-gradient-text uppercase font-royal tracking-wide" data-i18n="admin.nav.title">Trung Tâm Quản Trị</h1>
+            <span class="text-[10px] text-amber-200/60 block" data-i18n="admin.nav.subtitle">Hệ Thống Casino Lucky Table • Live Admin</span>
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@
 
         <!-- Logout -->
         <button id="btn-admin-logout" class="px-3 py-1 rounded-full bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 text-neutral-300 text-xs font-bold transition flex items-center gap-1">
-          🚪 <span>Đăng Xuất</span>
+          <span data-i18n="admin.nav.logout">🚪 Đăng Xuất</span>
         </button>
       </div>
 
@@ -133,11 +133,11 @@
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">👥</div>
           <div>
-            <span class="text-xs text-neutral-400 font-bold block">Tổng Người Dùng</span>
+            <span class="text-xs text-neutral-400 font-bold block" data-i18n="admin.stat.users">Tổng Người Dùng</span>
             <span class="text-xl sm:text-2xl font-black text-amber-300" id="stat-total-users">--</span>
           </div>
         </div>
-        <span class="text-[11px] text-amber-400/80 group-hover:text-amber-300 font-extrabold transition">Xem ➔</span>
+        <span class="text-[11px] text-amber-400/80 group-hover:text-amber-300 font-extrabold transition" data-i18n="admin.stat.view">Xem ➔</span>
       </div>
 
       <!-- Card 2: Coins -->
@@ -145,14 +145,14 @@
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">🪙</div>
           <div class="min-w-0">
-            <span class="text-xs text-neutral-400 font-bold block truncate">Xu Trong Lưu Thông</span>
+            <span class="text-xs text-neutral-400 font-bold block truncate" data-i18n="admin.stat.coins">Xu Trong Lưu Thông</span>
             <div class="flex items-baseline gap-1.5 flex-wrap">
               <span class="text-xl sm:text-2xl font-black text-emerald-400 whitespace-nowrap" id="stat-total-coins">--</span>
               <span class="text-[11px] text-neutral-400 font-mono hidden sm:inline whitespace-nowrap" id="stat-total-coins-exact"></span>
             </div>
           </div>
         </div>
-        <span class="text-[11px] text-emerald-400/80 group-hover:text-emerald-300 font-extrabold transition shrink-0">Xem ➔</span>
+        <span class="text-[11px] text-emerald-400/80 group-hover:text-emerald-300 font-extrabold transition shrink-0" data-i18n="admin.stat.view">Xem ➔</span>
       </div>
 
       <!-- Card 3: Games -->
@@ -160,11 +160,11 @@
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">🎮</div>
           <div>
-            <span class="text-xs text-neutral-400 font-bold block">Trò Chơi Hoạt Động</span>
+            <span class="text-xs text-neutral-400 font-bold block" data-i18n="admin.stat.games">Trò Chơi Hoạt Động</span>
             <span class="text-xl sm:text-2xl font-black text-blue-400" id="stat-active-games">4 / 6</span>
           </div>
         </div>
-        <span class="text-[11px] text-blue-400/80 group-hover:text-blue-300 font-extrabold transition">Xem ➔</span>
+        <span class="text-[11px] text-blue-400/80 group-hover:text-blue-300 font-extrabold transition" data-i18n="admin.stat.view">Xem ➔</span>
       </div>
 
       <!-- Card 4: Transactions -->
@@ -172,11 +172,11 @@
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">📋</div>
           <div>
-            <span class="text-xs text-neutral-400 font-bold block">Lịch Sử Giao Dịch</span>
+            <span class="text-xs text-neutral-400 font-bold block" data-i18n="admin.stat.txns">Lịch Sử Giao Dịch</span>
             <span class="text-xl sm:text-2xl font-black text-purple-300" id="stat-total-txns">--</span>
           </div>
         </div>
-        <span class="text-[11px] text-purple-400/80 group-hover:text-purple-300 font-extrabold transition">Xem ➔</span>
+        <span class="text-[11px] text-purple-400/80 group-hover:text-purple-300 font-extrabold transition" data-i18n="admin.stat.view">Xem ➔</span>
       </div>
     </section>
 
@@ -185,41 +185,41 @@
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-amber-500/20">
         <div class="flex items-center gap-2">
           <span class="text-xl text-amber-400">⚡</span>
-          <h2 class="text-base sm:text-lg font-extrabold text-amber-300 font-royal">Điều Chỉnh & Bù Xu Người Dùng (Hỗ Trợ Chuyển Khoản)</h2>
+          <h2 class="text-base sm:text-lg font-extrabold text-amber-300 font-royal" data-i18n="admin.form.title">Điều Chỉnh & Bù Xu Người Dùng (Hỗ Trợ Chuyển Khoản)</h2>
         </div>
-        <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-bold">Cập Nhật Tức Thì</span>
+        <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-bold" data-i18n="admin.form.instant_badge">Cập Nhật Tức Thì</span>
       </div>
 
       <form id="form-adjust-balance" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- User target -->
           <div>
-            <label class="text-xs font-bold text-neutral-300 block mb-1">Tài khoản người chơi:</label>
-            <input type="text" id="target-username" placeholder="Nhập username (vd: Player001, PlayerTest2k1)..." required class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+            <label class="text-xs font-bold text-neutral-300 block mb-1" data-i18n="admin.form.user_label">Tài khoản người chơi:</label>
+            <input type="text" id="target-username" data-i18n-placeholder="admin.form.user_placeholder" placeholder="Nhập username (vd: Player001, PlayerTest2k1)..." required class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
           </div>
 
           <!-- Action type -->
           <div>
-            <label class="text-xs font-bold text-neutral-300 block mb-1">Loại thao tác:</label>
+            <label class="text-xs font-bold text-neutral-300 block mb-1" data-i18n="admin.form.action_label">Loại thao tác:</label>
             <select id="adjust-type" class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
-              <option value="ADD">🟢 Cộng Xu (Nạp bù sự cố / Quà tặng VIP)</option>
-              <option value="DEDUCT">🔴 Khấu Trừ Xu (Thu hồi sự cố)</option>
+              <option value="ADD" data-i18n="admin.form.action_add">🟢 Cộng Xu (Nạp bù sự cố / Quà tặng VIP)</option>
+              <option value="DEDUCT" data-i18n="admin.form.action_deduct">🔴 Khấu Trừ Xu (Thu hồi sự cố)</option>
             </select>
           </div>
 
           <!-- Amount -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-xs font-bold text-neutral-300">Số xu điều chỉnh:</label>
+              <label class="text-xs font-bold text-neutral-300" data-i18n="admin.form.amount_label">Số xu điều chỉnh:</label>
               <span id="adjust-amount-preview" class="text-xs font-extrabold text-amber-300 transition-all"></span>
             </div>
-            <input type="number" id="adjust-amount" min="1000" step="1000" placeholder="Nhập số xu (vd: 50000, 1000000)..." required class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+            <input type="number" id="adjust-amount" min="1000" step="1000" data-i18n-placeholder="admin.form.amount_placeholder" placeholder="Nhập số xu (vd: 50000, 1000000)..." required class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
           </div>
         </div>
 
         <!-- Quick chips -->
         <div class="flex items-center gap-2 flex-wrap text-xs">
-          <span class="text-neutral-400 font-bold">Chọn nhanh:</span>
+          <span class="text-neutral-400 font-bold" data-i18n="admin.form.quick_select">Chọn nhanh:</span>
           <button type="button" class="chip-quick-btn" data-val="10000">+10k</button>
           <button type="button" class="chip-quick-btn" data-val="50000">+50k</button>
           <button type="button" class="chip-quick-btn" data-val="100000">+100k</button>
@@ -232,9 +232,9 @@
 
         <!-- Reason -->
         <div>
-          <label class="text-xs font-bold text-neutral-300 block mb-1">Lý do điều chỉnh (sẽ lưu vào lịch sử giao dịch):</label>
+          <label class="text-xs font-bold text-neutral-300 block mb-1" data-i18n="admin.form.reason_label">Lý do điều chỉnh (sẽ lưu vào lịch sử giao dịch):</label>
           <div class="flex gap-2 flex-wrap sm:flex-nowrap">
-            <input type="text" id="adjust-reason" value="Bù lỗi chuyển khoản ngân hàng" placeholder="Nhập lý do bù xu..." required class="flex-1 bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+            <input type="text" id="adjust-reason" value="Bù lỗi chuyển khoản ngân hàng" data-i18n-placeholder="admin.form.reason_placeholder" placeholder="Nhập lý do bù xu..." required class="flex-1 bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
             <select id="reason-presets" class="bg-neutral-800 border border-neutral-600 rounded-xl px-3 py-2 text-xs text-neutral-200">
               <option value="Bù lỗi chuyển khoản ngân hàng">Bù lỗi chuyển khoản ngân hàng</option>
               <option value="Khắc phục sự cố gián đoạn đường truyền">Sự cố đường truyền</option>
@@ -277,7 +277,7 @@
               <th class="p-3">VIP</th>
               <th class="p-3">Số Dư Xu</th>
               <th class="p-3">Giao Dịch Gần Nhất</th>
-              <th class="p-3 text-center">Thao Tác</th>
+              <th class="p-3 text-center" data-i18n="admin.table.th_action">Thao Tác</th>
             </tr>
           </thead>
           <tbody id="user-table-tbody" class="divide-y divide-white/5">
@@ -585,6 +585,18 @@
       init() {
         this.checkAdminAuth();
         this.bindEvents();
+        // Listen for language changes to update UI dynamically
+        window.addEventListener('languageChanged', () => {
+          this.fetchMetrics();
+          const query = document.getElementById('user-search-input').value.toLowerCase().trim();
+          this.renderUsersTable(query);
+          const val = parseInt(document.getElementById('adjust-amount').value, 10);
+          const previewEl = document.getElementById('adjust-amount-preview');
+          if (previewEl && !isNaN(val) && val > 0) {
+            const shortStr = window.Wallet ? window.Wallet.formatWords(val, true) : val.toLocaleString();
+            previewEl.textContent = `✨ ${shortStr} (${val.toLocaleString()} xu)`;
+          }
+        });
         this.bindStatCardEvents();
         this.fetchMetrics();
         this.fetchUsers();

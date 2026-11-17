@@ -22,6 +22,7 @@ const translations = {
     'nav.deposit': '+ Nạp Tiền',
     'nav.withdraw': '💳 Rút Tiền',
     'nav.vip': 'VIP',
+    'nav.admin_dashboard': '⚡ Quản Trị Viên',
 
     // Dropdown Items
     'game.taixiu.title': '🎲 Tài Xỉu Bát Rồng 3D',
@@ -53,7 +54,7 @@ const translations = {
     'card.btn_play': 'CHƠI NGAY ➔',
     'card.players': 'người chơi',
 
-    // Modals
+    // Modals Auth & Profile
     'modal.login.title': '🔑 Đăng Nhập Tài Khoản',
     'modal.login.username_placeholder': 'Nhập tên tài khoản...',
     'modal.login.password_placeholder': 'Nhập mật khẩu...',
@@ -77,7 +78,71 @@ const translations = {
     'modal.deposit.title': '🪙 Nạp Xu Tài Khoản',
     'modal.withdraw.title': '💳 Rút Xu Về Ngân Hàng',
 
-    // Game Common Actions
+    // Admin Dashboard
+    'admin.guard.title': 'Xác Thực Quản Trị Viên',
+    'admin.guard.desc': 'Vui lòng đăng nhập với tài khoản Admin để truy cập trung tâm điều hành.',
+    'admin.guard.user_label': 'Tài khoản Admin:',
+    'admin.guard.pass_label': 'Mật khẩu:',
+    'admin.guard.pass_placeholder': 'Nhập mật khẩu admin...',
+    'admin.guard.btn_unlock': '🔓 Mở Khóa Bảng Điều Khiển',
+    'admin.guard.hint': 'Gợi ý:',
+    'admin.guard.back_lobby': '🏠 Về Sảnh',
+
+    'admin.nav.back_lobby': '🏠 Về Sảnh',
+    'admin.nav.title': 'Trung Tâm Quản Trị',
+    'admin.nav.subtitle': 'Hệ Thống Casino Lucky Table • Live Admin',
+    'admin.nav.badge': 'Admin: {username}',
+    'admin.nav.logout': '🚪 Đăng Xuất',
+
+    'admin.stat.users': 'Tổng Người Dùng',
+    'admin.stat.coins': 'Xu Trong Lưu Thông',
+    'admin.stat.games': 'Trò Chơi Hoạt Động',
+    'admin.stat.txns': 'Lịch Sử Giao Dịch',
+    'admin.stat.view': 'Xem ➔',
+
+    'admin.form.title': 'Điều Chỉnh & Bù Xu Người Dùng (Hỗ Trợ Chuyển Khoản)',
+    'admin.form.instant_badge': 'Cập Nhật Tức Thì',
+    'admin.form.user_label': 'Tài khoản người chơi:',
+    'admin.form.user_placeholder': 'Nhập username (vd: Player001, PlayerTest2k1)...',
+    'admin.form.action_label': 'Loại thao tác:',
+    'admin.form.action_add': '🟢 Cộng Xu (Nạp bù sự cố / Quà tặng VIP)',
+    'admin.form.action_deduct': '🔴 Khấu Trừ Xu (Thu hồi sự cố)',
+    'admin.form.amount_label': 'Số xu điều chỉnh:',
+    'admin.form.amount_placeholder': 'Nhập số xu (vd: 50000, 1000000)...',
+    'admin.form.quick_select': 'Chọn nhanh:',
+    'admin.form.reason_label': 'Lý do điều chỉnh (sẽ lưu vào lịch sử giao dịch):',
+    'admin.form.reason_placeholder': 'Nhập lý do bù xu...',
+    'admin.form.btn_submit': '⚡ Thực Hiện Điều Chỉnh Xu',
+
+    'admin.table.title': 'Danh Sách Người Chơi & Số Dư Trực Tiếp',
+    'admin.table.count_badge': '{count} Tài khoản',
+    'admin.table.search_placeholder': '🔍 Tìm theo username...',
+    'admin.table.th_player': 'Người Chơi',
+    'admin.table.th_role': 'Vai Trò',
+    'admin.table.th_vip': 'Cấp VIP',
+    'admin.table.th_balance': 'Số Dư Hiện Tại',
+    'admin.table.th_recent_txn': 'Giao Dịch Gần Nhất',
+    'admin.table.th_action': 'Thao Tác',
+    'admin.table.btn_compensate': '+ Bù Xu',
+    'admin.table.no_users': 'Không tìm thấy người chơi nào',
+
+    'admin.modal.users.title': '👥 Danh Sách Đầy Đủ Tài Khoản Người Chơi',
+    'admin.modal.coins.title': '🪙 Thống Kê Phân Bổ Xu & Top Đại Gia',
+    'admin.modal.coins.total_label': 'Tổng Xu Trong Lưu Thông:',
+    'admin.modal.coins.admin_label': 'Xu tài khoản Admin:',
+    'admin.modal.coins.players_label': 'Xu người chơi thường:',
+    'admin.modal.coins.richest_title': '🏆 Bảng Xếp Hạng Top Đại Gia Nhiều Xu Nhất',
+    'admin.modal.games.title': '🎮 Quản Lý Trạng Thái Hoạt Động Trò Chơi',
+    'admin.modal.txns.title': '📋 Toàn Bộ Lịch Sử Giao Dịch Toàn Hệ Thống',
+    'admin.modal.close': 'Đóng',
+    'admin.modal.btn_adjust_now': 'Mở Form Điều Chỉnh Xu ➔',
+
+    'admin.status.active': 'Đang hoạt động',
+    'admin.status.maintenance': 'Bảo trì',
+    'admin.audit.title': 'Nhật Ký Thao Tác Bù Xu Gần Nhất',
+
+    // Game Common Actions & Controls
+    'game.back_lobby': '🏠 Sảnh',
     'game.squeeze.on': 'Nặn: BẬT',
     'game.squeeze.off': 'Nặn: TẮT',
     'game.squeeze.guide': '🖐️ Kéo giữ Bát Sứ để nặn hé lộ kết quả!',
@@ -85,6 +150,10 @@ const translations = {
     'game.balance': 'Số Dư:',
     'game.clear_bet': '⤺ Hủy Cược',
     'game.confirm_bet': '✔ Đặt Cược',
+    'game.history': 'Lịch Sử Cầu',
+    'game.waiting': 'Đang chờ phiên mới...',
+    'game.betting': 'Đang mở cược...',
+    'game.revealing': 'Đang mở bát...',
 
     // Xoc Dia Doors
     'door.chan': 'CHẴN',
@@ -121,6 +190,7 @@ const translations = {
     'nav.deposit': '+ Deposit',
     'nav.withdraw': '💳 Withdraw',
     'nav.vip': 'VIP',
+    'nav.admin_dashboard': '⚡ Admin Center',
 
     // Dropdown Items
     'game.taixiu.title': '🎲 Dragon Sic Bo 3D',
@@ -152,7 +222,7 @@ const translations = {
     'card.btn_play': 'PLAY NOW ➔',
     'card.players': 'players',
 
-    // Modals
+    // Modals Auth & Profile
     'modal.login.title': '🔑 Account Login',
     'modal.login.username_placeholder': 'Enter username...',
     'modal.login.password_placeholder': 'Enter password...',
@@ -176,7 +246,71 @@ const translations = {
     'modal.deposit.title': '🪙 Deposit Coins',
     'modal.withdraw.title': '💳 Withdraw to Bank',
 
-    // Game Common Actions
+    // Admin Dashboard
+    'admin.guard.title': 'Administrator Authentication',
+    'admin.guard.desc': 'Please sign in with an Admin account to access the control center.',
+    'admin.guard.user_label': 'Admin Username:',
+    'admin.guard.pass_label': 'Password:',
+    'admin.guard.pass_placeholder': 'Enter admin password...',
+    'admin.guard.btn_unlock': '🔓 Unlock Admin Dashboard',
+    'admin.guard.hint': 'Hint:',
+    'admin.guard.back_lobby': '🏠 Back to Lobby',
+
+    'admin.nav.back_lobby': '🏠 Lobby',
+    'admin.nav.title': 'Admin Control Center',
+    'admin.nav.subtitle': 'Lucky Table Casino Management • Live Admin',
+    'admin.nav.badge': 'Admin: {username}',
+    'admin.nav.logout': '🚪 Log Out',
+
+    'admin.stat.users': 'Total Users',
+    'admin.stat.coins': 'Circulating Coins',
+    'admin.stat.games': 'Active Games',
+    'admin.stat.txns': 'Transaction Logs',
+    'admin.stat.view': 'View ➔',
+
+    'admin.form.title': 'Adjust & Compensate User Coins (Bank Transfer Support)',
+    'admin.form.instant_badge': 'Instant Update',
+    'admin.form.user_label': 'Target Player Account:',
+    'admin.form.user_placeholder': 'Enter username (e.g. Player001, PlayerTest2k1)...',
+    'admin.form.action_label': 'Action Type:',
+    'admin.form.action_add': '🟢 Add Coins (Issue Compensation / VIP Gift)',
+    'admin.form.action_deduct': '🔴 Deduct Coins (System Reversal)',
+    'admin.form.amount_label': 'Coin Adjustment Amount:',
+    'admin.form.amount_placeholder': 'Enter coin amount (e.g. 50000, 1000000)...',
+    'admin.form.quick_select': 'Quick Select:',
+    'admin.form.reason_label': 'Adjustment Reason (recorded in audit logs):',
+    'admin.form.reason_placeholder': 'Enter compensation reason...',
+    'admin.form.btn_submit': '⚡ Execute Coin Adjustment',
+
+    'admin.table.title': 'Live Player Accounts & Balances',
+    'admin.table.count_badge': '{count} Accounts',
+    'admin.table.search_placeholder': '🔍 Search by username...',
+    'admin.table.th_player': 'Player',
+    'admin.table.th_role': 'Role',
+    'admin.table.th_vip': 'VIP Tier',
+    'admin.table.th_balance': 'Current Balance',
+    'admin.table.th_recent_txn': 'Latest Transaction',
+    'admin.table.th_action': 'Action',
+    'admin.table.btn_compensate': '+ Add Coins',
+    'admin.table.no_users': 'No matching player accounts found',
+
+    'admin.modal.users.title': '👥 Full Player Account Directory',
+    'admin.modal.coins.title': '🪙 Coin Circulation & Richest Players',
+    'admin.modal.coins.total_label': 'Total Circulating Coins:',
+    'admin.modal.coins.admin_label': 'Admin Account Coins:',
+    'admin.modal.coins.players_label': 'Regular Player Coins:',
+    'admin.modal.coins.richest_title': '🏆 Richest Player Leaderboard',
+    'admin.modal.games.title': '🎮 Game Operations & Status Control',
+    'admin.modal.txns.title': '📋 Comprehensive Transaction Logs',
+    'admin.modal.close': 'Close',
+    'admin.modal.btn_adjust_now': 'Open Coin Adjustment Form ➔',
+
+    'admin.status.active': 'Active',
+    'admin.status.maintenance': 'Maintenance',
+    'admin.audit.title': 'Recent Admin Coin Adjustment Logs',
+
+    // Game Common Actions & Controls
+    'game.back_lobby': '🏠 Lobby',
     'game.squeeze.on': 'Squeeze: ON',
     'game.squeeze.off': 'Squeeze: OFF',
     'game.squeeze.guide': '🖐️ Drag and hold cup to squeeze and reveal result!',
@@ -184,6 +318,10 @@ const translations = {
     'game.balance': 'Balance:',
     'game.clear_bet': '⤺ Clear Bet',
     'game.confirm_bet': '✔ Place Bet',
+    'game.history': 'Roadmap History',
+    'game.waiting': 'Waiting for next round...',
+    'game.betting': 'Betting Open...',
+    'game.revealing': 'Revealing results...',
 
     // Xoc Dia Doors
     'door.chan': 'EVEN',
@@ -251,7 +389,15 @@ class I18nManager {
       }
     });
 
-    // 2. Placeholder elements with data-i18n-placeholder
+    // 2. HTML elements with data-i18n-html
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (key) {
+        el.innerHTML = this.t(key);
+      }
+    });
+
+    // 3. Placeholder elements with data-i18n-placeholder
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.getAttribute('data-i18n-placeholder');
       if (key) {
@@ -259,7 +405,15 @@ class I18nManager {
       }
     });
 
-    // 3. Update language switcher labels
+    // 4. Title elements with data-i18n-title
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const key = el.getAttribute('data-i18n-title');
+      if (key) {
+        el.setAttribute('title', this.t(key));
+      }
+    });
+
+    // 5. Update language switcher labels
     document.querySelectorAll('.lang-switcher-text').forEach(el => {
       el.textContent = this.currentLang.toUpperCase();
     });
@@ -288,7 +442,11 @@ class I18nManager {
 const i18n = new I18nManager();
 if (typeof window !== 'undefined') {
   window.i18n = i18n;
-  document.addEventListener('DOMContentLoaded', () => i18n.init());
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => i18n.init());
+  } else {
+    i18n.init();
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
