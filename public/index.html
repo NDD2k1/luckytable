@@ -25,15 +25,56 @@
         </div>
       </a>
 
-      <!-- Navigation Menu Links -->
+            <!-- Navigation Menu Links (Neo Category) -->
       <ul class="portal-nav-menu">
         <li><a href="/" class="nav-link-btn active">🏠 Trang Chủ</a></li>
-        <li><a href="/taixiu" class="nav-link-btn">🎲 Tài Xỉu 3D</a></li>
-        <li><a href="/xocdia" class="nav-link-btn">🥢 Xóc Đĩa 3D</a></li>
-        <li><a href="/baucua" class="nav-link-btn">🦀 Bầu Cua 3D</a></li>
-        <li><a href="/bacay" class="nav-link-btn">🃏 Ba Cây VIP</a></li>
-        <li><a href="#friends-section" class="nav-link-btn">👥 Chơi Bạn Bè</a></li>
-        <li><a href="#games-section" class="nav-link-btn">🎰 Kho Trò Chơi</a></li>
+        
+        <!-- Category 1: Dân Gian -->
+        <li class="nav-item-dropdown">
+          <a href="#games-section" class="nav-link-btn" data-filter-cat="dângian">
+            🎲 Dân Gian <span class="dropdown-caret">▾</span>
+          </a>
+          <ul class="dropdown-menu-list">
+            <li><a href="/taixiu" class="dropdown-item-link">🎲 Tài Xỉu Bát Rồng 3D <span class="item-tag hot">HOT</span></a></li>
+            <li><a href="/xocdia" class="dropdown-item-link">🥢 Xóc Đĩa Tứ Linh 3D <span class="item-tag new">MỚI</span></a></li>
+            <li><a href="/baucua" class="dropdown-item-link">🦀 Bầu Cua Tôm Cá 3D</a></li>
+          </ul>
+        </li>
+
+        <!-- Category 2: Nổ Hũ Slots -->
+        <li class="nav-item-dropdown">
+          <a href="#games-section" class="nav-link-btn" data-filter-cat="slots">
+            🎰 Nổ Hũ Slots <span class="dropdown-caret">▾</span>
+          </a>
+          <ul class="dropdown-menu-list">
+            <li><a href="#games-section" class="dropdown-item-link" data-filter-cat="slots">🎰 Nổ Hũ Tây Du Ký <span class="item-tag jackpot">HŨ KHỦNG</span></a></li>
+            <li><a href="#games-section" class="dropdown-item-link" data-filter-cat="slots">🐟 Bắn Cá Thần Tài 3D</a></li>
+          </ul>
+        </li>
+
+        <!-- Category 3: Game Bài -->
+        <li class="nav-item-dropdown">
+          <a href="#games-section" class="nav-link-btn" data-filter-cat="cards">
+            🃏 Game Bài <span class="dropdown-caret">▾</span>
+          </a>
+          <ul class="dropdown-menu-list">
+            <li><a href="/bacay" class="dropdown-item-link">🃏 Ba Cây Hoàng Gia VIP <span class="item-tag hot">HOT</span></a></li>
+          </ul>
+        </li>
+
+        <!-- Category 4: Chơi Bạn Bè -->
+        <li>
+          <a href="#friends-section" class="nav-link-btn">
+            👥 Chơi Bạn Bè
+          </a>
+        </li>
+
+        <!-- Category 5: Tất Cả Kho Game -->
+        <li>
+          <a href="#games-section" class="nav-link-btn" data-filter-cat="all">
+            🎮 Tất Cả Game
+          </a>
+        </li>
       </ul>
 
       <!-- User Bar: Balance & Action Buttons -->

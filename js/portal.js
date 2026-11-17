@@ -234,6 +234,49 @@ class PortalController {
         this.filterGames(cat);
       });
     });
+
+    // Neo Category Links (Header & Dropdown)
+    document.querySelectorAll('a[data-filter-cat]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const cat = link.getAttribute('data-filter-cat');
+        const target = document.getElementById('games-section');
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+
+          // Active tab button
+          this.dom.categoryTabs.forEach(t => {
+            if (t.getAttribute('data-category') === cat) {
+              t.classList.add('active');
+            } else {
+              t.classList.remove('active');
+            }
+          });
+
+          // Active nav link
+          document.querySelectorAll('.portal-nav-menu .nav-link-btn').forEach(btn => {
+            if (btn.getAttribute('data-filter-cat') === cat) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+
+          this.filterGames(cat);
+        }
+      });
+    });
+
+    // Check URL parameters for category filtering on load
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const catParam = urlParams.get('cat');
+      if (catParam) {
+        const tab = document.querySelector(`.tab-filter-btn[data-category="${catParam}"]`);
+        if (tab) tab.click();
+      }
+    } catch (err) {}
+
   }
 
   // =========================================================================
