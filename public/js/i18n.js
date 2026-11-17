@@ -48,25 +48,45 @@ const translations = {
     'category.slots': '🎰 Nổ Hũ Slots',
     'category.cards': '🃏 Game Bài',
 
+    // Game Cards Descriptions
+    'game.taixiu.desc': 'Cổng Tài Xỉu Bát Rồng 3D phong cách Á Đông, tính năng Tự Tay Nặn Bát 360° kịch tính, hoàn trả cược sòng phẳng.',
+    'game.xocdia.desc': 'Xóc Đĩa 4 quân vị Đỏ Trắng, Bát Sứ truyền thống tự tay nặn mở bát, đa dạng cửa cược Chẵn Lẻ Tứ Tử.',
+    'game.baucua.desc': 'Lắc Bầu Cua Tôm Cá 3D xúc xắc chạm khắc tinh xảo, hiệu ứng âm thanh tiếng lắc chân thực.',
+    'game.slots.desc': 'Vòng quay may mắn 5 cuộn 25 dòng cược, săn hũ Jackpot nổ tung hàng triệu xu.',
+    'game.bacay.desc': 'Bàn bài nỉ xanh sang trọng, chia 3 lá bay 3D, tính năng NẶN BÀI cực phê, cược Gà nhân 3 tiền thưởng!',
+    'game.fish.desc': 'Săn rồng vàng đại dương, súng laser đạn nổ, thu hoạch ngọc báu ngập màn hình.',
+
     // Game Cards
     'card.status.live': '🟢 ĐANG MỞ',
     'card.status.soon': 'Sắp Khởi Chạy',
     'card.btn_play': 'CHƠI NGAY ➔',
     'card.players': 'người chơi',
 
+    // Home News & Footer
+    'home.news.title': 'Tin Tức & Sự Kiện Hệ Thống',
+    'home.footer.desc': '© 2026 LUCKY TABLE CASINO ENTERTAINMENT. Game mô phỏng giải trí sử dụng xu ảo. Không hỗ trợ nạp/rút tiền thật.',
+    'home.footer.sub': 'Hệ thống phát triển bằng Node.js Express & Realtime Socket.io.',
+
     // Modals Auth & Profile
     'modal.login.title': '🔑 Đăng Nhập Tài Khoản',
+    'modal.login.sub': 'Đăng nhập để lưu số dư xu và đồng bộ bàn chơi',
+    'modal.login.user_label': 'Tên tài khoản:',
+    'modal.login.pass_label': 'Mật khẩu:',
     'modal.login.username_placeholder': 'Nhập tên tài khoản...',
     'modal.login.password_placeholder': 'Nhập mật khẩu...',
-    'modal.login.btn_submit': 'Đăng Nhập Ngay',
-    'modal.login.switch_text': 'Chưa có tài khoản? Đăng ký nhận 50.000 xu',
+    'modal.login.btn_submit': '🚀 ĐĂNG NHẬP NGAY',
+    'modal.login.switch_text': 'Chưa có tài khoản? Đăng ký ngay (+50K xu)',
 
     'modal.register.title': '✨ Đăng Ký Tân Thủ (+50.000 Xu)',
-    'modal.register.username_placeholder': 'Tên tài khoản (tối thiểu 3 ký tự)...',
-    'modal.register.password_placeholder': 'Mật khẩu...',
-    'modal.register.confirm_placeholder': 'Xác nhận lại mật khẩu...',
-    'modal.register.btn_submit': 'Đăng Ký & Nhận 50.000 Xu',
-    'modal.register.switch_text': 'Đã có tài khoản? Đăng nhập',
+    'modal.register.sub': 'Tặng ngay 50.000 xu may mắn vào tài khoản!',
+    'modal.register.user_label': 'Tên tài khoản:',
+    'modal.register.pass_label': 'Mật khẩu:',
+    'modal.register.confirm_label': 'Xác nhận mật khẩu:',
+    'modal.register.username_placeholder': 'Từ 3 ký tự (VD: DaiGia88)...',
+    'modal.register.password_placeholder': 'Nhập mật khẩu...',
+    'modal.register.confirm_placeholder': 'Nhập lại mật khẩu...',
+    'modal.register.btn_submit': '🎁 TẠO TÀI KHOẢN & NHẬN 50K XU',
+    'modal.register.switch_text': 'Đã có tài khoản? Đăng nhập tại đây',
 
     'modal.profile.title': '👤 Hồ Sơ Người Chơi',
     'modal.profile.balance_label': 'Số dư:',
@@ -75,8 +95,19 @@ const translations = {
     'modal.profile.btn_logout': '🚪 Đăng Xuất',
     'modal.profile.txn_history': '📋 Lịch Sử Giao Dịch Gần Đây',
 
-    'modal.deposit.title': '🪙 Nạp Xu Tài Khoản',
-    'modal.withdraw.title': '💳 Rút Xu Về Ngân Hàng',
+    'modal.deposit.title': '🪙 Nạp Xu May Mắn',
+    'modal.deposit.tab_qr': '🏦 Ngân Hàng QR',
+    'modal.deposit.tab_momo': '📱 Ví MoMo',
+    'modal.deposit.tab_card': '💳 Thẻ Cào',
+    'modal.deposit.amount_label': 'Nhập số xu muốn nạp:',
+    'modal.deposit.btn_submit': '✓ XÁC NHẬN NẠP XU NGAY',
+
+    'modal.withdraw.title': '💳 Rút Xu Về Tài Khoản',
+    'modal.withdraw.bank_label': 'Chọn Ngân hàng nhận:',
+    'modal.withdraw.acc_num_label': 'Số tài khoản ngân hàng:',
+    'modal.withdraw.acc_name_label': 'Tên chủ tài khoản (viết hoa không dấu):',
+    'modal.withdraw.amount_label': 'Số xu muốn rút (Tối thiểu 10.000 xu):',
+    'modal.withdraw.btn_submit': '✓ GỬI YÊU CẦU RÚT XU',
 
     // Admin Dashboard
     'admin.guard.title': 'Xác Thực Quản Trị Viên',
@@ -114,6 +145,11 @@ const translations = {
     'admin.form.reason_placeholder': 'Nhập lý do bù xu...',
     'admin.form.btn_submit': '⚡ Thực Hiện Điều Chỉnh Xu',
 
+    'admin.chip.1m': '+1 triệu',
+    'admin.chip.10m': '+10 triệu',
+    'admin.chip.100m': '+100 triệu',
+    'admin.chip.1b': '+1 tỷ',
+
     'admin.table.title': 'Danh Sách Người Chơi & Số Dư Trực Tiếp',
     'admin.table.count_badge': '{count} Tài khoản',
     'admin.table.search_placeholder': '🔍 Tìm theo username...',
@@ -125,21 +161,58 @@ const translations = {
     'admin.table.th_action': 'Thao Tác',
     'admin.table.btn_compensate': '+ Bù Xu',
     'admin.table.no_users': 'Không tìm thấy người chơi nào',
+    'admin.table.no_txns': 'Chưa có GD',
 
-    'admin.modal.users.title': '👥 Danh Sách Đầy Đủ Tài Khoản Người Chơi',
-    'admin.modal.coins.title': '🪙 Thống Kê Phân Bổ Xu & Top Đại Gia',
-    'admin.modal.coins.total_label': 'Tổng Xu Trong Lưu Thông:',
-    'admin.modal.coins.admin_label': 'Xu tài khoản Admin:',
-    'admin.modal.coins.players_label': 'Xu người chơi thường:',
-    'admin.modal.coins.richest_title': '🏆 Bảng Xếp Hạng Top Đại Gia Nhiều Xu Nhất',
-    'admin.modal.games.title': '🎮 Quản Lý Trạng Thái Hoạt Động Trò Chơi',
-    'admin.modal.txns.title': '📋 Toàn Bộ Lịch Sử Giao Dịch Toàn Hệ Thống',
+    'admin.audit.title': 'Nhật Ký Điều Chỉnh & Bù Xu Gần Đây',
+    'admin.audit.th_time': 'Thời Gian',
+    'admin.audit.th_recipient': 'Người Nhận',
+    'admin.audit.th_action': 'Loại Thao Tác',
+    'admin.audit.th_amount': 'Số Xu',
+    'admin.audit.th_reason': 'Lý Do / Ghi Chú',
+    'admin.audit.th_status': 'Trạng Thái',
+    'admin.audit.empty': 'Chưa có giao dịch điều chỉnh nào trong phiên.',
+    'admin.audit.action_add': 'CỘNG XU',
+    'admin.audit.action_deduct': 'KHẤU TRỪ',
+    'admin.audit.status_success': 'Thành công',
+
+    'admin.modal.users.title': '👥 Chi Tiết Danh Sách Người Dùng',
+    'admin.modal.users.total': 'Tổng: {count} người',
+    'admin.modal.users.admins': '1 Quản Trị Viên',
+    'admin.modal.users.players': '{count} Người Chơi',
+    'admin.modal.users.th_account': 'Tài Khoản',
+    'admin.modal.users.th_role': 'Vai Trò',
+    'admin.modal.users.th_vip': 'Cấp VIP',
+    'admin.modal.users.th_balance': 'Số Dư Xu',
+    'admin.modal.users.th_action': 'Hành Động',
+
+    'admin.modal.coins.title': '🪙 Thống Kê Phân Phối Tiền Tệ (Xu)',
+    'admin.modal.coins.reserve': 'Xu Quỹ Dự Trữ / Admin',
+    'admin.modal.coins.players': 'Xu Người Chơi Thực Tế',
+    'admin.modal.coins.richest_title': '🏆 Bảng Xếp Hạng Đại Gia Giàu Nhất',
+    'admin.modal.coins.btn_adjust': '+ Bù xu cho người chơi ➔',
+    'admin.modal.coins.no_data': 'Chưa có dữ liệu người chơi',
+
+    'admin.modal.games.title': '🎮 Chi Tiết & Quản Lý Trạng Thái Trò Chơi',
+    'admin.modal.games.hint': '💡 Bấm nút trạng thái để bật/tắt trò chơi tức thì',
+    'admin.modal.games.playing': '👥 Đang chơi: {count} người',
+    'admin.modal.games.active_badge': '🟢 HOẠT ĐỘNG',
+    'admin.modal.games.maintenance_badge': '🔴 BẢO TRÌ',
+
+    'admin.modal.txns.title': '📋 Toàn Bộ Lịch Sử Giao Dịch & Biến Động Số Dư',
+    'admin.modal.txns.all': 'Tất Cả',
+    'admin.modal.txns.deposit': '🟢 Nạp / Bù Xu',
+    'admin.modal.txns.withdraw': '🔴 Rút / Khấu Trừ',
+    'admin.modal.txns.th_time': 'Thời Gian',
+    'admin.modal.txns.th_user': 'Người Chơi',
+    'admin.modal.txns.th_type': 'Loại',
+    'admin.modal.txns.th_amount': 'Số Tiền',
+    'admin.modal.txns.th_desc': 'Nội Dung',
+    'admin.modal.txns.th_status': 'Trạng Thái',
+    'admin.modal.txns.empty': 'Chưa có giao dịch nào khớp với bộ lọc',
+    'admin.modal.txns.badge_deposit': '🟢 NẠP / BÙ',
+    'admin.modal.txns.badge_withdraw': '🔴 RÚT TIỀN',
+    'admin.modal.txns.status_success': 'Thành công',
     'admin.modal.close': 'Đóng',
-    'admin.modal.btn_adjust_now': 'Mở Form Điều Chỉnh Xu ➔',
-
-    'admin.status.active': 'Đang hoạt động',
-    'admin.status.maintenance': 'Bảo trì',
-    'admin.audit.title': 'Nhật Ký Thao Tác Bù Xu Gần Nhất',
 
     // Game Common Actions & Controls
     'game.back_lobby': '🏠 Sảnh',
@@ -216,25 +289,45 @@ const translations = {
     'category.slots': '🎰 Slots',
     'category.cards': '🃏 Card Games',
 
+    // Game Cards Descriptions
+    'game.taixiu.desc': 'Asian Royal Dragon Sic Bo featuring interactive 360° 3D Cup Squeezing with guaranteed fairness.',
+    'game.xocdia.desc': 'Traditional 4-coin red/white Xoc Dia with interactive porcelain bowl squeezing and multi-door betting.',
+    'game.baucua.desc': 'Fish Prawn Crab 3D with authentic porcelain plate shaking and vivid dice physics.',
+    'game.slots.desc': 'Lucky 5-reel 25-line slots, hunt massive progressive jackpots and bonus multipliers.',
+    'game.bacay.desc': 'Luxury green felt 3 Cards table, 3D card distribution, card squeeze mechanics and pot multipliers!',
+    'game.fish.desc': 'Deep-sea gold dragon hunting with explosive laser cannons and treasure rewards.',
+
     // Game Cards
     'card.status.live': '🟢 LIVE NOW',
     'card.status.soon': 'Coming Soon',
     'card.btn_play': 'PLAY NOW ➔',
     'card.players': 'players',
 
+    // Home News & Footer
+    'home.news.title': 'System News & Events',
+    'home.footer.desc': '© 2026 LUCKY TABLE CASINO ENTERTAINMENT. Entertainment simulation game using virtual coins. Real-money gambling is not supported.',
+    'home.footer.sub': 'Engineered with Node.js Express & Realtime Socket.io.',
+
     // Modals Auth & Profile
     'modal.login.title': '🔑 Account Login',
+    'modal.login.sub': 'Sign in to save coin balances and sync tables',
+    'modal.login.user_label': 'Username:',
+    'modal.login.pass_label': 'Password:',
     'modal.login.username_placeholder': 'Enter username...',
     'modal.login.password_placeholder': 'Enter password...',
-    'modal.login.btn_submit': 'Log In Now',
-    'modal.login.switch_text': 'Don\'t have an account? Sign up for 50,000 coins',
+    'modal.login.btn_submit': '🚀 LOG IN NOW',
+    'modal.login.switch_text': 'Don\'t have an account? Sign up (+50K coins)',
 
     'modal.register.title': '✨ Welcome Registration (+50,000 Coins)',
-    'modal.register.username_placeholder': 'Username (minimum 3 characters)...',
-    'modal.register.password_placeholder': 'Password...',
-    'modal.register.confirm_placeholder': 'Confirm password...',
-    'modal.register.btn_submit': 'Register & Claim 50,000 Coins',
-    'modal.register.switch_text': 'Already have an account? Log In',
+    'modal.register.sub': 'Get 50,000 complimentary coins credited instantly!',
+    'modal.register.user_label': 'Username:',
+    'modal.register.pass_label': 'Password:',
+    'modal.register.confirm_label': 'Confirm Password:',
+    'modal.register.username_placeholder': 'Min 3 chars (e.g. LuckyPlayer88)...',
+    'modal.register.password_placeholder': 'Enter password...',
+    'modal.register.confirm_placeholder': 'Re-enter password...',
+    'modal.register.btn_submit': '🎁 CREATE ACCOUNT & GET 50K COINS',
+    'modal.register.switch_text': 'Already have an account? Log In here',
 
     'modal.profile.title': '👤 Player Profile',
     'modal.profile.balance_label': 'Balance:',
@@ -244,7 +337,18 @@ const translations = {
     'modal.profile.txn_history': '📋 Recent Transaction History',
 
     'modal.deposit.title': '🪙 Deposit Coins',
-    'modal.withdraw.title': '💳 Withdraw to Bank',
+    'modal.deposit.tab_qr': '🏦 Bank QR',
+    'modal.deposit.tab_momo': '📱 MoMo Wallet',
+    'modal.deposit.tab_card': '💳 Scratch Card',
+    'modal.deposit.amount_label': 'Enter coin amount to deposit:',
+    'modal.deposit.btn_submit': '✓ CONFIRM DEPOSIT NOW',
+
+    'modal.withdraw.title': '💳 Withdraw to Bank Account',
+    'modal.withdraw.bank_label': 'Select Receiving Bank:',
+    'modal.withdraw.acc_num_label': 'Bank Account Number:',
+    'modal.withdraw.acc_name_label': 'Account Holder Name (UPPERCASE):',
+    'modal.withdraw.amount_label': 'Withdraw Amount (Min 10,000 coins):',
+    'modal.withdraw.btn_submit': '✓ SUBMIT WITHDRAWAL REQUEST',
 
     // Admin Dashboard
     'admin.guard.title': 'Administrator Authentication',
@@ -282,6 +386,11 @@ const translations = {
     'admin.form.reason_placeholder': 'Enter compensation reason...',
     'admin.form.btn_submit': '⚡ Execute Coin Adjustment',
 
+    'admin.chip.1m': '+1M',
+    'admin.chip.10m': '+10M',
+    'admin.chip.100m': '+100M',
+    'admin.chip.1b': '+1B',
+
     'admin.table.title': 'Live Player Accounts & Balances',
     'admin.table.count_badge': '{count} Accounts',
     'admin.table.search_placeholder': '🔍 Search by username...',
@@ -293,21 +402,58 @@ const translations = {
     'admin.table.th_action': 'Action',
     'admin.table.btn_compensate': '+ Add Coins',
     'admin.table.no_users': 'No matching player accounts found',
+    'admin.table.no_txns': 'No transactions',
+
+    'admin.audit.title': 'Recent Coin Adjustment & Audit Logs',
+    'admin.audit.th_time': 'Timestamp',
+    'admin.audit.th_recipient': 'Recipient',
+    'admin.audit.th_action': 'Action Type',
+    'admin.audit.th_amount': 'Coin Amount',
+    'admin.audit.th_reason': 'Reason / Note',
+    'admin.audit.th_status': 'Status',
+    'admin.audit.empty': 'No coin adjustments recorded in this session.',
+    'admin.audit.action_add': 'ADD COINS',
+    'admin.audit.action_deduct': 'DEDUCT',
+    'admin.audit.status_success': 'Success',
 
     'admin.modal.users.title': '👥 Full Player Account Directory',
-    'admin.modal.coins.title': '🪙 Coin Circulation & Richest Players',
-    'admin.modal.coins.total_label': 'Total Circulating Coins:',
-    'admin.modal.coins.admin_label': 'Admin Account Coins:',
-    'admin.modal.coins.players_label': 'Regular Player Coins:',
-    'admin.modal.coins.richest_title': '🏆 Richest Player Leaderboard',
-    'admin.modal.games.title': '🎮 Game Operations & Status Control',
-    'admin.modal.txns.title': '📋 Comprehensive Transaction Logs',
-    'admin.modal.close': 'Close',
-    'admin.modal.btn_adjust_now': 'Open Coin Adjustment Form ➔',
+    'admin.modal.users.total': 'Total: {count} users',
+    'admin.modal.users.admins': '1 Administrator',
+    'admin.modal.users.players': '{count} Players',
+    'admin.modal.users.th_account': 'Account',
+    'admin.modal.users.th_role': 'Role',
+    'admin.modal.users.th_vip': 'VIP Tier',
+    'admin.modal.users.th_balance': 'Coin Balance',
+    'admin.modal.users.th_action': 'Action',
 
-    'admin.status.active': 'Active',
-    'admin.status.maintenance': 'Maintenance',
-    'admin.audit.title': 'Recent Admin Coin Adjustment Logs',
+    'admin.modal.coins.title': '🪙 Coin Circulation & Distribution',
+    'admin.modal.coins.reserve': 'Admin / Reserve Coins',
+    'admin.modal.coins.players': 'Actual Player Coins',
+    'admin.modal.coins.richest_title': '🏆 Richest Player Leaderboard',
+    'admin.modal.coins.btn_adjust': '+ Compensate Coins ➔',
+    'admin.modal.coins.no_data': 'No player data available',
+
+    'admin.modal.games.title': '🎮 Game Operations & Status Control',
+    'admin.modal.games.hint': '💡 Click status toggle to activate/deactivate games instantly',
+    'admin.modal.games.playing': '👥 Playing: {count} players',
+    'admin.modal.games.active_badge': '🟢 ACTIVE',
+    'admin.modal.games.maintenance_badge': '🔴 MAINTENANCE',
+
+    'admin.modal.txns.title': '📋 Comprehensive Transaction Logs & Balance Fluctuations',
+    'admin.modal.txns.all': 'All',
+    'admin.modal.txns.deposit': '🟢 Deposit / Add',
+    'admin.modal.txns.withdraw': '🔴 Withdraw / Deduct',
+    'admin.modal.txns.th_time': 'Time',
+    'admin.modal.txns.th_user': 'Player',
+    'admin.modal.txns.th_type': 'Type',
+    'admin.modal.txns.th_amount': 'Amount',
+    'admin.modal.txns.th_desc': 'Description',
+    'admin.modal.txns.th_status': 'Status',
+    'admin.modal.txns.empty': 'No transactions match current filter',
+    'admin.modal.txns.badge_deposit': '🟢 DEPOSIT',
+    'admin.modal.txns.badge_withdraw': '🔴 WITHDRAW',
+    'admin.modal.txns.status_success': 'Success',
+    'admin.modal.close': 'Close',
 
     // Game Common Actions & Controls
     'game.back_lobby': '🏠 Lobby',
@@ -372,7 +518,7 @@ class I18nManager {
 
   t(key, params = {}) {
     const dict = translations[this.currentLang] || translations.vi;
-    let str = dict[key] || translations.vi[key] || key;
+    let str = dict[key] || (translations.vi ? translations.vi[key] : key) || key;
 
     for (const [k, v] of Object.entries(params)) {
       str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v);

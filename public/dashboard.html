@@ -224,10 +224,10 @@
           <button type="button" class="chip-quick-btn" data-val="50000">+50k</button>
           <button type="button" class="chip-quick-btn" data-val="100000">+100k</button>
           <button type="button" class="chip-quick-btn" data-val="500000">+500k</button>
-          <button type="button" class="chip-quick-btn" data-val="1000000">+1 triệu</button>
-          <button type="button" class="chip-quick-btn" data-val="10000000">+10 triệu</button>
-          <button type="button" class="chip-quick-btn" data-val="100000000">+100 triệu</button>
-          <button type="button" class="chip-quick-btn" data-val="1000000000">+1 tỷ</button>
+          <button type="button" class="chip-quick-btn" data-val="1000000" data-i18n="admin.chip.1m">+1 triệu</button>
+          <button type="button" class="chip-quick-btn" data-val="10000000" data-i18n="admin.chip.10m">+10 triệu</button>
+          <button type="button" class="chip-quick-btn" data-val="100000000" data-i18n="admin.chip.100m">+100 triệu</button>
+          <button type="button" class="chip-quick-btn" data-val="1000000000" data-i18n="admin.chip.1b">+1 tỷ</button>
         </div>
 
         <!-- Reason -->
@@ -375,7 +375,7 @@
     <section class="admin-card p-5">
       <div class="flex items-center gap-2 pb-3 mb-4 border-b border-amber-500/20">
         <span class="text-xl text-amber-400">📜</span>
-        <h2 class="text-base sm:text-lg font-extrabold text-amber-300 font-royal">Nhật Ký Điều Chỉnh & Bù Xu Gần Đây</h2>
+        <h2 class="text-base sm:text-lg font-extrabold text-amber-300 font-royal" data-i18n="admin.audit.title">Nhật Ký Điều Chỉnh & Bù Xu Gần Đây</h2>
       </div>
 
       <div class="overflow-x-auto rounded-xl border border-white/10">
@@ -410,7 +410,7 @@
         <div class="flex items-center justify-between pb-3 border-b border-amber-500/30">
           <div class="flex items-center gap-2">
             <span class="text-2xl">👥</span>
-            <h3 class="text-lg font-black text-amber-300 font-royal">Chi Tiết Danh Sách Người Dùng</h3>
+            <h3 class="text-lg font-black text-amber-300 font-royal" data-i18n="admin.modal.users.title">Chi Tiết Danh Sách Người Dùng</h3>
           </div>
           <button class="modal-close text-neutral-400 hover:text-white text-2xl font-bold">&times;</button>
         </div>
@@ -439,7 +439,7 @@
         </div>
 
         <div class="pt-3 border-t border-amber-500/20 flex justify-end">
-          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition">Đóng</button>
+          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition" data-i18n="admin.modal.close">Đóng</button>
         </div>
       </div>
     </div>
@@ -450,7 +450,7 @@
         <div class="flex items-center justify-between pb-3 border-b border-emerald-500/30">
           <div class="flex items-center gap-2">
             <span class="text-2xl">🪙</span>
-            <h3 class="text-lg font-black text-emerald-300 font-royal">Thống Kê Phân Phối Tiền Tệ (Xu)</h3>
+            <h3 class="text-lg font-black text-emerald-300 font-royal" data-i18n="admin.modal.coins.title">Thống Kê Phân Phối Tiền Tệ (Xu)</h3>
           </div>
           <button class="modal-close text-neutral-400 hover:text-white text-2xl font-bold">&times;</button>
         </div>
@@ -459,11 +459,11 @@
           <!-- Breakdown cards -->
           <div class="grid grid-cols-2 gap-3 text-xs">
             <div class="p-3 rounded-xl bg-black/50 border border-emerald-500/30">
-              <span class="text-neutral-400 block mb-1">Xu Quỹ Dự Trữ / Admin</span>
+              <span class="text-neutral-400 block mb-1" data-i18n="admin.modal.coins.reserve">Xu Quỹ Dự Trữ / Admin</span>
               <span class="text-lg font-black text-amber-300" id="coins-admin-total">--</span>
             </div>
             <div class="p-3 rounded-xl bg-black/50 border border-emerald-500/30">
-              <span class="text-neutral-400 block mb-1">Xu Người Chơi Thực Tế</span>
+              <span class="text-neutral-400 block mb-1" data-i18n="admin.modal.coins.players">Xu Người Chơi Thực Tế</span>
               <span class="text-lg font-black text-emerald-400" id="coins-players-total">--</span>
             </div>
           </div>
@@ -471,7 +471,7 @@
           <!-- Top Richest Players -->
           <div class="p-4 rounded-xl bg-black/40 border border-white/10 space-y-3">
             <h4 class="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-              <span>🏆</span> <span>Bảng Xếp Hạng Đại Gia Giàu Nhất</span>
+              <span>🏆</span> <span data-i18n="admin.modal.coins.richest_title">Bảng Xếp Hạng Đại Gia Giàu Nhất</span>
             </h4>
             <div id="coins-top-rich-list" class="space-y-2 text-xs">
               <!-- Rendered by JS -->
@@ -481,9 +481,9 @@
 
         <div class="pt-3 border-t border-emerald-500/20 flex justify-between items-center">
           <button onclick="document.getElementById('modal-stat-coins').style.display='none'; document.getElementById('form-adjust-balance').scrollIntoView({behavior:'smooth'});" class="text-xs text-amber-400 font-bold hover:underline">
-            + Bù xu cho người chơi ➔
+            <span data-i18n="admin.modal.coins.btn_adjust">+ Bù xu cho người chơi ➔</span>
           </button>
-          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition">Đóng</button>
+          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition" data-i18n="admin.modal.close">Đóng</button>
         </div>
       </div>
     </div>
@@ -494,7 +494,7 @@
         <div class="flex items-center justify-between pb-3 border-b border-blue-500/30">
           <div class="flex items-center gap-2">
             <span class="text-2xl">🎮</span>
-            <h3 class="text-lg font-black text-blue-300 font-royal">Chi Tiết & Quản Lý Trạng Thái Trò Chơi</h3>
+            <h3 class="text-lg font-black text-blue-300 font-royal" data-i18n="admin.modal.games.title">Chi Tiết & Quản Lý Trạng Thái Trò Chơi</h3>
           </div>
           <button class="modal-close text-neutral-400 hover:text-white text-2xl font-bold">&times;</button>
         </div>
@@ -504,8 +504,8 @@
         </div>
 
         <div class="pt-3 border-t border-blue-500/20 flex justify-between items-center">
-          <span class="text-xs text-neutral-400">💡 Bấm nút trạng thái để bật/tắt trò chơi tức thì</span>
-          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition">Đóng</button>
+          <span class="text-xs text-neutral-400" data-i18n="admin.modal.games.hint">💡 Bấm nút trạng thái để bật/tắt trò chơi tức thì</span>
+          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition" data-i18n="admin.modal.close">Đóng</button>
         </div>
       </div>
     </div>
@@ -516,16 +516,16 @@
         <div class="flex items-center justify-between pb-3 border-b border-purple-500/30">
           <div class="flex items-center gap-2">
             <span class="text-2xl">📋</span>
-            <h3 class="text-lg font-black text-purple-300 font-royal">Toàn Bộ Lịch Sử Giao Dịch & Biến Động Số Dư</h3>
+            <h3 class="text-lg font-black text-purple-300 font-royal" data-i18n="admin.modal.txns.title">Toàn Bộ Lịch Sử Giao Dịch & Biến Động Số Dư</h3>
           </div>
           <button class="modal-close text-neutral-400 hover:text-white text-2xl font-bold">&times;</button>
         </div>
 
         <!-- Filter tabs -->
         <div class="flex gap-2 my-3 text-xs flex-wrap">
-          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-purple-600 text-white font-bold" data-filter="ALL">Tất Cả</button>
-          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold" data-filter="DEPOSIT">🟢 Nạp / Bù Xu</button>
-          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold" data-filter="WITHDRAW">🔴 Rút / Khấu Trừ</button>
+          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-purple-600 text-white font-bold" data-filter="ALL" data-i18n="admin.modal.txns.all">Tất Cả</button>
+          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold" data-filter="DEPOSIT" data-i18n="admin.modal.txns.deposit">🟢 Nạp / Bù Xu</button>
+          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold" data-filter="WITHDRAW" data-i18n="admin.modal.txns.withdraw">🔴 Rút / Khấu Trừ</button>
         </div>
 
         <div class="overflow-y-auto flex-1 pr-1 border border-white/10 rounded-xl">
@@ -549,7 +549,7 @@
         </div>
 
         <div class="pt-3 border-t border-purple-500/20 flex justify-end">
-          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition">Đóng</button>
+          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition" data-i18n="admin.modal.close">Đóng</button>
         </div>
       </div>
     </div>
@@ -590,11 +590,17 @@
           this.fetchMetrics();
           const query = document.getElementById('user-search-input').value.toLowerCase().trim();
           this.renderUsersTable(query);
+          this.renderAuditLog();
+          if (document.getElementById('modal-stat-users').style.display === 'flex') this.renderUsersModalList();
+          if (document.getElementById('modal-stat-coins').style.display === 'flex') this.openCoinsModal();
+          if (document.getElementById('modal-stat-games').style.display === 'flex') this.openGamesModal();
+          if (document.getElementById('modal-stat-txns').style.display === 'flex') this.renderTransactionsTable();
           const val = parseInt(document.getElementById('adjust-amount').value, 10);
           const previewEl = document.getElementById('adjust-amount-preview');
           if (previewEl && !isNaN(val) && val > 0) {
             const shortStr = window.Wallet ? window.Wallet.formatWords(val, true) : val.toLocaleString();
-            previewEl.textContent = `✨ ${shortStr} (${val.toLocaleString()} xu)`;
+            const unit = window.i18n && window.i18n.currentLang === 'en' ? 'coins' : 'xu';
+            previewEl.textContent = `✨ ${shortStr} (${val.toLocaleString()} ${unit})`;
           }
         });
         this.bindStatCardEvents();
@@ -763,8 +769,8 @@
 
         const total = this.users.length;
         const players = this.users.filter(u => u.role !== 'admin').length;
-        document.getElementById('modal-users-count').textContent = `Tổng: ${total} người`;
-        document.getElementById('modal-players-count').textContent = `${players} Người Chơi`;
+        document.getElementById('modal-users-count').textContent = window.i18n ? window.i18n.t('admin.modal.users.total', { count: total }) : `Tổng: ${total} người`;
+        document.getElementById('modal-players-count').textContent = window.i18n ? window.i18n.t('admin.modal.users.players', { count: players }) : `${players} Người Chơi`;
 
         const tbody = document.getElementById('modal-users-tbody');
         tbody.innerHTML = this.users.map(u => `
@@ -787,7 +793,7 @@
             </td>
             <td class="p-2.5 text-center">
               <button onclick="document.getElementById('modal-stat-users').style.display='none'; adminDashboard.selectUserForAdjustment('${u.username}')" class="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 border border-amber-400/50 text-amber-300 font-bold text-[11px] transition">
-                + Bù Xu
+                ${window.i18n ? window.i18n.t('admin.table.btn_compensate') : '+ Bù Xu'}
               </button>
             </td>
           </tr>
@@ -860,11 +866,11 @@
               <div>
                 <span class="font-black text-white text-sm block">${g.name}</span>
                 <span class="text-[11px] text-neutral-400 block">${g.desc}</span>
-                <span class="text-[10px] text-amber-300 font-bold">👥 Đang chơi: ${g.players.toLocaleString('vi-VN')} người</span>
+                <span class="text-[10px] text-amber-300 font-bold">${window.i18n ? window.i18n.t('admin.modal.games.playing', { count: g.players.toLocaleString() }) : `👥 Đang chơi: ${g.players.toLocaleString()} người`}</span>
               </div>
             </div>
             <button onclick="adminDashboard.toggleGameStatus('${g.id}')" class="px-3.5 py-1.5 rounded-xl font-extrabold text-xs transition ${g.active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 hover:bg-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/50 hover:bg-red-500/30'}">
-              ${g.active ? '🟢 HOẠT ĐỘNG' : '🔴 BẢO TRÌ'}
+              ${g.active ? (window.i18n ? window.i18n.t('admin.modal.games.active_badge') : '🟢 HOẠT ĐỘNG') : (window.i18n ? window.i18n.t('admin.modal.games.maintenance_badge') : '🔴 BẢO TRÌ')}
             </button>
           </div>
         `).join('');
@@ -911,14 +917,14 @@
               <td class="p-2.5 font-bold text-white">${t.username || 'Player'}</td>
               <td class="p-2.5">
                 <span class="px-2 py-0.5 rounded-full ${isDeposit ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'} font-bold text-[10px]">
-                  ${isDeposit ? '🟢 NẠP / BÙ' : '🔴 RÚT TIỀN'}
+                  ${isDeposit ? (window.i18n ? window.i18n.t('admin.modal.txns.badge_deposit') : '🟢 NẠP / BÙ') : (window.i18n ? window.i18n.t('admin.modal.txns.badge_withdraw') : '🔴 RÚT TIỀN')}
                 </span>
               </td>
               <td class="p-2.5 font-black ${isDeposit ? 'text-emerald-400' : 'text-red-400'}">
                 ${isDeposit ? '+' : '-'}${Number(t.amount || 0).toLocaleString('vi-VN')} xu
               </td>
               <td class="p-2.5 text-neutral-300">${t.title || 'Giao dịch'}</td>
-              <td class="p-2.5 font-bold text-emerald-400">${t.status === 'SUCCESS' ? 'Thành công' : 'Hoàn tất'}</td>
+              <td class="p-2.5 font-bold text-emerald-400">${window.i18n ? window.i18n.t('admin.modal.txns.status_success') : 'Thành công'}</td>
             </tr>
           `;
         }).join('');
@@ -1019,11 +1025,11 @@
               <span class="text-[10px] text-neutral-400 font-normal font-mono block">(${Number(u.balance || 0).toLocaleString('vi-VN')} xu)</span>
             </td>
             <td class="p-3 text-[11px] text-neutral-400">
-              ${u.transactions && u.transactions[0] ? `${u.transactions[0].title} (${u.transactions[0].type === 'DEPOSIT' ? '+' : '-'}${Number(u.transactions[0].amount).toLocaleString('vi-VN')})` : 'Chưa có GD'}
+              ${u.transactions && u.transactions[0] ? `${u.transactions[0].title} (${u.transactions[0].type === 'DEPOSIT' ? '+' : '-'}${Number(u.transactions[0].amount).toLocaleString(window.i18n && window.i18n.currentLang === 'en' ? 'en-US' : 'vi-VN')})` : (window.i18n ? window.i18n.t('admin.table.no_txns') : 'Chưa có GD')}
             </td>
             <td class="p-3 text-center">
               <button onclick="adminDashboard.selectUserForAdjustment('${u.username}')" class="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 border border-amber-400/50 text-amber-300 font-bold text-[11px] transition">
-                + Bù Xu
+                ${window.i18n ? window.i18n.t('admin.table.btn_compensate') : '+ Bù Xu'}
               </button>
             </td>
           </tr>
@@ -1115,14 +1121,14 @@
             <td class="p-3 font-bold text-white">${log.username}</td>
             <td class="p-3">
               <span class="px-2 py-0.5 rounded-full ${log.type === 'ADD' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'} font-bold text-[10px]">
-                ${log.type === 'ADD' ? 'CỘNG XU' : 'KHẤU TRỪ'}
+                ${log.type === 'ADD' ? (window.i18n ? window.i18n.t('admin.audit.action_add') : 'CỘNG XU') : (window.i18n ? window.i18n.t('admin.audit.action_deduct') : 'KHẤU TRỪ')}
               </span>
             </td>
             <td class="p-3 font-black ${log.type === 'ADD' ? 'text-emerald-400' : 'text-red-400'}">
               ${log.type === 'ADD' ? '+' : '-'}${Number(log.amount).toLocaleString('vi-VN')} xu
             </td>
             <td class="p-3 text-neutral-300">${log.reason}</td>
-            <td class="p-3 font-bold text-emerald-400">Thành công</td>
+            <td class="p-3 font-bold text-emerald-400">${window.i18n ? window.i18n.t('admin.audit.status_success') : 'Thành công'}</td>
           </tr>
         `).join('');
       }
