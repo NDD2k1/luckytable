@@ -123,16 +123,16 @@ const Wallet = {
       return str;
     };
 
-    if (abs >= 1e12) {
+    if (abs >= 999500000000) {
       return sign + formatDec(abs / 1e12) + (isEn ? 'T' : ' nghìn tỷ') + (withUnit && !isEn ? ' xu' : unit);
     }
-    if (abs >= 1e9) {
+    if (abs >= 999500000) {
       return sign + formatDec(abs / 1e9) + (isEn ? 'B' : ' tỷ') + (withUnit && !isEn ? ' xu' : unit);
     }
-    if (abs >= 1e6) {
+    if (abs >= 999500) {
       return sign + formatDec(abs / 1e6) + (isEn ? 'M' : ' triệu') + (withUnit && !isEn ? ' xu' : unit);
     }
-    if (abs >= 1e3) {
+    if (abs >= 1000) {
       return sign + formatDec(abs / 1e3) + 'k' + (withUnit && !isEn ? ' xu' : unit);
     }
 

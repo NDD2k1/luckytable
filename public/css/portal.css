@@ -55,11 +55,11 @@ body {
 .header-container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 10px 20px;
+  padding: 6px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px;
   flex-wrap: nowrap;
 }
 
@@ -73,8 +73,8 @@ body {
 }
 
 .brand-logo-icon {
-  font-size: 2rem;
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+  font-size: 1.5rem;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
   animation: logoPulse 2.5s infinite ease-in-out;
   flex-shrink: 0;
 }
@@ -92,12 +92,12 @@ body {
 }
 
 .brand-name {
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   font-weight: 900;
   background: var(--gold-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -114,7 +114,7 @@ body {
 .portal-nav-menu {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 3px;
   list-style: none;
   flex-shrink: 0;
   white-space: nowrap;
@@ -129,12 +129,12 @@ body {
 .nav-link-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 7px 13px;
-  border-radius: 20px;
+  gap: 3px;
+  padding: 5px 8px;
+  border-radius: 16px;
   text-decoration: none;
   color: #e0d0c0;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-weight: 700;
   transition: all 0.25s ease;
   border: 1px solid transparent;
@@ -274,7 +274,7 @@ html {
 .portal-user-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -282,11 +282,11 @@ html {
 .user-balance-pill {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   background: rgba(0, 0, 0, 0.6);
   border: 1.5px solid #d4af37;
-  border-radius: 30px;
-  padding: 6px 12px;
+  border-radius: 20px;
+  padding: 4px 9px;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(212, 175, 55, 0.25);
   white-space: nowrap;
   flex-shrink: 0;
@@ -299,10 +299,10 @@ html {
 
 .balance-amount {
   font-weight: 900;
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: var(--primary-gold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   white-space: nowrap;
 }
 
@@ -312,15 +312,15 @@ html {
   border: 1.5px solid #58d68d;
   color: #fff;
   font-weight: 800;
-  font-size: 0.84rem;
-  padding: 7px 14px;
-  border-radius: 20px;
+  font-size: 0.78rem;
+  padding: 5px 10px;
+  border-radius: 16px;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   white-space: nowrap;
   flex-shrink: 0;
   word-break: keep-all;
@@ -336,15 +336,15 @@ html {
   border: 1.5px solid #e74c3c;
   color: #fff;
   font-weight: 800;
-  font-size: 0.84rem;
-  padding: 7px 14px;
-  border-radius: 20px;
+  font-size: 0.78rem;
+  padding: 5px 10px;
+  border-radius: 16px;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(231, 76, 60, 0.35);
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   white-space: nowrap;
   flex-shrink: 0;
   word-break: keep-all;
@@ -358,11 +358,11 @@ html {
 .user-profile-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: 30px;
-  padding: 4px 12px 4px 4px;
+  border-radius: 20px;
+  padding: 3px 8px 3px 3px;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -375,22 +375,22 @@ html {
 }
 
 .user-avatar-mini {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  border: 2px solid #ffd700;
+  border: 1.5px solid #ffd700;
   object-fit: cover;
   flex-shrink: 0;
 }
 
 .user-name-label {
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: #fff;
   white-space: nowrap;
 }
 
-.vip-badge-tag {
+.vip-badge-tag { display: none; /* hidden on compact navbar */
   background: linear-gradient(135deg, #f39c12, #d35400);
   font-size: 0.65rem;
   font-weight: 900;

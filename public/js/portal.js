@@ -661,8 +661,15 @@ class PortalController {
   }
 
   updateUserUI() {
-    const formattedBalance = Number(this.user.balance).toLocaleString('vi-VN');
-    if (this.dom.headerBalance) this.dom.headerBalance.textContent = formattedBalance;
+    const rawBal = Number(this.user.balance) || 0;
+    const formattedBalance = rawBal.toLocaleString('vi-VN');
+    const compactBalance = window.Wallet ? window.Wallet.formatWords(rawBal, false) : formattedBalance;
+    if (this.dom.headerBalance) {
+      this.dom.headerBalance.textContent = compactBalance;
+      if (this.dom.headerBalance.parentElement) {
+        this.dom.headerBalance.parentElement.title = `Số dư: ${formattedBalance} xu`;
+      }
+    }
     if (this.dom.headerUsername) this.dom.headerUsername.textContent = this.user.username;
     if (this.dom.headerVip) this.dom.headerVip.textContent = `VIP ${this.user.vipLevel || 1}`;
 
