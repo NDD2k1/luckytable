@@ -152,6 +152,26 @@
       0% { transform: translateY(-6px) scale(1); }
       100% { transform: translateY(4px) scale(1.25); }
     }
+    /* In-Table Toast Shake & Card Shake Feedback */
+    @keyframes toast-shake {
+      0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+      20% { transform: translate(calc(-50% - 10px), -50%) rotate(-2deg); }
+      40% { transform: translate(calc(-50% + 10px), -50%) rotate(2deg); }
+      60% { transform: translate(calc(-50% - 7px), -50%) rotate(-1deg); }
+      80% { transform: translate(calc(-50% + 7px), -50%) rotate(1deg); }
+    }
+    .shake-toast {
+      animation: toast-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    @keyframes hand-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .shake-hand {
+      animation: hand-shake 0.4s ease;
+    }
+
     /* Ghost Card for throwing animation */
     .ghost-card {
       position: fixed;
@@ -233,6 +253,15 @@
   <!-- MAIN ARENA TABLE -->
   <main class="flex-1 w-full max-w-6xl mx-auto p-2 sm:p-4 flex flex-col justify-between relative">
     
+    <!-- IN-TABLE RULE VIOLATION WARNING TOAST -->
+    <div id="table-warning-toast" class="pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-300 opacity-0 scale-90 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-red-950/95 via-neutral-900/95 to-red-950/95 border-2 border-red-500 text-white shadow-[0_14px_50px_rgba(239,68,68,0.7)] backdrop-blur-md max-w-sm sm:max-w-md select-none">
+      <span id="toast-icon" class="text-3xl animate-bounce">⚠️</span>
+      <div class="flex flex-col text-left">
+        <span id="toast-title" class="text-xs sm:text-sm font-black text-red-400 uppercase tracking-wider">Không Đúng Luật!</span>
+        <span id="toast-message" class="text-xs sm:text-sm font-bold text-white drop-shadow">Bộ bài chọn không hợp lệ theo luật Tiến Lên!</span>
+      </div>
+    </div>
+
     <!-- THE CASINO OVAL FELT TABLE -->
     <div class="tienlen-table w-full rounded-[40px] sm:rounded-[60px] p-3 sm:p-6 flex-1 flex flex-col justify-between relative min-h-[580px] sm:min-h-[640px] shadow-2xl">
       
@@ -446,6 +475,22 @@
         return ctx;
       }
       return {
+        playError() {
+          try {
+            const c = getCtx();
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(170, c.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(75, c.currentTime + 0.18);
+            gain.gain.setValueAtTime(0.28, c.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, c.currentTime + 0.18);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start();
+            osc.stop(c.currentTime + 0.18);
+          } catch(e){}
+        },
         playSnap() {
           try {
             const c = getCtx();
@@ -982,23 +1027,89 @@
         this.startTurn();
       }
 
+      showTableToast(key, isError = true) {
+        const isEn = window.I18n && window.I18n.currentLang === 'en';
+        const msgs = {
+          no_cards: {
+            title: isEn ? 'No Cards Selected' : 'Chưa Chọn Bài',
+            desc: isEn ? 'Vui lòng chọn ít nhất 1 lá bài trên tay để đánh!' : 'Vui lòng chọn ít nhất 1 lá bài trên tay để đánh!'
+          },
+          invalid_combo: {
+            title: isEn ? 'Rule Violation' : 'Không Đúng Luật',
+            desc: isEn ? 'Bộ bài không đúng luật (Rác, Đôi, Sám, Sảnh liên tiếp hoặc Tứ quý)!' : 'Bộ bài không đúng luật (Rác, Đôi, Sám, Sảnh liên tiếp hoặc Tứ quý)!'
+          },
+          cannot_beat: {
+            title: isEn ? 'Cannot Beat' : 'Không Đủ Lớn',
+            desc: isEn ? 'Bài chọn không đè được bài trên bàn (cần cùng loại bài và lớn hơn)!' : 'Bài chọn không đè được bài trên bàn (cần cùng loại bài và lớn hơn)!'
+          },
+          cannot_pass_lead: {
+            title: isEn ? 'Cannot Pass' : 'Không Thể Bỏ Lượt',
+            desc: isEn ? 'Bạn là người bắt đầu vòng mới, phải đánh ít nhất 1 lá bài!' : 'Bạn là người bắt đầu vòng mới, phải đánh ít nhất 1 lá bài!'
+          },
+          no_hint: {
+            title: isEn ? 'No Valid Cards' : 'Không Có Bài Đè',
+            desc: isEn ? 'Không tìm thấy bộ bài nào có thể đè bài bàn này. Bạn có thể Bỏ Lượt!' : 'Không tìm thấy bộ bài nào có thể đè bài bàn này. Bạn có thể Bỏ Lượt!'
+          }
+        };
+
+        const item = msgs[key] || { title: isEn ? 'Notice' : 'Thông Báo', desc: key };
+
+        if (this.soundEnabled && isError) {
+          AudioEngine.playError();
+        }
+
+        const toast = document.getElementById('table-warning-toast');
+        const titleEl = document.getElementById('toast-title');
+        const msgEl = document.getElementById('toast-message');
+        const iconEl = document.getElementById('toast-icon');
+
+        titleEl.textContent = item.title;
+        msgEl.textContent = item.desc;
+        iconEl.textContent = isError ? '⚠️' : '💡';
+
+        if (isError) {
+          toast.className = 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-300 opacity-100 scale-100 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-red-950/95 via-neutral-900/95 to-red-950/95 border-2 border-red-500 text-white shadow-[0_14px_50px_rgba(239,68,68,0.7)] backdrop-blur-md max-w-sm sm:max-w-md select-none shake-toast';
+
+          const handEl = document.getElementById('player-hand-container');
+          if (handEl) {
+            handEl.classList.remove('shake-hand');
+            void handEl.offsetWidth;
+            handEl.classList.add('shake-hand');
+            setTimeout(() => handEl.classList.remove('shake-hand'), 450);
+          }
+        } else {
+          toast.className = 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-300 opacity-100 scale-100 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-950/95 via-neutral-900/95 to-amber-950/95 border-2 border-amber-400 text-white shadow-[0_14px_50px_rgba(251,191,36,0.6)] backdrop-blur-md max-w-sm sm:max-w-md select-none';
+        }
+
+        this.setRibbon(`⚠️ ${item.desc}`);
+
+        clearTimeout(this._toastTimeout);
+        this._toastTimeout = setTimeout(() => {
+          toast.classList.remove('opacity-100', 'scale-100', 'shake-toast');
+          toast.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+          if (this.currentTurn === 0) {
+            this.setRibbon(isEn ? '⚡ Your turn! Select cards and click Play Cards' : '⚡ Đến lượt bạn! Chọn bài và bấm Đánh Bài');
+          }
+        }, 2500);
+      }
+
       handlePlayerPlay() {
         if (this.currentTurn !== 0) return;
 
         const selectedCards = Array.from(this.selectedIndices).map(idx => this.players[0].hand[idx]);
         if (selectedCards.length === 0) {
-          alert('Vui lòng chọn ít nhất 1 lá bài để đánh!');
+          this.showTableToast('no_cards');
           return;
         }
 
         const combo = Evaluator.evaluate(selectedCards);
         if (!combo) {
-          alert('Bộ bài chọn không hợp lệ theo luật Tiến Lên!');
+          this.showTableToast('invalid_combo');
           return;
         }
 
         if (!Evaluator.canBeat(combo, this.currentPile ? this.currentPile.combo : null)) {
-          alert('Bộ bài chọn không đủ lớn để đè bài trên bàn!');
+          this.showTableToast('cannot_beat');
           return;
         }
 
@@ -1008,7 +1119,7 @@
       handlePlayerPass() {
         if (this.currentTurn !== 0) return;
         if (this.currentPile === null) {
-          alert('Bạn là người bắt đầu vòng này, không thể bỏ lượt!');
+          this.showTableToast('cannot_pass_lead');
           return;
         }
         this.players[0].passed = true;
@@ -1324,7 +1435,7 @@
           }
         }
 
-        alert('Không tìm thấy bộ bài hợp lệ để đè! Bạn có thể Bỏ Lượt.');
+        this.showTableToast('no_hint', false);
       }
 
       endGame() {
