@@ -142,14 +142,17 @@
 
       <!-- Card 2: Coins -->
       <div id="card-stat-coins" class="admin-card p-4 flex items-center justify-between gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:border-emerald-400 hover:shadow-emerald-500/20 hover:shadow-xl group" title="Bấm để xem phân phối xu & đại gia">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">🪙</div>
-          <div>
-            <span class="text-xs text-neutral-400 font-bold block">Xu Trong Lưu Thông</span>
-            <span class="text-xl sm:text-2xl font-black text-emerald-400" id="stat-total-coins">--</span>
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">🪙</div>
+          <div class="min-w-0">
+            <span class="text-xs text-neutral-400 font-bold block truncate">Xu Trong Lưu Thông</span>
+            <div class="flex items-baseline gap-1.5 flex-wrap">
+              <span class="text-xl sm:text-2xl font-black text-emerald-400 whitespace-nowrap" id="stat-total-coins">--</span>
+              <span class="text-[11px] text-neutral-400 font-mono hidden sm:inline whitespace-nowrap" id="stat-total-coins-exact"></span>
+            </div>
           </div>
         </div>
-        <span class="text-[11px] text-emerald-400/80 group-hover:text-emerald-300 font-extrabold transition">Xem ➔</span>
+        <span class="text-[11px] text-emerald-400/80 group-hover:text-emerald-300 font-extrabold transition shrink-0">Xem ➔</span>
       </div>
 
       <!-- Card 3: Games -->
@@ -206,19 +209,25 @@
 
           <!-- Amount -->
           <div>
-            <label class="text-xs font-bold text-neutral-300 block mb-1">Số xu điều chỉnh:</label>
-            <input type="number" id="adjust-amount" min="1000" step="1000" placeholder="Nhập số xu (vd: 50000)..." required class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs font-bold text-neutral-300">Số xu điều chỉnh:</label>
+              <span id="adjust-amount-preview" class="text-xs font-extrabold text-amber-300 transition-all"></span>
+            </div>
+            <input type="number" id="adjust-amount" min="1000" step="1000" placeholder="Nhập số xu (vd: 50000, 1000000)..." required class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
           </div>
         </div>
 
         <!-- Quick chips -->
         <div class="flex items-center gap-2 flex-wrap text-xs">
           <span class="text-neutral-400 font-bold">Chọn nhanh:</span>
-          <button type="button" class="chip-quick-btn" data-val="10000">+10.000</button>
-          <button type="button" class="chip-quick-btn" data-val="50000">+50.000</button>
-          <button type="button" class="chip-quick-btn" data-val="100000">+100.000</button>
-          <button type="button" class="chip-quick-btn" data-val="500000">+500.000</button>
-          <button type="button" class="chip-quick-btn" data-val="1000000">+1.000.000</button>
+          <button type="button" class="chip-quick-btn" data-val="10000">+10k</button>
+          <button type="button" class="chip-quick-btn" data-val="50000">+50k</button>
+          <button type="button" class="chip-quick-btn" data-val="100000">+100k</button>
+          <button type="button" class="chip-quick-btn" data-val="500000">+500k</button>
+          <button type="button" class="chip-quick-btn" data-val="1000000">+1 triệu</button>
+          <button type="button" class="chip-quick-btn" data-val="10000000">+10 triệu</button>
+          <button type="button" class="chip-quick-btn" data-val="100000000">+100 triệu</button>
+          <button type="button" class="chip-quick-btn" data-val="1000000000">+1 tỷ</button>
         </div>
 
         <!-- Reason -->
@@ -635,11 +644,26 @@
           window.location.href = '/';
         });
 
+        const amtInput = document.getElementById('adjust-amount');
+        const amtPreview = document.getElementById('adjust-amount-preview');
+        const updateAmountPreview = () => {
+          const val = parseInt(amtInput.value, 10);
+          if (!isNaN(val) && val > 0) {
+            const shortStr = window.Wallet ? window.Wallet.formatWords(val, true) : val.toLocaleString('vi-VN') + ' xu';
+            amtPreview.textContent = `✨ ${shortStr} (${val.toLocaleString('vi-VN')} xu)`;
+          } else {
+            amtPreview.textContent = '';
+          }
+        };
+
+        amtInput.addEventListener('input', updateAmountPreview);
+
         // Quick chip buttons
         document.querySelectorAll('.chip-quick-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             const val = btn.getAttribute('data-val');
-            document.getElementById('adjust-amount').value = val;
+            amtInput.value = val;
+            updateAmountPreview();
           });
         });
 
@@ -745,7 +769,10 @@
               </span>
             </td>
             <td class="p-2.5 font-extrabold text-amber-400">VIP ${u.vipLevel || 1}</td>
-            <td class="p-2.5 font-black text-emerald-400">${Number(u.balance || 0).toLocaleString('vi-VN')} xu</td>
+            <td class="p-2.5 font-black text-emerald-400">
+              <span>${window.Wallet ? window.Wallet.formatWords(u.balance, true) : Number(u.balance || 0).toLocaleString('vi-VN') + ' xu'}</span>
+              <span class="text-[10px] text-neutral-400 font-mono font-normal block">(${Number(u.balance || 0).toLocaleString('vi-VN')} xu)</span>
+            </td>
             <td class="p-2.5 text-center">
               <button onclick="document.getElementById('modal-stat-users').style.display='none'; adminDashboard.selectUserForAdjustment('${u.username}')" class="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 border border-amber-400/50 text-amber-300 font-bold text-[11px] transition">
                 + Bù Xu
@@ -767,8 +794,20 @@
           else playersTotal += bal;
         });
 
-        document.getElementById('coins-admin-total').textContent = adminTotal.toLocaleString('vi-VN') + ' xu';
-        document.getElementById('coins-players-total').textContent = playersTotal.toLocaleString('vi-VN') + ' xu';
+        const fmtWords = (val) => window.Wallet ? window.Wallet.formatWords(val, true) : val.toLocaleString('vi-VN') + ' xu';
+
+        document.getElementById('coins-admin-total').innerHTML = `
+          <div class="flex items-baseline gap-1.5 flex-wrap">
+            <span class="text-base font-black text-amber-300">${fmtWords(adminTotal)}</span>
+            <span class="text-[11px] text-neutral-400 font-mono">(${adminTotal.toLocaleString('vi-VN')} xu)</span>
+          </div>
+        `;
+        document.getElementById('coins-players-total').innerHTML = `
+          <div class="flex items-baseline gap-1.5 flex-wrap">
+            <span class="text-base font-black text-emerald-400">${fmtWords(playersTotal)}</span>
+            <span class="text-[11px] text-neutral-400 font-mono">(${playersTotal.toLocaleString('vi-VN')} xu)</span>
+          </div>
+        `;
 
         // Top richest players (excluding admin)
         const sorted = [...this.users].filter(u => u.role !== 'admin').sort((a, b) => (b.balance || 0) - (a.balance || 0)).slice(0, 5);
@@ -778,16 +817,22 @@
           richContainer.innerHTML = '<span class="text-neutral-500">Chưa có dữ liệu người chơi</span>';
         } else {
           const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
-          richContainer.innerHTML = sorted.map((u, i) => `
+          richContainer.innerHTML = sorted.map((u, i) => {
+            const bal = Number(u.balance || 0);
+            return `
             <div class="flex items-center justify-between p-2 rounded-lg bg-black/60 border border-white/5">
               <div class="flex items-center gap-2">
                 <span class="text-base">${medals[i] || '🎖️'}</span>
                 <span class="font-bold text-white">${u.username}</span>
                 <span class="text-[10px] text-amber-400 font-extrabold">VIP ${u.vipLevel || 1}</span>
               </div>
-              <span class="font-black text-emerald-400">${Number(u.balance || 0).toLocaleString('vi-VN')} xu</span>
+              <div class="text-right">
+                <span class="font-black text-emerald-400 text-sm">${fmtWords(bal)}</span>
+                <span class="text-[10px] text-neutral-400 font-mono block">(${bal.toLocaleString('vi-VN')} xu)</span>
+              </div>
             </div>
-          `).join('');
+          `;
+          }).join('');
         }
       }
 
@@ -889,14 +934,26 @@
           const data = await res.json();
           if (data && data.success && data.data) {
             document.getElementById('stat-total-users').textContent = data.data.totalUsers.toLocaleString('vi-VN');
-            document.getElementById('stat-total-coins').textContent = data.data.totalBalance.toLocaleString('vi-VN') + ' xu';
+            
+            const totalBal = Number(data.data.totalBalance || 0);
+            const shortCoin = window.Wallet ? window.Wallet.formatWords(totalBal, true) : totalBal.toLocaleString('vi-VN') + ' xu';
+            document.getElementById('stat-total-coins').textContent = shortCoin;
+            
+            const exactEl = document.getElementById('stat-total-coins-exact');
+            if (exactEl) exactEl.textContent = `(${totalBal.toLocaleString('vi-VN')} xu)`;
+            
+            const cardEl = document.getElementById('card-stat-coins');
+            if (cardEl) cardEl.setAttribute('title', `Xu trong lưu thông: ${totalBal.toLocaleString('vi-VN')} xu (Bấm để xem chi tiết)`);
+
             document.getElementById('stat-total-txns').textContent = data.data.totalTransactions.toLocaleString('vi-VN');
           }
         } catch (e) {
           const accounts = JSON.parse(localStorage.getItem('lucky_casino_accounts') || '{}');
           const count = Object.keys(accounts).length + 2;
           document.getElementById('stat-total-users').textContent = count.toString();
-          document.getElementById('stat-total-coins').textContent = '1,250,000 xu';
+          document.getElementById('stat-total-coins').textContent = '1.25 triệu xu';
+          const exactEl = document.getElementById('stat-total-coins-exact');
+          if (exactEl) exactEl.textContent = '(1.250.000 xu)';
         }
       }
 
@@ -945,7 +1002,10 @@
               </span>
             </td>
             <td class="p-3 font-black text-amber-400">VIP ${u.vipLevel || 1}</td>
-            <td class="p-3 font-extrabold text-emerald-400">${Number(u.balance || 0).toLocaleString('vi-VN')} xu</td>
+            <td class="p-3 font-extrabold text-emerald-400">
+              <span class="font-black text-emerald-400">${window.Wallet ? window.Wallet.formatWords(u.balance, true) : Number(u.balance || 0).toLocaleString('vi-VN') + ' xu'}</span>
+              <span class="text-[10px] text-neutral-400 font-normal font-mono block">(${Number(u.balance || 0).toLocaleString('vi-VN')} xu)</span>
+            </td>
             <td class="p-3 text-[11px] text-neutral-400">
               ${u.transactions && u.transactions[0] ? `${u.transactions[0].title} (${u.transactions[0].type === 'DEPOSIT' ? '+' : '-'}${Number(u.transactions[0].amount).toLocaleString('vi-VN')})` : 'Chưa có GD'}
             </td>
@@ -1023,6 +1083,8 @@
 
             // Reset form
             document.getElementById('adjust-amount').value = '';
+            const previewEl = document.getElementById('adjust-amount-preview');
+            if (previewEl) previewEl.textContent = '';
           } else {
             this.showToast(data.message || 'Lỗi khi điều chỉnh số dư!', 'error');
           }

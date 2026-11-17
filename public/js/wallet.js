@@ -101,6 +101,45 @@ const Wallet = {
   },
 
   /**
+   * Format coin amounts into human-friendly words (e.g., 10k, 100k, 1 triệu, 100 triệu, 1 tỷ)
+   * Supports both Vietnamese and English locales.
+   */
+  formatWords(amount, withUnit = true) {
+    const num = Number(amount) || 0;
+    const isEn = (typeof window !== 'undefined' && window.i18n && window.i18n.currentLang === 'en') ||
+                 (typeof localStorage !== 'undefined' && localStorage.getItem('lucky_casino_lang') === 'en');
+    const unit = withUnit ? (isEn ? ' coins' : ' xu') : '';
+
+    if (Math.abs(num) < 1000) {
+      return num.toLocaleString(isEn ? 'en-US' : 'vi-VN') + unit;
+    }
+
+    const sign = num < 0 ? '-' : '';
+    const abs = Math.abs(num);
+
+    const formatDec = (val, maxDec = 2) => {
+      let str = val.toFixed(maxDec);
+      str = str.replace(/\.?0+$/, ''); // Strip unnecessary trailing zeroes (.00 -> '', .50 -> .5)
+      return str;
+    };
+
+    if (abs >= 1e12) {
+      return sign + formatDec(abs / 1e12) + (isEn ? 'T' : ' nghìn tỷ') + (withUnit && !isEn ? ' xu' : unit);
+    }
+    if (abs >= 1e9) {
+      return sign + formatDec(abs / 1e9) + (isEn ? 'B' : ' tỷ') + (withUnit && !isEn ? ' xu' : unit);
+    }
+    if (abs >= 1e6) {
+      return sign + formatDec(abs / 1e6) + (isEn ? 'M' : ' triệu') + (withUnit && !isEn ? ' xu' : unit);
+    }
+    if (abs >= 1e3) {
+      return sign + formatDec(abs / 1e3) + 'k' + (withUnit && !isEn ? ' xu' : unit);
+    }
+
+    return sign + abs.toLocaleString(isEn ? 'en-US' : 'vi-VN') + unit;
+  },
+
+  /**
    * Sync wallet with server
    */
   async syncWithServer() {
