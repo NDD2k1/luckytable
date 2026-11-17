@@ -126,38 +126,54 @@
   <!-- MAIN ADMIN DASHBOARD CONTENT -->
   <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1 space-y-6">
 
-    <!-- METRICS OVERVIEW (4 STAT CARDS) -->
+    <!-- METRICS OVERVIEW (4 STAT CARDS - CLICKABLE TO VIEW DETAILS) -->
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="admin-card p-4 flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl">👥</div>
-        <div>
-          <span class="text-xs text-neutral-400 font-bold block">Tổng Người Dùng</span>
-          <span class="text-xl sm:text-2xl font-black text-amber-300" id="stat-total-users">--</span>
+      <!-- Card 1: Users -->
+      <div id="card-stat-users" class="admin-card p-4 flex items-center justify-between gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:border-amber-400 hover:shadow-amber-500/20 hover:shadow-xl group" title="Bấm để xem danh sách & chi tiết người dùng">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">👥</div>
+          <div>
+            <span class="text-xs text-neutral-400 font-bold block">Tổng Người Dùng</span>
+            <span class="text-xl sm:text-2xl font-black text-amber-300" id="stat-total-users">--</span>
+          </div>
         </div>
+        <span class="text-[11px] text-amber-400/80 group-hover:text-amber-300 font-extrabold transition">Xem ➔</span>
       </div>
 
-      <div class="admin-card p-4 flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl">🪙</div>
-        <div>
-          <span class="text-xs text-neutral-400 font-bold block">Xu Trong Lưu Thông</span>
-          <span class="text-xl sm:text-2xl font-black text-emerald-400" id="stat-total-coins">--</span>
+      <!-- Card 2: Coins -->
+      <div id="card-stat-coins" class="admin-card p-4 flex items-center justify-between gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:border-emerald-400 hover:shadow-emerald-500/20 hover:shadow-xl group" title="Bấm để xem phân phối xu & đại gia">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">🪙</div>
+          <div>
+            <span class="text-xs text-neutral-400 font-bold block">Xu Trong Lưu Thông</span>
+            <span class="text-xl sm:text-2xl font-black text-emerald-400" id="stat-total-coins">--</span>
+          </div>
         </div>
+        <span class="text-[11px] text-emerald-400/80 group-hover:text-emerald-300 font-extrabold transition">Xem ➔</span>
       </div>
 
-      <div class="admin-card p-4 flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-2xl">🎮</div>
-        <div>
-          <span class="text-xs text-neutral-400 font-bold block">Trò Chơi Hoạt Động</span>
-          <span class="text-xl sm:text-2xl font-black text-blue-400" id="stat-active-games">4 / 6</span>
+      <!-- Card 3: Games -->
+      <div id="card-stat-games" class="admin-card p-4 flex items-center justify-between gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:border-blue-400 hover:shadow-blue-500/20 hover:shadow-xl group" title="Bấm để xem & cấu hình trạng thái trò chơi">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">🎮</div>
+          <div>
+            <span class="text-xs text-neutral-400 font-bold block">Trò Chơi Hoạt Động</span>
+            <span class="text-xl sm:text-2xl font-black text-blue-400" id="stat-active-games">4 / 6</span>
+          </div>
         </div>
+        <span class="text-[11px] text-blue-400/80 group-hover:text-blue-300 font-extrabold transition">Xem ➔</span>
       </div>
 
-      <div class="admin-card p-4 flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-2xl">📋</div>
-        <div>
-          <span class="text-xs text-neutral-400 font-bold block">Lịch Sử Giao Dịch</span>
-          <span class="text-xl sm:text-2xl font-black text-purple-300" id="stat-total-txns">--</span>
+      <!-- Card 4: Transactions -->
+      <div id="card-stat-txns" class="admin-card p-4 flex items-center justify-between gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:border-purple-400 hover:shadow-purple-500/20 hover:shadow-xl group" title="Bấm để xem toàn bộ lịch sử giao dịch">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">📋</div>
+          <div>
+            <span class="text-xs text-neutral-400 font-bold block">Lịch Sử Giao Dịch</span>
+            <span class="text-xl sm:text-2xl font-black text-purple-300" id="stat-total-txns">--</span>
+          </div>
         </div>
+        <span class="text-[11px] text-purple-400/80 group-hover:text-purple-300 font-extrabold transition">Xem ➔</span>
       </div>
     </section>
 
@@ -374,6 +390,161 @@
       </div>
     </section>
 
+
+    <!-- =========================================================================
+         INTERACTIVE DETAIL MODALS FOR STAT CARDS
+         ========================================================================= -->
+
+    <!-- MODAL 1: CHI TIẾT NGƯỜI DÙNG -->
+    <div id="modal-stat-users" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
+      <div class="admin-card max-w-3xl w-full p-6 border-2 border-amber-500 relative max-h-[90vh] flex flex-col shadow-2xl">
+        <div class="flex items-center justify-between pb-3 border-b border-amber-500/30">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">👥</span>
+            <h3 class="text-lg font-black text-amber-300 font-royal">Chi Tiết Danh Sách Người Dùng</h3>
+          </div>
+          <button class="modal-close text-neutral-400 hover:text-white text-2xl font-bold">&times;</button>
+        </div>
+
+        <div class="py-3 flex gap-4 text-xs font-bold border-b border-white/5 flex-wrap">
+          <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40" id="modal-users-count">Tổng: 0 người</span>
+          <span class="px-3 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/40">1 Quản Trị Viên</span>
+          <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" id="modal-players-count">0 Người Chơi</span>
+        </div>
+
+        <div class="overflow-y-auto flex-1 my-3 pr-1">
+          <table class="w-full text-left text-xs text-neutral-300">
+            <thead class="bg-black/60 text-amber-300 sticky top-0 font-extrabold uppercase border-b border-amber-500/30">
+              <tr>
+                <th class="p-2.5">Tài Khoản</th>
+                <th class="p-2.5">Vai Trò</th>
+                <th class="p-2.5">Cấp VIP</th>
+                <th class="p-2.5">Số Dư Xu</th>
+                <th class="p-2.5 text-center">Hành Động</th>
+              </tr>
+            </thead>
+            <tbody id="modal-users-tbody" class="divide-y divide-white/5">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pt-3 border-t border-amber-500/20 flex justify-end">
+          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: CHI TIẾT PHÂN PHỐI XU -->
+    <div id="modal-stat-coins" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
+      <div class="admin-card max-w-2xl w-full p-6 border-2 border-emerald-500 relative max-h-[90vh] flex flex-col shadow-2xl">
+        <div class="flex items-center justify-between pb-3 border-b border-emerald-500/30">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🪙</span>
+            <h3 class="text-lg font-black text-emerald-300 font-royal">Thống Kê Phân Phối Tiền Tệ (Xu)</h3>
+          </div>
+          <button class="modal-close text-neutral-400 hover:text-white text-2xl font-bold">&times;</button>
+        </div>
+
+        <div class="space-y-4 my-4 overflow-y-auto flex-1">
+          <!-- Breakdown cards -->
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-black/50 border border-emerald-500/30">
+              <span class="text-neutral-400 block mb-1">Xu Quỹ Dự Trữ / Admin</span>
+              <span class="text-lg font-black text-amber-300" id="coins-admin-total">--</span>
+            </div>
+            <div class="p-3 rounded-xl bg-black/50 border border-emerald-500/30">
+              <span class="text-neutral-400 block mb-1">Xu Người Chơi Thực Tế</span>
+              <span class="text-lg font-black text-emerald-400" id="coins-players-total">--</span>
+            </div>
+          </div>
+
+          <!-- Top Richest Players -->
+          <div class="p-4 rounded-xl bg-black/40 border border-white/10 space-y-3">
+            <h4 class="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span>🏆</span> <span>Bảng Xếp Hạng Đại Gia Giàu Nhất</span>
+            </h4>
+            <div id="coins-top-rich-list" class="space-y-2 text-xs">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-emerald-500/20 flex justify-between items-center">
+          <button onclick="document.getElementById('modal-stat-coins').style.display='none'; document.getElementById('form-adjust-balance').scrollIntoView({behavior:'smooth'});" class="text-xs text-amber-400 font-bold hover:underline">
+            + Bù xu cho người chơi ➔
+          </button>
+          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: CHI TIẾT & CẤU HÌNH TRÒ CHƠI -->
+    <div id="modal-stat-games" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
+      <div class="admin-card max-w-3xl w-full p-6 border-2 border-blue-500 relative max-h-[90vh] flex flex-col shadow-2xl">
+        <div class="flex items-center justify-between pb-3 border-b border-blue-500/30">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🎮</span>
+            <h3 class="text-lg font-black text-blue-300 font-royal">Chi Tiết & Quản Lý Trạng Thái Trò Chơi</h3>
+          </div>
+          <button class="modal-close text-neutral-400 hover:text-white text-2xl font-bold">&times;</button>
+        </div>
+
+        <div class="my-4 overflow-y-auto flex-1 space-y-3" id="modal-games-list">
+          <!-- Rendered by JS with interactive toggles -->
+        </div>
+
+        <div class="pt-3 border-t border-blue-500/20 flex justify-between items-center">
+          <span class="text-xs text-neutral-400">💡 Bấm nút trạng thái để bật/tắt trò chơi tức thì</span>
+          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 4: TOÀN BỘ LỊCH SỬ GIAO DỊCH -->
+    <div id="modal-stat-txns" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
+      <div class="admin-card max-w-4xl w-full p-6 border-2 border-purple-500 relative max-h-[90vh] flex flex-col shadow-2xl">
+        <div class="flex items-center justify-between pb-3 border-b border-purple-500/30">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">📋</span>
+            <h3 class="text-lg font-black text-purple-300 font-royal">Toàn Bộ Lịch Sử Giao Dịch & Biến Động Số Dư</h3>
+          </div>
+          <button class="modal-close text-neutral-400 hover:text-white text-2xl font-bold">&times;</button>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="flex gap-2 my-3 text-xs flex-wrap">
+          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-purple-600 text-white font-bold" data-filter="ALL">Tất Cả</button>
+          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold" data-filter="DEPOSIT">🟢 Nạp / Bù Xu</button>
+          <button class="txn-filter-btn px-3 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold" data-filter="WITHDRAW">🔴 Rút / Khấu Trừ</button>
+        </div>
+
+        <div class="overflow-y-auto flex-1 pr-1 border border-white/10 rounded-xl">
+          <table class="w-full text-left text-xs text-neutral-300">
+            <thead class="bg-black/60 text-purple-300 sticky top-0 font-extrabold uppercase border-b border-purple-500/30">
+              <tr>
+                <th class="p-2.5">Thời Gian</th>
+                <th class="p-2.5">Người Chơi</th>
+                <th class="p-2.5">Loại</th>
+                <th class="p-2.5">Số Tiền</th>
+                <th class="p-2.5">Nội Dung</th>
+                <th class="p-2.5">Trạng Thái</th>
+              </tr>
+            </thead>
+            <tbody id="modal-all-txns-tbody" class="divide-y divide-white/5">
+              <tr>
+                <td colspan="6" class="p-4 text-center text-neutral-500">Đang tải lịch sử giao dịch...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pt-3 border-t border-purple-500/20 flex justify-end">
+          <button class="modal-close px-5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition">Đóng</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- TOAST NOTIFICATION -->
@@ -382,22 +553,33 @@
   </div>
 
   <script>
-    /**
+        /**
      * ADMIN DASHBOARD CONTROLLER
-     * Manages users list, coin compensation, and game states
+     * Manages users list, coin compensation, interactive detail modals, and game states
      */
     class AdminDashboard {
       constructor() {
         this.users = [];
         this.auditLogs = [];
+        this.allTransactions = [];
+        this.games = [
+          { id: 'taixiu', name: 'Tài Xỉu Bát Rồng 3D', icon: '🎲', desc: 'Cửa Tài / Xỉu (1:1.98), Nặn Bát 360°', active: true, players: 1842 },
+          { id: 'xocdia', name: 'Xóc Đĩa Tứ Linh 3D', icon: '🥢', desc: 'Bát Sứ 4 Quân Vị Đỏ Trắng, Nặn Bát', active: true, players: 1840 },
+          { id: 'baucua', name: 'Bầu Cua Tôm Cá 3D', icon: '🦀', desc: '6 Linh Vật, Đĩa Sứ Three.js', active: true, players: 1350 },
+          { id: 'bacay', name: 'Ba Cây Hoàng Gia VIP', icon: '🃏', desc: 'Đánh Ké, Cướp Chương, Nặn Bài', active: true, players: 2480 },
+          { id: 'slots_west', name: 'Nổ Hũ Tây Du Ký', icon: '🎰', desc: 'Jackpot Khủng: 5.800.000 xu', active: false, players: 0 },
+          { id: 'banca', name: 'Bắn Cá Thần Tài 3D', icon: '🐟', desc: 'Đại Dương 3D, Boss Khủng', active: false, players: 0 }
+        ];
         this.init();
       }
 
       init() {
         this.checkAdminAuth();
         this.bindEvents();
+        this.bindStatCardEvents();
         this.fetchMetrics();
         this.fetchUsers();
+        this.fetchAllTransactions();
       }
 
       checkAdminAuth() {
@@ -441,6 +623,7 @@
             this.showToast('🎉 Đăng nhập Admin thành công!', 'success');
             this.fetchMetrics();
             this.fetchUsers();
+            this.fetchAllTransactions();
           } else {
             this.showToast('Sai tài khoản hoặc mật khẩu Admin!', 'error');
           }
@@ -476,6 +659,228 @@
           const query = e.target.value.toLowerCase().trim();
           this.renderUsersTable(query);
         });
+
+        // Generic modal close handlers
+        document.querySelectorAll('.modal-close').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[id^="modal-stat-"]').forEach(m => m.style.display = 'none');
+          });
+        });
+
+        // Close on backdrop click
+        document.querySelectorAll('[id^="modal-stat-"]').forEach(modal => {
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+          });
+        });
+
+        // Close on Escape key
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            document.querySelectorAll('[id^="modal-stat-"]').forEach(m => m.style.display = 'none');
+          }
+        });
+
+        // Transaction filters in modal
+        document.querySelectorAll('.txn-filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.txn-filter-btn').forEach(b => {
+              b.classList.remove('bg-purple-600', 'text-white');
+              b.classList.add('bg-neutral-800', 'text-neutral-300');
+            });
+            btn.classList.add('bg-purple-600', 'text-white');
+            btn.classList.remove('bg-neutral-800', 'text-neutral-300');
+            const filter = btn.getAttribute('data-filter');
+            this.renderAllTransactionsTable(filter);
+          });
+        });
+      }
+
+      bindStatCardEvents() {
+        // Card 1: Users Detail Modal
+        document.getElementById('card-stat-users').addEventListener('click', () => {
+          this.openUsersModal();
+        });
+
+        // Card 2: Coins Detail Modal
+        document.getElementById('card-stat-coins').addEventListener('click', () => {
+          this.openCoinsModal();
+        });
+
+        // Card 3: Games Detail Modal
+        document.getElementById('card-stat-games').addEventListener('click', () => {
+          this.openGamesModal();
+        });
+
+        // Card 4: Transactions Detail Modal
+        document.getElementById('card-stat-txns').addEventListener('click', () => {
+          this.openTransactionsModal();
+        });
+      }
+
+      // =========================================================================
+      // INTERACTIVE MODALS LOGIC
+      // =========================================================================
+      openUsersModal() {
+        const modal = document.getElementById('modal-stat-users');
+        modal.style.display = 'flex';
+
+        const total = this.users.length;
+        const players = this.users.filter(u => u.role !== 'admin').length;
+        document.getElementById('modal-users-count').textContent = `Tổng: ${total} người`;
+        document.getElementById('modal-players-count').textContent = `${players} Người Chơi`;
+
+        const tbody = document.getElementById('modal-users-tbody');
+        tbody.innerHTML = this.users.map(u => `
+          <tr class="hover:bg-white/5 transition">
+            <td class="p-2.5 font-bold flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-xs">
+                ${u.role === 'admin' ? '👑' : '👤'}
+              </span>
+              <span class="${u.role === 'admin' ? 'text-amber-300 font-black' : 'text-white'}">${u.username}</span>
+            </td>
+            <td class="p-2.5">
+              <span class="px-2 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-red-500/20 text-red-300' : 'bg-neutral-800 text-neutral-300'} font-bold text-[10px]">
+                ${u.role === 'admin' ? 'ADMIN' : 'PLAYER'}
+              </span>
+            </td>
+            <td class="p-2.5 font-extrabold text-amber-400">VIP ${u.vipLevel || 1}</td>
+            <td class="p-2.5 font-black text-emerald-400">${Number(u.balance || 0).toLocaleString('vi-VN')} xu</td>
+            <td class="p-2.5 text-center">
+              <button onclick="document.getElementById('modal-stat-users').style.display='none'; adminDashboard.selectUserForAdjustment('${u.username}')" class="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 border border-amber-400/50 text-amber-300 font-bold text-[11px] transition">
+                + Bù Xu
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      openCoinsModal() {
+        const modal = document.getElementById('modal-stat-coins');
+        modal.style.display = 'flex';
+
+        let adminTotal = 0;
+        let playersTotal = 0;
+        this.users.forEach(u => {
+          const bal = Number(u.balance || 0);
+          if (u.role === 'admin') adminTotal += bal;
+          else playersTotal += bal;
+        });
+
+        document.getElementById('coins-admin-total').textContent = adminTotal.toLocaleString('vi-VN') + ' xu';
+        document.getElementById('coins-players-total').textContent = playersTotal.toLocaleString('vi-VN') + ' xu';
+
+        // Top richest players (excluding admin)
+        const sorted = [...this.users].filter(u => u.role !== 'admin').sort((a, b) => (b.balance || 0) - (a.balance || 0)).slice(0, 5);
+        const richContainer = document.getElementById('coins-top-rich-list');
+
+        if (sorted.length === 0) {
+          richContainer.innerHTML = '<span class="text-neutral-500">Chưa có dữ liệu người chơi</span>';
+        } else {
+          const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+          richContainer.innerHTML = sorted.map((u, i) => `
+            <div class="flex items-center justify-between p-2 rounded-lg bg-black/60 border border-white/5">
+              <div class="flex items-center gap-2">
+                <span class="text-base">${medals[i] || '🎖️'}</span>
+                <span class="font-bold text-white">${u.username}</span>
+                <span class="text-[10px] text-amber-400 font-extrabold">VIP ${u.vipLevel || 1}</span>
+              </div>
+              <span class="font-black text-emerald-400">${Number(u.balance || 0).toLocaleString('vi-VN')} xu</span>
+            </div>
+          `).join('');
+        }
+      }
+
+      openGamesModal() {
+        const modal = document.getElementById('modal-stat-games');
+        modal.style.display = 'flex';
+
+        const container = document.getElementById('modal-games-list');
+        container.innerHTML = this.games.map(g => `
+          <div class="p-3.5 rounded-xl bg-black/50 border ${g.active ? 'border-amber-500/40' : 'border-neutral-800 opacity-60'} flex items-center justify-between transition">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">${g.icon}</span>
+              <div>
+                <span class="font-black text-white text-sm block">${g.name}</span>
+                <span class="text-[11px] text-neutral-400 block">${g.desc}</span>
+                <span class="text-[10px] text-amber-300 font-bold">👥 Đang chơi: ${g.players.toLocaleString('vi-VN')} người</span>
+              </div>
+            </div>
+            <button onclick="adminDashboard.toggleGameStatus('${g.id}')" class="px-3.5 py-1.5 rounded-xl font-extrabold text-xs transition ${g.active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 hover:bg-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/50 hover:bg-red-500/30'}">
+              ${g.active ? '🟢 HOẠT ĐỘNG' : '🔴 BẢO TRÌ'}
+            </button>
+          </div>
+        `).join('');
+      }
+
+      toggleGameStatus(gameId) {
+        const game = this.games.find(g => g.id === gameId);
+        if (game) {
+          game.active = !game.active;
+          this.openGamesModal();
+          this.showToast(`Đã chuyển trạng thái trò chơi "${game.name}" sang: ${game.active ? 'HOẠT ĐỘNG' : 'BẢO TRÌ'}`, 'success');
+          
+          // Update active games count
+          const activeCount = this.games.filter(g => g.active).length;
+          document.getElementById('stat-active-games').textContent = `${activeCount} / ${this.games.length}`;
+        }
+      }
+
+      openTransactionsModal() {
+        const modal = document.getElementById('modal-stat-txns');
+        modal.style.display = 'flex';
+        this.renderAllTransactionsTable('ALL');
+      }
+
+      renderAllTransactionsTable(filter = 'ALL') {
+        const tbody = document.getElementById('modal-all-txns-tbody');
+        let filtered = this.allTransactions;
+
+        if (filter !== 'ALL') {
+          filtered = this.allTransactions.filter(t => t.type === filter);
+        }
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-neutral-500">Chưa có giao dịch nào khớp với bộ lọc</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(t => {
+          const dateStr = t.timestamp ? new Date(t.timestamp).toLocaleTimeString('vi-VN') + ' ' + new Date(t.timestamp).toLocaleDateString('vi-VN') : 'Mới';
+          const isDeposit = t.type === 'DEPOSIT';
+          return `
+            <tr class="hover:bg-white/5 transition">
+              <td class="p-2.5 text-neutral-400 font-mono text-[11px]">${dateStr}</td>
+              <td class="p-2.5 font-bold text-white">${t.username || 'Player'}</td>
+              <td class="p-2.5">
+                <span class="px-2 py-0.5 rounded-full ${isDeposit ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'} font-bold text-[10px]">
+                  ${isDeposit ? '🟢 NẠP / BÙ' : '🔴 RÚT TIỀN'}
+                </span>
+              </td>
+              <td class="p-2.5 font-black ${isDeposit ? 'text-emerald-400' : 'text-red-400'}">
+                ${isDeposit ? '+' : '-'}${Number(t.amount || 0).toLocaleString('vi-VN')} xu
+              </td>
+              <td class="p-2.5 text-neutral-300">${t.title || 'Giao dịch'}</td>
+              <td class="p-2.5 font-bold text-emerald-400">${t.status === 'SUCCESS' ? 'Thành công' : 'Hoàn tất'}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      async fetchAllTransactions() {
+        try {
+          const res = await fetch('/api/admin/transactions');
+          const data = await res.json();
+          if (data && data.success && Array.isArray(data.data)) {
+            this.allTransactions = data.data;
+          }
+        } catch (e) {
+          // Fallback initial transaction demo
+          this.allTransactions = [
+            { id: 'TXN1001', username: 'Player001', type: 'DEPOSIT', title: 'Nạp tiền qua MoMo', amount: 50000, status: 'SUCCESS', timestamp: new Date().toISOString() },
+            { id: 'SYS1001', username: 'admin', type: 'DEPOSIT', title: 'Hệ thống Quản Trị Viên', amount: 999999999, status: 'SUCCESS', timestamp: new Date().toISOString() }
+          ];
+        }
       }
 
       async fetchMetrics() {
@@ -488,7 +893,6 @@
             document.getElementById('stat-total-txns').textContent = data.data.totalTransactions.toLocaleString('vi-VN');
           }
         } catch (e) {
-          // Client fallback metrics
           const accounts = JSON.parse(localStorage.getItem('lucky_casino_accounts') || '{}');
           const count = Object.keys(accounts).length + 2;
           document.getElementById('stat-total-users').textContent = count.toString();
@@ -504,7 +908,6 @@
             this.users = data.data;
           }
         } catch (e) {
-          // Fallback to local accounts
           this.users = [
             { id: 'admin', username: 'admin', role: 'admin', balance: 999999999, vipLevel: 10 },
             { id: 'Player001', username: 'Player001', role: 'player', balance: 50000, vipLevel: 2 }
@@ -593,14 +996,26 @@
             }
 
             // Append to audit logs
-            this.auditLogs.unshift({
+            const logEntry = {
               timestamp: new Date().toLocaleTimeString('vi-VN'),
               username,
               type,
               amount,
               reason
-            });
+            };
+            this.auditLogs.unshift(logEntry);
             this.renderAuditLog();
+
+            // Also add to allTransactions
+            this.allTransactions.unshift({
+              id: data.transaction ? data.transaction.id : 'ADJ' + Date.now(),
+              username,
+              type: type === 'DEDUCT' ? 'WITHDRAW' : 'DEPOSIT',
+              title: reason,
+              amount,
+              status: 'SUCCESS',
+              timestamp: new Date().toISOString()
+            });
 
             // Refresh lists
             this.fetchUsers();
@@ -652,6 +1067,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       adminDashboard = new AdminDashboard();
     });
+
   </script>
 </body>
 </html>

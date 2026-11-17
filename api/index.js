@@ -205,6 +205,23 @@ router.get('/admin/stats', (req, res) => {
   });
 });
 
+// Get all aggregated transactions for audit & history modal
+router.get('/admin/transactions', (req, res) => {
+  const allTxns = [];
+  for (const user of Object.values(users)) {
+    if (user.transactions && Array.isArray(user.transactions)) {
+      for (const t of user.transactions) {
+        allTxns.push({
+          ...t,
+          username: user.username
+        });
+      }
+    }
+  }
+  allTxns.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+  res.json({ success: true, count: allTxns.length, data: allTxns });
+});
+
 // Get user accounts list
 router.get('/admin/users', (req, res) => {
   const userList = Object.values(users).map(u => {
