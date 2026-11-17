@@ -235,6 +235,27 @@ class PortalController {
       });
     });
 
+        // Đóng dropdown ngay lập tức khi click vào link hoặc khi chuột rời đi (mouseleave)
+    document.querySelectorAll('.dropdown-item-link, .nav-link-btn').forEach(link => {
+      link.addEventListener('click', () => {
+        const menu = link.closest('.nav-item-dropdown')?.querySelector('.dropdown-menu-list');
+        if (menu) {
+          menu.classList.add('force-hide');
+          setTimeout(() => menu.classList.remove('force-hide'), 300);
+        }
+        if (document.activeElement) document.activeElement.blur();
+      });
+    });
+
+    document.querySelectorAll('.nav-item-dropdown').forEach(dropdown => {
+      dropdown.addEventListener('mouseleave', () => {
+        dropdown.querySelectorAll(':focus').forEach(el => el.blur());
+        if (document.activeElement && dropdown.contains(document.activeElement)) {
+          document.activeElement.blur();
+        }
+      });
+    });
+
     // Neo Category Links (Header & Dropdown)
     document.querySelectorAll('a[data-filter-cat]').forEach(link => {
       link.addEventListener('click', (e) => {
