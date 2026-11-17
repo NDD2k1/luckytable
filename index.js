@@ -210,8 +210,8 @@ router.get('/admin/stats', (req, res) => {
       totalUsers: userList.length,
       totalBalance,
       totalTransactions,
-      activeGames: 4,
-      totalGames: 6
+      activeGames: 5,
+      totalGames: 7
     }
   });
 });

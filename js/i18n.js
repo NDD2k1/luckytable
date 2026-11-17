@@ -31,6 +31,7 @@ const translations = {
     'game.slots.west': '🎰 Nổ Hũ Tây Du Ký',
     'game.slots.fish': '🐟 Bắn Cá Thần Tài 3D',
     'game.cards.bacay': '🃏 Ba Cây Hoàng Gia VIP',
+    'game.cards.tienlen': '🃏 Tiến Lên Miền Nam 3D',
     'tag.hot': 'HOT',
     'tag.new': 'MỚI',
     'tag.jackpot': 'HŨ KHỦNG',
@@ -240,6 +241,26 @@ const translations = {
     'door.tai': 'TÀI',
     'door.xiu': 'XỈU',
 
+    
+    // Tien Len 13 Cards Game
+    'game.tienlen.title': '🃏 Tiến Lên Miền Nam 3D',
+    'game.tienlen.desc': 'Game bài Tiến Lên Miền Nam sát phạt đỉnh cao, chặt heo tứ quý, 4 người so tài kịch tính.',
+    'tienlen.nav.title': 'Tiến Lên Miền Nam 3D',
+    'tienlen.nav.room': 'Bàn VIP 01 — Phòng Sát Phạt',
+    'tienlen.btn.play': 'Đánh Bài',
+    'tienlen.btn.pass': 'Bỏ Lượt',
+    'tienlen.btn.hint': 'Gợi Ý',
+    'tienlen.btn.sort': 'Xếp Bài',
+    'tienlen.btn.new_round': 'Ván Mới',
+    'tienlen.status.waiting': 'Đang chuẩn bị chia bài...',
+    'tienlen.status.your_turn': 'Đến lượt bạn đánh!',
+    'tienlen.status.turn_of': 'Lượt của {name}...',
+    'tienlen.status.chop': '💥 CHẶT HEO! +{amount} xu',
+    'tienlen.status.passed': 'Đã bỏ lượt',
+    'tienlen.status.first_turn': 'Người có 3 Bích (3♠) đi đầu tiên',
+    'tienlen.rules.title': 'Luật Chơi Tiến Lên Miền Nam',
+    'tienlen.modal.victory': '🎉 KẾT QUẢ VÁN ĐẤU',
+
     // Notifications
     'toast.welcome_back': 'Chào mừng {username} quay trở lại!',
     'toast.register_success': 'Đăng ký thành công! Nhận ngay +50.000 xu tân thủ!',
@@ -272,6 +293,7 @@ const translations = {
     'game.slots.west': '🎰 Journey to the West Slots',
     'game.slots.fish': '🐟 God of Wealth Fishing 3D',
     'game.cards.bacay': '🃏 Royal 3 Cards VIP',
+    'game.cards.tienlen': '🃏 Southern Poker 13 Cards',
     'tag.hot': 'HOT',
     'tag.new': 'NEW',
     'tag.jackpot': 'JACKPOT',
@@ -480,6 +502,26 @@ const translations = {
     // Tai Xiu Doors
     'door.tai': 'BIG',
     'door.xiu': 'SMALL',
+
+    
+    // Tien Len 13 Cards Game
+    'game.tienlen.title': '🃏 Southern Poker 13 Cards',
+    'game.tienlen.desc': 'Vietnamese Southern 13-Card Poker, intense competitive card battles, chop 2s with four-of-a-kind.',
+    'tienlen.nav.title': 'Southern Poker 13 Cards',
+    'tienlen.nav.room': 'VIP Room 01 — Elite Arena',
+    'tienlen.btn.play': 'Play Cards',
+    'tienlen.btn.pass': 'Pass',
+    'tienlen.btn.hint': 'Hint',
+    'tienlen.btn.sort': 'Sort',
+    'tienlen.btn.new_round': 'New Round',
+    'tienlen.status.waiting': 'Dealing 13 cards to each player...',
+    'tienlen.status.your_turn': 'Your turn to play!',
+    'tienlen.status.turn_of': 'Turn of {name}...',
+    'tienlen.status.chop': '💥 2 CHOPPED! +{amount} coins',
+    'tienlen.status.passed': 'Passed',
+    'tienlen.status.first_turn': 'Player with 3 of Spades (3♠) leads',
+    'tienlen.rules.title': 'Southern Poker (Tien Len) Rules',
+    'tienlen.modal.victory': '🎉 ROUND RESULTS',
 
     // Notifications
     'toast.welcome_back': 'Welcome back, {username}!',

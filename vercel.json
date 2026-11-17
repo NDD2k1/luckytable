@@ -24,6 +24,10 @@
     {
       "source": "/dashboard",
       "destination": "/dashboard.html"
+    },
+    {
+      "source": "/tienlen",
+      "destination": "/tienlen.html"
     }
   ]
 }
