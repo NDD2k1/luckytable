@@ -225,7 +225,7 @@ class PortalController {
       });
     }
 
-    // Lọc danh mục trò chơi
+    // Filter games by category
     this.dom.categoryTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         this.dom.categoryTabs.forEach(t => t.classList.remove('active'));
@@ -235,7 +235,7 @@ class PortalController {
       });
     });
 
-        // Đóng dropdown ngay lập tức khi click vào link hoặc khi chuột rời đi (mouseleave)
+        // Auto-close dropdown when link clicked or mouse leaves
     document.querySelectorAll('.dropdown-item-link, .nav-link-btn').forEach(link => {
       link.addEventListener('click', () => {
         const menu = link.closest('.nav-item-dropdown')?.querySelector('.dropdown-menu-list');
@@ -480,7 +480,7 @@ class PortalController {
     const password = this.dom.loginPass ? this.dom.loginPass.value : '';
 
     if (!username || !password) {
-      this.showToast('Vui lòng nhập đầy đủ tên tài khoản và mật khẩu!', 'error');
+      this.showToast(window.i18n ? window.i18n.t('toast.fill_required') : 'Please enter username and password!', 'error');
       return;
     }
 
@@ -497,7 +497,7 @@ class PortalController {
         localStorage.setItem('lucky_casino_balance', this.user.balance.toString());
         this.updateUserUI();
         this.closeModal(this.dom.modalLogin);
-        this.showToast('🎉 Chào mừng ' + this.user.username + ' quay trở lại!', 'success');
+        this.showToast(window.i18n ? window.i18n.t('toast.welcome_back', { username: this.user.username }) : `Welcome back, ${this.user.username}!`, 'success');
         return;
       }
     } catch (e) {
@@ -522,7 +522,7 @@ class PortalController {
           localStorage.setItem('lucky_casino_balance', bal.toString());
           this.updateUserUI();
           this.closeModal(this.dom.modalLogin);
-          this.showToast('🎉 Chào mừng ' + this.user.username + ' quay trở lại!', 'success');
+          this.showToast(window.i18n ? window.i18n.t('toast.welcome_back', { username: this.user.username }) : `Welcome back, ${this.user.username}!`, 'success');
           return;
         } else {
           this.showToast('Sai mật khẩu! Vui lòng thử lại.', 'error');
@@ -531,7 +531,7 @@ class PortalController {
       }
     } catch (err) {}
 
-    this.showToast('Sai tên đăng nhập hoặc tài khoản chưa đăng ký!', 'error');
+    this.showToast(window.i18n ? window.i18n.t('toast.login_failed') : 'Invalid credentials or unregistered account!', 'error');
   }
 
   async handleRegister() {
@@ -540,7 +540,7 @@ class PortalController {
     const confirmPass = this.dom.regConfirmPass ? this.dom.regConfirmPass.value : '';
 
     if (!username || !password) {
-      this.showToast('Vui lòng điền đủ thông tin đăng ký!', 'error');
+      this.showToast(window.i18n ? window.i18n.t('toast.fill_required') : 'Please complete all fields!', 'error');
       return;
     }
     if (username.length < 3) {
@@ -548,7 +548,7 @@ class PortalController {
       return;
     }
     if (password !== confirmPass) {
-      this.showToast('Mật khẩu xác nhận không khớp!', 'error');
+      this.showToast(window.i18n ? window.i18n.t('toast.password_mismatch') : 'Passwords do not match!', 'error');
       return;
     }
 
@@ -601,7 +601,7 @@ class PortalController {
     localStorage.setItem('tai_xiu_balance', this.user.balance.toString());
     this.updateUserUI();
     this.closeModal(this.dom.modalRegister);
-    this.showToast('🎉 Đăng ký thành công! Tặng ngay +50.000 xu tân thủ!', 'success');
+    this.showToast(window.i18n ? window.i18n.t('toast.register_success') : 'Registration successful! +50,000 welcome coins added!', 'success');
   }
 
     fetchUserData() {
@@ -642,7 +642,7 @@ class PortalController {
     localStorage.setItem('tai_xiu_balance', '10000');
     this.updateUserUI();
     this.closeModal(this.dom.modalProfile);
-    this.showToast('Đã đăng xuất tài khoản!', 'info');
+    this.showToast(window.i18n ? window.i18n.t('toast.logout_success') : 'Successfully logged out!', 'info');
   }
 
   updateUserUI() {

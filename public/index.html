@@ -27,12 +27,12 @@
 
             <!-- Navigation Menu Links (Neo Category) -->
       <ul class="portal-nav-menu">
-        <li><a href="/" class="nav-link-btn active">🏠 Trang Chủ</a></li>
+        <li><a href="/" class="nav-link-btn active" data-i18n="nav.home">🏠 Trang Chủ</a></li>
         
         <!-- Category 1: Dân Gian -->
         <li class="nav-item-dropdown">
           <a href="#games-section" class="nav-link-btn" data-filter-cat="dângian">
-            🎲 Dân Gian <span class="dropdown-caret">▾</span>
+            <span data-i18n="nav.folk">🎲 Dân Gian</span> <span class="dropdown-caret">▾</span>
           </a>
           <ul class="dropdown-menu-list">
             <li><a href="/taixiu" class="dropdown-item-link">🎲 Tài Xỉu Bát Rồng 3D <span class="item-tag hot">HOT</span></a></li>
@@ -44,7 +44,7 @@
         <!-- Category 2: Nổ Hũ Slots -->
         <li class="nav-item-dropdown">
           <a href="#games-section" class="nav-link-btn" data-filter-cat="slots">
-            🎰 Nổ Hũ Slots <span class="dropdown-caret">▾</span>
+            <span data-i18n="nav.slots">🎰 Nổ Hũ Slots</span> <span class="dropdown-caret">▾</span>
           </a>
           <ul class="dropdown-menu-list">
             <li><a href="#games-section" class="dropdown-item-link" data-filter-cat="slots">🎰 Nổ Hũ Tây Du Ký <span class="item-tag jackpot">HŨ KHỦNG</span></a></li>
@@ -55,7 +55,7 @@
         <!-- Category 3: Game Bài -->
         <li class="nav-item-dropdown">
           <a href="#games-section" class="nav-link-btn" data-filter-cat="cards">
-            🃏 Game Bài <span class="dropdown-caret">▾</span>
+            <span data-i18n="nav.cards">🃏 Game Bài</span> <span class="dropdown-caret">▾</span>
           </a>
           <ul class="dropdown-menu-list">
             <li><a href="/bacay" class="dropdown-item-link">🃏 Ba Cây Hoàng Gia VIP <span class="item-tag hot">HOT</span></a></li>
@@ -65,29 +65,34 @@
         <!-- Category 4: Chơi Bạn Bè -->
         <li>
           <a href="#friends-section" class="nav-link-btn">
-            👥 Chơi Bạn Bè
+            <span data-i18n="nav.friends">👥 Chơi Bạn Bè</span>
           </a>
         </li>
 
         <!-- Category 5: Tất Cả Kho Game -->
         <li>
           <a href="#games-section" class="nav-link-btn" data-filter-cat="all">
-            🎮 Tất Cả Game
+            <span data-i18n="nav.all_games">🎮 Tất Cả Game</span>
           </a>
         </li>
       </ul>
 
       <!-- User Bar: Balance & Action Buttons -->
       <div class="portal-user-bar">
+        <!-- Language Switcher Toggle (EN / VI) -->
+        <button class="btn-lang-toggle" title="Switch Language / Đổi Ngôn Ngữ" style="background: rgba(255,255,255,0.08); border: 1.5px solid #d4af37; border-radius: 20px; padding: 5px 11px; color: #ffd700; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 800; font-size: 0.78rem; transition: all 0.2s ease;">
+          <span class="lang-switcher-flag">🇻🇳</span>
+          <span class="lang-switcher-text">VI</span>
+        </button>
         <!-- Balance Pill -->
         
         <!-- Auth Guest Buttons (Hiện khi chưa đăng nhập) -->
         <div id="auth-guest-box" style="display: none; align-items: center; gap: 8px;">
           <button class="btn-deposit-gold" id="btn-open-login" style="background: linear-gradient(135deg, #2c3e50, #34495e); border-color: #5dade2;" title="Đăng nhập tài khoản">
-            🔑 Đăng Nhập
+            <span data-i18n="nav.login">🔑 Đăng Nhập</span>
           </button>
           <button class="btn-deposit-gold" id="btn-open-register" title="Đăng ký nhận 50.000 xu">
-            ✨ Đăng Ký
+            <span data-i18n="nav.register">✨ Đăng Ký</span>
           </button>
         </div>
 
@@ -99,13 +104,13 @@
         <!-- Nạp Tiền Button -->
         <button class="btn-deposit-gold" id="btn-open-deposit" title="Nạp thêm xu">
           <span>+</span>
-          <span>Nạp Tiền</span>
+          <span data-i18n="nav.deposit">+ Nạp Tiền</span>
         </button>
 
         <!-- Rút Tiền Button -->
         <button class="btn-withdraw-gold" id="btn-open-withdraw" title="Rút xu về ngân hàng">
           <span>💳</span>
-          <span>Rút Tiền</span>
+          <span data-i18n="nav.withdraw">💳 Rút Tiền</span>
         </button>
 
         <!-- Profile Widget -->
@@ -197,10 +202,10 @@
 
         <!-- Filter Category Tabs -->
         <div class="category-filter-tabs">
-          <button class="tab-filter-btn active" data-category="all">Tất Cả</button>
-          <button class="tab-filter-btn" data-category="dângian">🎲 Dân Gian</button>
-          <button class="tab-filter-btn" data-category="slots">🎰 Nổ Hũ Slots</button>
-          <button class="tab-filter-btn" data-category="cards">🃏 Game Bài</button>
+          <button class="tab-filter-btn active" data-category="all" data-i18n="category.all">Tất Cả</button>
+          <button class="tab-filter-btn" data-category="dângian" data-i18n="category.folk">🎲 Dân Gian</button>
+          <button class="tab-filter-btn" data-category="slots" data-i18n="category.slots">🎰 Nổ Hũ Slots</button>
+          <button class="tab-filter-btn" data-category="cards" data-i18n="category.cards">🃏 Game Bài</button>
         </div>
       </div>
 

@@ -25,4 +25,5 @@ data/*.tmp
 .vscode/
 .idea/
 .gemini/
-skills/
+skills/system/
+!skills/localization/

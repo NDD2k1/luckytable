@@ -7,6 +7,7 @@
   <meta name="description" content="Xóc Đĩa Tứ Linh 3D - Casino Dân Gian Bát Sứ Quân Vị Đỏ Trắng, Tự Tay Nặn Bát Chẵn Lẻ Cực Phê.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/room-overlay.css">
+  <script src="/js/i18n.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/room-overlay.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
@@ -379,6 +380,11 @@
 
       <!-- User Bar -->
       <div class="flex items-center gap-3">
+        <!-- Language Toggle -->
+        <button class="btn-lang-toggle px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-400 text-amber-200 text-xs font-bold hover:bg-amber-500/40 transition flex items-center gap-1.5" title="Switch Language / Đổi Ngôn Ngữ">
+          <span class="lang-switcher-flag">🇻🇳</span>
+          <span class="lang-switcher-text">VI</span>
+        </button>
         <div class="bg-black/50 border border-amber-500/50 rounded-full px-4 py-1.5 flex items-center gap-2">
           <span class="text-amber-400">🪙</span>
           <span class="font-extrabold text-amber-300 text-base" id="top-user-balance">50,000</span>
