@@ -20,6 +20,10 @@
     {
       "source": "/bacay",
       "destination": "/bacay.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
     }
   ]
 }

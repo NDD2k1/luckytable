@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Admin Dashboard — Lucky Table</title>
+  <meta name="description" content="Trung Tâm Quản Trị Hệ Thống Lucky Table — Quản lý trò chơi, tài khoản người chơi và bù xu phát sinh lỗi.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/wallet.js"></script>
+  <script src="/js/i18n.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+  <style>
+    :root {
+      --gold-primary: #ffd700;
+      --gold-deep: #b8860b;
+      --bg-dark: #0f0204;
+    }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: radial-gradient(ellipse 90% 60% at 50% 15%, rgba(185, 28, 28, 0.3) 0%, rgba(20, 2, 5, 0.98) 60%, rgba(8, 1, 2, 1) 100%);
+      color: #f1f2f6;
+      min-height: 100vh;
+    }
+    .font-royal { font-family: 'Playfair Display', serif; }
+    .gold-gradient-text {
+      background: linear-gradient(180deg, #ffffff 0%, #ffe680 40%, #d4af37 80%, #8c6218 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .admin-card {
+      background: linear-gradient(135deg, rgba(28, 5, 9, 0.85) 0%, rgba(15, 2, 4, 0.95) 100%);
+      border: 1.5px solid rgba(212, 175, 55, 0.35);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+    }
+    .chip-quick-btn {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #ffd700;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .chip-quick-btn:hover {
+      background: #ffd700;
+      color: #0b0204;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- ADMIN AUTH GUARD MODAL (Hiện nếu chưa đăng nhập quyền admin) -->
+  <div id="admin-auth-guard" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
+    <div class="admin-card max-w-md w-full p-6 border-2 border-amber-500 text-center relative shadow-2xl">
+      <div class="text-4xl mb-3">👑</div>
+      <h2 class="text-xl font-black text-amber-300 uppercase tracking-wider mb-2 font-royal">Xác Thực Quản Trị Viên</h2>
+      <p class="text-xs text-neutral-300 mb-5">Vui lòng đăng nhập với tài khoản Admin để truy cập trung tâm điều hành.</p>
+      
+      <form id="admin-login-form" class="space-y-4 text-left">
+        <div>
+          <label class="text-xs font-bold text-amber-200 block mb-1">Tài khoản Admin:</label>
+          <input type="text" id="admin-user-input" value="admin" class="w-full bg-black/60 border border-amber-500/50 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-amber-200 block mb-1">Mật khẩu:</label>
+          <input type="password" id="admin-pass-input" placeholder="Nhập mật khẩu admin..." class="w-full bg-black/60 border border-amber-500/50 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-amber-400">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-extrabold text-sm shadow-lg transition">
+          🔓 Mở Khóa Bảng Điều Khiển
+        </button>
+      </form>
+      <div class="mt-4 pt-3 border-t border-amber-500/20 text-xs text-neutral-400 flex justify-between items-center">
+        <span>Gợi ý: <code>admin</code> / <code>admin123</code></span>
+        <a href="/" class="text-amber-400 hover:underline">🏠 Về Sảnh</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP ADMIN NAVBAR -->
+  <header class="w-full bg-black/75 border-b border-amber-500/40 px-4 py-3 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-3">
+      
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs transition flex items-center gap-1.5">
+          🏠 <span>Về Sảnh</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">👑</span>
+          <div>
+            <h1 class="text-base sm:text-lg font-black gold-gradient-text uppercase font-royal tracking-wide">Trung Tâm Quản Trị</h1>
+            <span class="text-[10px] text-amber-200/60 block">Hệ Thống Casino Lucky Table &bull; Live Admin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Status & Action Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Badge Admin -->
+        <div class="bg-red-950/80 border border-red-500/60 rounded-full px-3 py-1 flex items-center gap-1.5 text-xs font-bold text-red-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="current-admin-name">Admin: admin</span>
+        </div>
+
+        <!-- Language Switcher -->
+        <button class="btn-lang-toggle px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-400 text-amber-200 text-xs font-bold flex items-center gap-1">
+          <span class="lang-switcher-flag">🇻🇳</span>
+          <span class="lang-switcher-text">VI</span>
+        </button>
+
+        <!-- Logout -->
+        <button id="btn-admin-logout" class="px-3 py-1 rounded-full bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 text-neutral-300 text-xs font-bold transition flex items-center gap-1">
+          🚪 <span>Đăng Xuất</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN ADMIN DASHBOARD CONTENT -->
+  <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1 space-y-6">
+
+    <!-- METRICS OVERVIEW (4 STAT CARDS) -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="admin-card p-4 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl">👥</div>
+        <div>
+          <span class="text-xs text-neutral-400 font-bold block">Tổng Người Dùng</span>
+          <span class="text-xl sm:text-2xl font-black text-amber-300" id="stat-total-users">--</span>
+        </div>
+      </div>
+
+      <div class="admin-card p-4 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl">🪙</div>
+        <div>
+          <span class="text-xs text-neutral-400 font-bold block">Xu Trong Lưu Thông</span>
+          <span class="text-xl sm:text-2xl font-black text-emerald-400" id="stat-total-coins">--</span>
+        </div>
+      </div>
+
+      <div class="admin-card p-4 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-2xl">🎮</div>
+        <div>
+          <span class="text-xs text-neutral-400 font-bold block">Trò Chơi Hoạt Động</span>
+          <span class="text-xl sm:text-2xl font-black text-blue-400" id="stat-active-games">4 / 6</span>
+        </div>
+      </div>
+
+      <div class="admin-card p-4 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-2xl">📋</div>
+        <div>
+          <span class="text-xs text-neutral-400 font-bold block">Lịch Sử Giao Dịch</span>
+          <span class="text-xl sm:text-2xl font-black text-purple-300" id="stat-total-txns">--</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: CỘNG / KHẤU TRỪ XU (BÙ LỖI CHUYỂN KHOẢN CHO NGƯỜI DÙNG) -->
+    <section class="admin-card p-5 border-amber-500/50">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-amber-500/20">
+        <div class="flex items-center gap-2">
+          <span class="text-xl text-amber-400">⚡</span>
+          <h2 class="text-base sm:text-lg font-extrabold text-amber-300 font-royal">Điều Chỉnh & Bù Xu Người Dùng (Hỗ Trợ Chuyển Khoản)</h2>
+        </div>
+        <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-bold">Cập Nhật Tức Thì</span>
+      </div>
+
+      <form id="form-adjust-balance" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- User target -->
+          <div>
+            <label class="text-xs font-bold text-neutral-300 block mb-1">Tài khoản người chơi:</label>
+            <input type="text" id="target-username" placeholder="Nhập username (vd: Player001, PlayerTest2k1)..." required class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+          </div>
+
+          <!-- Action type -->
+          <div>
+            <label class="text-xs font-bold text-neutral-300 block mb-1">Loại thao tác:</label>
+            <select id="adjust-type" class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+              <option value="ADD">🟢 Cộng Xu (Nạp bù sự cố / Quà tặng VIP)</option>
+              <option value="DEDUCT">🔴 Khấu Trừ Xu (Thu hồi sự cố)</option>
+            </select>
+          </div>
+
+          <!-- Amount -->
+          <div>
+            <label class="text-xs font-bold text-neutral-300 block mb-1">Số xu điều chỉnh:</label>
+            <input type="number" id="adjust-amount" min="1000" step="1000" placeholder="Nhập số xu (vd: 50000)..." required class="w-full bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <!-- Quick chips -->
+        <div class="flex items-center gap-2 flex-wrap text-xs">
+          <span class="text-neutral-400 font-bold">Chọn nhanh:</span>
+          <button type="button" class="chip-quick-btn" data-val="10000">+10.000</button>
+          <button type="button" class="chip-quick-btn" data-val="50000">+50.000</button>
+          <button type="button" class="chip-quick-btn" data-val="100000">+100.000</button>
+          <button type="button" class="chip-quick-btn" data-val="500000">+500.000</button>
+          <button type="button" class="chip-quick-btn" data-val="1000000">+1.000.000</button>
+        </div>
+
+        <!-- Reason -->
+        <div>
+          <label class="text-xs font-bold text-neutral-300 block mb-1">Lý do điều chỉnh (sẽ lưu vào lịch sử giao dịch):</label>
+          <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+            <input type="text" id="adjust-reason" value="Bù lỗi chuyển khoản ngân hàng" placeholder="Nhập lý do bù xu..." required class="flex-1 bg-black/50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+            <select id="reason-presets" class="bg-neutral-800 border border-neutral-600 rounded-xl px-3 py-2 text-xs text-neutral-200">
+              <option value="Bù lỗi chuyển khoản ngân hàng">Bù lỗi chuyển khoản ngân hàng</option>
+              <option value="Khắc phục sự cố gián đoạn đường truyền">Sự cố đường truyền</option>
+              <option value="Quà tặng tri ân thành viên VIP">Quà tặng VIP</option>
+              <option value="Hoàn tiền ván chơi lỗi kết nối">Hoàn tiền ván chơi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex justify-end pt-2">
+          <button type="submit" id="btn-submit-adjust" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white font-extrabold text-sm shadow-xl transition flex items-center gap-2">
+            <span>✔</span>
+            <span>Thực Hiện Điều Chỉnh Xu</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- SECTION 2: DANH SÁCH TÀI KHOẢN NGƯỜI DÙNG -->
+    <section class="admin-card p-5">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-amber-500/20 flex-wrap gap-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl text-amber-400">👥</span>
+          <h2 class="text-base sm:text-lg font-extrabold text-amber-300 font-royal">Danh Sách Người Chơi</h2>
+        </div>
+        
+        <!-- Search filter -->
+        <div class="w-full sm:w-64">
+          <input type="text" id="user-search-input" placeholder="Tìm kiếm tên tài khoản..." class="w-full bg-black/50 border border-amber-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400">
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-white/10">
+        <table class="w-full text-left text-xs text-neutral-300">
+          <thead class="bg-black/60 text-amber-300 font-extrabold uppercase border-b border-amber-500/30">
+            <tr>
+              <th class="p-3">Người Chơi</th>
+              <th class="p-3">Vai Trò</th>
+              <th class="p-3">VIP</th>
+              <th class="p-3">Số Dư Xu</th>
+              <th class="p-3">Giao Dịch Gần Nhất</th>
+              <th class="p-3 text-center">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="user-table-tbody" class="divide-y divide-white/5">
+            <tr>
+              <td colspan="6" class="p-4 text-center text-neutral-500">Đang tải danh sách người chơi...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 3: QUẢN LÝ TRẠNG THÁI TRÒ CHƠI -->
+    <section class="admin-card p-5">
+      <div class="flex items-center gap-2 pb-3 mb-4 border-b border-amber-500/20">
+        <span class="text-xl text-amber-400">🎮</span>
+        <h2 class="text-base sm:text-lg font-extrabold text-amber-300 font-royal">Trạng Thái Kho Trò Chơi</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="game-status-grid">
+        <!-- Game 1: Tai Xiu -->
+        <div class="p-3.5 rounded-xl bg-black/50 border border-amber-500/30 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🎲</span>
+            <div>
+              <span class="font-black text-amber-300 block text-sm">Tài Xỉu Bát Rồng 3D</span>
+              <span class="text-[11px] text-neutral-400">Tính năng Nặn Bát 360&deg; &bull; Live</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-[10px] font-extrabold">HOẠT ĐỘNG</span>
+        </div>
+
+        <!-- Game 2: Xoc Dia -->
+        <div class="p-3.5 rounded-xl bg-black/50 border border-amber-500/30 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🥢</span>
+            <div>
+              <span class="font-black text-amber-300 block text-sm">Xóc Đĩa Tứ Linh 3D</span>
+              <span class="text-[11px] text-neutral-400">Bát Sứ 4 Quân Vị &bull; Nặn Bát</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-[10px] font-extrabold">HOẠT ĐỘNG</span>
+        </div>
+
+        <!-- Game 3: Bau Cua -->
+        <div class="p-3.5 rounded-xl bg-black/50 border border-amber-500/30 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🦀</span>
+            <div>
+              <span class="font-black text-amber-300 block text-sm">Bầu Cua Tôm Cá 3D</span>
+              <span class="text-[11px] text-neutral-400">6 Linh Vật &bull; Đĩa Sứ Three.js</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-[10px] font-extrabold">HOẠT ĐỘNG</span>
+        </div>
+
+        <!-- Game 4: Ba Cay -->
+        <div class="p-3.5 rounded-xl bg-black/50 border border-amber-500/30 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🃏</span>
+            <div>
+              <span class="font-black text-amber-300 block text-sm">Ba Cây Hoàng Gia VIP</span>
+              <span class="text-[11px] text-neutral-400">Đánh Ké, Cướp Chương, Nặn Bài</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-[10px] font-extrabold">HOẠT ĐỘNG</span>
+        </div>
+
+        <!-- Game 5: Slots Tay Du Ky -->
+        <div class="p-3.5 rounded-xl bg-black/30 border border-white/10 flex items-center justify-between opacity-75">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🎰</span>
+            <div>
+              <span class="font-black text-amber-300 block text-sm">Nổ Hũ Tây Du Ký</span>
+              <span class="text-[11px] text-neutral-400">Jackpot Khủng: 5.800.000 xu</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold">BẢO TRÌ</span>
+        </div>
+
+        <!-- Game 6: Ban Ca -->
+        <div class="p-3.5 rounded-xl bg-black/30 border border-white/10 flex items-center justify-between opacity-75">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🐟</span>
+            <div>
+              <span class="font-black text-amber-300 block text-sm">Bắn Cá Thần Tài 3D</span>
+              <span class="text-[11px] text-neutral-400">Đại Dương 3D &bull; Đang Nâng Cấp</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold">BẢO TRÌ</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: NHẬT KÝ ĐIỀU CHỈNH XU GẦN ĐÂY -->
+    <section class="admin-card p-5">
+      <div class="flex items-center gap-2 pb-3 mb-4 border-b border-amber-500/20">
+        <span class="text-xl text-amber-400">📜</span>
+        <h2 class="text-base sm:text-lg font-extrabold text-amber-300 font-royal">Nhật Ký Điều Chỉnh & Bù Xu Gần Đây</h2>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-white/10">
+        <table class="w-full text-left text-xs text-neutral-300">
+          <thead class="bg-black/60 text-amber-300 font-extrabold uppercase border-b border-amber-500/30">
+            <tr>
+              <th class="p-3">Thời Gian</th>
+              <th class="p-3">Người Nhận</th>
+              <th class="p-3">Loại Thao Tác</th>
+              <th class="p-3">Số Xu</th>
+              <th class="p-3">Lý Do / Ghi Chú</th>
+              <th class="p-3">Trạng Thái</th>
+            </tr>
+          </thead>
+          <tbody id="audit-log-tbody" class="divide-y divide-white/5">
+            <tr>
+              <td colspan="6" class="p-4 text-center text-neutral-500">Chưa có giao dịch điều chỉnh nào trong phiên.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-black/95 border-2 border-amber-400 text-amber-300 px-6 py-2.5 rounded-full font-bold text-sm shadow-2xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+    Thông báo
+  </div>
+
+  <script>
+    /**
+     * ADMIN DASHBOARD CONTROLLER
+     * Manages users list, coin compensation, and game states
+     */
+    class AdminDashboard {
+      constructor() {
+        this.users = [];
+        this.auditLogs = [];
+        this.init();
+      }
+
+      init() {
+        this.checkAdminAuth();
+        this.bindEvents();
+        this.fetchMetrics();
+        this.fetchUsers();
+      }
+
+      checkAdminAuth() {
+        const user = window.Wallet ? window.Wallet.getUser() : null;
+        const isAdmin = user && (user.role === 'admin' || user.username.toLowerCase() === 'admin');
+        const guardModal = document.getElementById('admin-auth-guard');
+
+        if (!isAdmin) {
+          guardModal.style.display = 'flex';
+        } else {
+          guardModal.style.display = 'none';
+          document.getElementById('current-admin-name').textContent = `Admin: ${user.username}`;
+        }
+      }
+
+      bindEvents() {
+        // Admin Login Form
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const username = document.getElementById('admin-user-input').value.trim();
+          const password = document.getElementById('admin-pass-input').value;
+
+          if (!username || !password) {
+            this.showToast('Vui lòng nhập đầy đủ tài khoản và mật khẩu admin!', 'error');
+            return;
+          }
+
+          if (username.toLowerCase() === 'admin' && password === 'admin123') {
+            const adminUser = {
+              id: 'admin',
+              username: 'admin',
+              role: 'admin',
+              balance: 999999999,
+              vipLevel: 10,
+              avatar: 'assets/avatar.png',
+              isLoggedIn: true
+            };
+            localStorage.setItem('lucky_casino_user', JSON.stringify(adminUser));
+            document.getElementById('admin-auth-guard').style.display = 'none';
+            document.getElementById('current-admin-name').textContent = `Admin: admin`;
+            this.showToast('🎉 Đăng nhập Admin thành công!', 'success');
+            this.fetchMetrics();
+            this.fetchUsers();
+          } else {
+            this.showToast('Sai tài khoản hoặc mật khẩu Admin!', 'error');
+          }
+        });
+
+        // Logout
+        document.getElementById('btn-admin-logout').addEventListener('click', () => {
+          localStorage.removeItem('lucky_casino_user');
+          window.location.href = '/';
+        });
+
+        // Quick chip buttons
+        document.querySelectorAll('.chip-quick-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-val');
+            document.getElementById('adjust-amount').value = val;
+          });
+        });
+
+        // Reason preset change
+        document.getElementById('reason-presets').addEventListener('change', (e) => {
+          document.getElementById('adjust-reason').value = e.target.value;
+        });
+
+        // Adjust Balance Form Submit
+        document.getElementById('form-adjust-balance').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleAdjustBalance();
+        });
+
+        // Search user filter
+        document.getElementById('user-search-input').addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase().trim();
+          this.renderUsersTable(query);
+        });
+      }
+
+      async fetchMetrics() {
+        try {
+          const res = await fetch('/api/admin/stats');
+          const data = await res.json();
+          if (data && data.success && data.data) {
+            document.getElementById('stat-total-users').textContent = data.data.totalUsers.toLocaleString('vi-VN');
+            document.getElementById('stat-total-coins').textContent = data.data.totalBalance.toLocaleString('vi-VN') + ' xu';
+            document.getElementById('stat-total-txns').textContent = data.data.totalTransactions.toLocaleString('vi-VN');
+          }
+        } catch (e) {
+          // Client fallback metrics
+          const accounts = JSON.parse(localStorage.getItem('lucky_casino_accounts') || '{}');
+          const count = Object.keys(accounts).length + 2;
+          document.getElementById('stat-total-users').textContent = count.toString();
+          document.getElementById('stat-total-coins').textContent = '1,250,000 xu';
+        }
+      }
+
+      async fetchUsers() {
+        try {
+          const res = await fetch('/api/admin/users');
+          const data = await res.json();
+          if (data && data.success && data.data) {
+            this.users = data.data;
+          }
+        } catch (e) {
+          // Fallback to local accounts
+          this.users = [
+            { id: 'admin', username: 'admin', role: 'admin', balance: 999999999, vipLevel: 10 },
+            { id: 'Player001', username: 'Player001', role: 'player', balance: 50000, vipLevel: 2 }
+          ];
+          const localAccs = JSON.parse(localStorage.getItem('lucky_casino_accounts') || '{}');
+          for (const [k, v] of Object.entries(localAccs)) {
+            if (!this.users.some(u => u.username === k)) {
+              this.users.push({ id: k, username: k, role: 'player', balance: v.balance || 50000, vipLevel: 1 });
+            }
+          }
+        }
+        this.renderUsersTable();
+      }
+
+      renderUsersTable(query = '') {
+        const tbody = document.getElementById('user-table-tbody');
+        const filtered = this.users.filter(u => u.username.toLowerCase().includes(query));
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-neutral-500">Không tìm thấy người chơi nào</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(u => `
+          <tr class="hover:bg-white/5 transition">
+            <td class="p-3 font-bold flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-amber-500/20 border border-amber-400 flex items-center justify-center text-xs">
+                ${u.role === 'admin' ? '👑' : '👤'}
+              </span>
+              <span class="${u.role === 'admin' ? 'text-amber-300 font-black' : 'text-white'}">${u.username}</span>
+            </td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-red-500/20 text-red-300 border border-red-500/40' : 'bg-neutral-800 text-neutral-300'} font-bold text-[10px]">
+                ${u.role === 'admin' ? 'ADMIN' : 'PLAYER'}
+              </span>
+            </td>
+            <td class="p-3 font-black text-amber-400">VIP ${u.vipLevel || 1}</td>
+            <td class="p-3 font-extrabold text-emerald-400">${Number(u.balance || 0).toLocaleString('vi-VN')} xu</td>
+            <td class="p-3 text-[11px] text-neutral-400">
+              ${u.transactions && u.transactions[0] ? `${u.transactions[0].title} (${u.transactions[0].type === 'DEPOSIT' ? '+' : '-'}${Number(u.transactions[0].amount).toLocaleString('vi-VN')})` : 'Chưa có GD'}
+            </td>
+            <td class="p-3 text-center">
+              <button onclick="adminDashboard.selectUserForAdjustment('${u.username}')" class="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 border border-amber-400/50 text-amber-300 font-bold text-[11px] transition">
+                + Bù Xu
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      selectUserForAdjustment(username) {
+        document.getElementById('target-username').value = username;
+        document.getElementById('form-adjust-balance').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('adjust-amount').focus();
+        this.showToast(`Đã chọn tài khoản ${username} để điều chỉnh xu`, 'info');
+      }
+
+      async handleAdjustBalance() {
+        const username = document.getElementById('target-username').value.trim();
+        const type = document.getElementById('adjust-type').value;
+        const amount = parseInt(document.getElementById('adjust-amount').value, 10);
+        const reason = document.getElementById('adjust-reason').value.trim();
+
+        if (!username || isNaN(amount) || amount <= 0) {
+          this.showToast('Vui lòng nhập đầy đủ tên tài khoản và số xu hợp lệ!', 'error');
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/admin/adjust-balance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, amount, type, reason })
+          });
+          const data = await res.json();
+
+          if (data && data.success) {
+            this.showToast(data.message, 'success');
+
+            // If the adjusted user is current user in Wallet, update local storage
+            if (window.Wallet) {
+              const cur = window.Wallet.getUser();
+              if (cur && cur.username.toLowerCase() === username.toLowerCase()) {
+                window.Wallet.setBalance(data.user.balance, false);
+              }
+            }
+
+            // Append to audit logs
+            this.auditLogs.unshift({
+              timestamp: new Date().toLocaleTimeString('vi-VN'),
+              username,
+              type,
+              amount,
+              reason
+            });
+            this.renderAuditLog();
+
+            // Refresh lists
+            this.fetchUsers();
+            this.fetchMetrics();
+
+            // Reset form
+            document.getElementById('adjust-amount').value = '';
+          } else {
+            this.showToast(data.message || 'Lỗi khi điều chỉnh số dư!', 'error');
+          }
+        } catch (e) {
+          this.showToast('Lỗi kết nối khi gửi yêu cầu điều chỉnh!', 'error');
+        }
+      }
+
+      renderAuditLog() {
+        const tbody = document.getElementById('audit-log-tbody');
+        if (this.auditLogs.length === 0) return;
+
+        tbody.innerHTML = this.auditLogs.map(log => `
+          <tr class="hover:bg-white/5 transition">
+            <td class="p-3 text-neutral-400 font-mono">${log.timestamp}</td>
+            <td class="p-3 font-bold text-white">${log.username}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded-full ${log.type === 'ADD' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'} font-bold text-[10px]">
+                ${log.type === 'ADD' ? 'CỘNG XU' : 'KHẤU TRỪ'}
+              </span>
+            </td>
+            <td class="p-3 font-black ${log.type === 'ADD' ? 'text-emerald-400' : 'text-red-400'}">
+              ${log.type === 'ADD' ? '+' : '-'}${Number(log.amount).toLocaleString('vi-VN')} xu
+            </td>
+            <td class="p-3 text-neutral-300">${log.reason}</td>
+            <td class="p-3 font-bold text-emerald-400">Thành công</td>
+          </tr>
+        `).join('');
+      }
+
+      showToast(msg, type = 'info') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.borderColor = type === 'error' ? '#ef4444' : (type === 'success' ? '#22c55e' : '#ffd700');
+        toast.style.color = type === 'error' ? '#f87171' : (type === 'success' ? '#4ade80' : '#ffd700');
+        toast.classList.remove('opacity-0', 'pointer-events-none');
+        setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 3200);
+      }
+    }
+
+    let adminDashboard;
+    document.addEventListener('DOMContentLoaded', () => {
+      adminDashboard = new AdminDashboard();
+    });
+  </script>
+</body>
+</html>

@@ -679,6 +679,12 @@ class PortalController {
     if (this.dom.userProfileBadge) {
       this.dom.userProfileBadge.style.display = isLoggedIn ? 'flex' : 'none';
     }
+    // Admin dashboard button visibility (Only visible to admin role)
+    const isAdmin = !!(this.user && (this.user.role === 'admin' || (this.user.username && this.user.username.toLowerCase() === 'admin')));
+    const adminBtn = document.getElementById('btn-admin-dashboard');
+    if (adminBtn) {
+      adminBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+    }
   }
 
   handleDeposit() {

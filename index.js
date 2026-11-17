@@ -23,6 +23,25 @@ app.use(express.static(publicDir));
 
 // Bộ nhớ đệm tạm thời cho môi trường Serverless Vercel
 const users = {
+  admin: {
+    id: 'admin',
+    username: 'admin',
+    password: 'admin123',
+    role: 'admin',
+    balance: 999999999,
+    vipLevel: 10,
+    avatar: 'assets/avatar.png',
+    transactions: [
+      {
+        id: 'SYS1001',
+        type: 'DEPOSIT',
+        title: 'Hệ thống Quản Trị Viên',
+        amount: 999999999,
+        status: 'SUCCESS',
+        timestamp: new Date().toISOString()
+      }
+    ]
+  },
   Player001: {
     id: 'Player001',
     username: 'Player001',
@@ -174,6 +193,94 @@ router.post('/auth/login', (req, res) => {
   const userSafe = { ...existing };
   delete userSafe.password;
   res.json({ success: true, message: 'Đăng nhập thành công!', user: userSafe });
+});
+
+// =========================================================================
+// ADMIN DASHBOARD APIS
+// =========================================================================
+
+// Get dashboard statistical metrics
+router.get('/admin/stats', (req, res) => {
+  const userList = Object.values(users);
+  const totalBalance = userList.reduce((acc, u) => acc + (u.balance || 0), 0);
+  const totalTransactions = userList.reduce((acc, u) => acc + (u.transactions ? u.transactions.length : 0), 0);
+  res.json({
+    success: true,
+    data: {
+      totalUsers: userList.length,
+      totalBalance,
+      totalTransactions,
+      activeGames: 4,
+      totalGames: 6
+    }
+  });
+});
+
+// Get user accounts list
+router.get('/admin/users', (req, res) => {
+  const userList = Object.values(users).map(u => {
+    const safe = { ...u };
+    delete safe.password;
+    return safe;
+  });
+  res.json({ success: true, count: userList.length, data: userList });
+});
+
+// Adjust user coin balance (compensation or deduction)
+router.post('/admin/adjust-balance', (req, res) => {
+  const { username, amount, type, reason } = req.body;
+  if (!username) {
+    return res.status(400).json({ success: false, message: 'Vui lòng cung cấp tên người dùng!' });
+  }
+  const cleanAmount = parseInt(amount, 10);
+  if (isNaN(cleanAmount) || cleanAmount <= 0) {
+    return res.status(400).json({ success: false, message: 'Số xu điều chỉnh phải là số dương hợp lệ!' });
+  }
+
+  const cleanUser = username.trim();
+  if (!users[cleanUser]) {
+    users[cleanUser] = {
+      id: cleanUser,
+      username: cleanUser,
+      balance: 50000,
+      vipLevel: 1,
+      role: cleanUser.toLowerCase() === 'admin' ? 'admin' : 'player',
+      avatar: 'assets/avatar.png',
+      transactions: []
+    };
+  }
+
+  const isAdd = type !== 'DEDUCT';
+  if (isAdd) {
+    users[cleanUser].balance += cleanAmount;
+  } else {
+    users[cleanUser].balance = Math.max(0, users[cleanUser].balance - cleanAmount);
+  }
+
+  const txnId = 'ADJ' + Date.now();
+  const txnRecord = {
+    id: txnId,
+    type: isAdd ? 'DEPOSIT' : 'WITHDRAW',
+    title: reason || (isAdd ? 'Cộng xu hỗ trợ kỹ thuật (Admin)' : 'Khấu trừ xu kỹ thuật (Admin)'),
+    amount: cleanAmount,
+    status: 'SUCCESS',
+    timestamp: new Date().toISOString()
+  };
+
+  if (!users[cleanUser].transactions) users[cleanUser].transactions = [];
+  users[cleanUser].transactions.unshift(txnRecord);
+
+  res.json({
+    success: true,
+    message: `Đã ${isAdd ? 'cộng' : 'khấu trừ'} thành công ${cleanAmount.toLocaleString('vi-VN')} xu cho tài khoản ${cleanUser}!`,
+    user: {
+      id: users[cleanUser].id,
+      username: users[cleanUser].username,
+      balance: users[cleanUser].balance,
+      vipLevel: users[cleanUser].vipLevel
+    },
+    transaction: txnRecord
+  });
 });
 
 // Game News
@@ -329,6 +436,10 @@ app.use('/api', router);
 // Route HTML phục vụ trực tiếp các trang game
 app.get('/', (req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+app.get(['/dashboard', '/dashboard.html'], (req, res) => {
+  res.sendFile(path.join(publicDir, 'dashboard.html'));
 });
 
 app.get(['/taixiu', '/taixiu.html'], (req, res) => {
